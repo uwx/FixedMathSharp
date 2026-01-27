@@ -361,7 +361,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator *(Fixed64 x, int y)
         {
-            return x + new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I);
+            return new Fixed64(x.m_rawValue * (long)y);
         }
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 operator *(int x, Fixed64 y)
         {
-            return y * x;
+            return new Fixed64(y.m_rawValue * (long)x);
         }
 
         /// <summary>
