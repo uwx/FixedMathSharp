@@ -121,7 +121,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int RoundToInt(this Fixed64 x)
         {
-            return (int)FixedMath.Round(x);
+            return Fixed64.RawToInt(Round(x));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CeilToInt(this Fixed64 x)
         {
-            return (int)FixedMath.Ceiling(x);
+            return Fixed64.RawToInt(Ceiling(x));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int FloorToInt(this Fixed64 x)
         {
-            return (int)Floor(x);
+            return Fixed64.RawToInt(Floor(x));
         }
 
         #endregion
