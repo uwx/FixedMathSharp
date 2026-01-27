@@ -278,6 +278,7 @@ namespace FixedMathSharp
             return new Fixed64((long)x << FixedMath.SHIFT_AMOUNT_I) - y;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator *(Fixed64 a, Fixed64 b)
         {
             // Widen to 128 bits to prevent overflow during multiplication
