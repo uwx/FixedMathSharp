@@ -89,42 +89,42 @@ namespace FixedMathSharp
         public Fixed64 MinX
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.x < Corner2.x ? Corner1.x : Corner2.x;
+            get => Corner1.X < Corner2.X ? Corner1.X : Corner2.X;
         }
 
         [IgnoreMember]
         public Fixed64 MaxX
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.x > Corner2.x ? Corner1.x : Corner2.x;
+            get => Corner1.X > Corner2.X ? Corner1.X : Corner2.X;
         }
 
         [IgnoreMember]
         public Fixed64 MinY
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.y < Corner2.y ? Corner1.y : Corner2.y;
+            get => Corner1.Y < Corner2.Y ? Corner1.Y : Corner2.Y;
         }
 
         [IgnoreMember]
         public Fixed64 MaxY
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.y > Corner2.y ? Corner1.y : Corner2.y;
+            get => Corner1.Y > Corner2.Y ? Corner1.Y : Corner2.Y;
         }
 
         [IgnoreMember]
         public Fixed64 MinZ
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.z < Corner2.z ? Corner1.z : Corner2.z;
+            get => Corner1.Z < Corner2.Z ? Corner1.Z : Corner2.Z;
         }
 
         [IgnoreMember]
         public Fixed64 MaxZ
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Corner1.z > Corner2.z ? Corner1.z : Corner2.z;
+            get => Corner1.Z > Corner2.Z ? Corner1.Z : Corner2.Z;
         }
 
         /// <summary>
@@ -163,9 +163,9 @@ namespace FixedMathSharp
         public bool Contains(Vector3d point)
         {
             // Check if the point is within the bounds of the area (including boundaries)
-            return point.x >= MinX && point.x <= MaxX 
-                && point.y >= MinY && point.y <= MaxY 
-                && point.z >= MinZ && point.z <= MaxZ;
+            return point.X >= MinX && point.X <= MaxX 
+                && point.Y >= MinY && point.Y <= MaxY 
+                && point.Z >= MinZ && point.Z <= MaxZ;
         }
 
         /// <summary>
@@ -184,23 +184,23 @@ namespace FixedMathSharp
                             return true;  // Full containment
 
                         // Determine which axis is "flat" (thickness zero)
-                        bool flatX = Min.x == Max.x && other.Min.x == other.Max.x;
-                        bool flatY = Min.y == Max.y && other.Min.y == other.Max.y;
-                        bool flatZ = Min.z == Max.z && other.Min.z == other.Max.z;
+                        bool flatX = Min.X == Max.X && other.Min.X == other.Max.X;
+                        bool flatY = Min.Y == Max.Y && other.Min.Y == other.Max.Y;
+                        bool flatZ = Min.Z == Max.Z && other.Min.Z == other.Max.Z;
 
                         if (flatZ) // Rectangle in XY
-                            return !(Max.x < other.Min.x || Min.x > other.Max.x ||
-                                     Max.y < other.Min.y || Min.y > other.Max.y);
+                            return !(Max.X < other.Min.X || Min.X > other.Max.X ||
+                                     Max.Y < other.Min.Y || Min.Y > other.Max.Y);
                         else if (flatY) // Rectangle in XZ
-                            return !(Max.x < other.Min.x || Min.x > other.Max.x ||
-                                     Max.z < other.Min.z || Min.z > other.Max.z);
+                            return !(Max.X < other.Min.X || Min.X > other.Max.X ||
+                                     Max.Z < other.Min.Z || Min.Z > other.Max.Z);
                         else if (flatX) // Rectangle in YZ
-                            return !(Max.y < other.Min.y || Min.y > other.Max.y ||
-                                     Max.z < other.Min.z || Min.z > other.Max.z);
+                            return !(Max.Y < other.Min.Y || Min.Y > other.Max.Y ||
+                                     Max.Z < other.Min.Z || Min.Z > other.Max.Z);
                         else // fallback to 3D volume logic
-                            return !(Max.x < other.Min.x || Min.x > other.Max.x ||
-                                     Max.y < other.Min.y || Min.y > other.Max.y ||
-                                     Max.z < other.Min.z || Min.z > other.Max.z);
+                            return !(Max.X < other.Min.X || Min.X > other.Max.X ||
+                                     Max.Y < other.Min.Y || Min.Y > other.Max.Y ||
+                                     Max.Z < other.Min.Z || Min.Z > other.Max.Z);
                     }
                 case BoundingSphere sphere:
                     // Find the closest point on the area to the sphere's center

@@ -29,7 +29,7 @@ namespace FixedMathSharp.Tests
             var extractedRotation = FixedQuaternion.FromMatrix(matrix);
 
             // Check if the extracted rotation matches the original quaternion
-            Assert.True(extractedRotation.FuzzyEqual(rotation, new Fixed64(0.0001)),
+            Assert.True(extractedRotation.FuzzyEqual(rotation, Fixed64.CreateFromDouble(0.0001)),
                 $"Extracted rotation {extractedRotation} does not match expected {rotation}.");
         }
 
@@ -82,9 +82,11 @@ namespace FixedMathSharp.Tests
             matrix.SetTransform(translation, rotation, scale);
 
             // Extract and validate translation, scale, and rotation
-            Assert.Equal(translation, matrix.Translation);
-            Assert.Equal(scale, matrix.Scale);
-            Assert.True(matrix.Rotation.FuzzyEqual(rotation, new Fixed64(0.0001)),
+            Assert.True(matrix.Translation.FuzzyEqual(translation, Fixed64.CreateFromDouble(0.0001)),
+                $"Extracted traslation {matrix.Translation} does not match expected {translation}.");
+            Assert.True(matrix.Scale.FuzzyEqual(scale, Fixed64.CreateFromDouble(0.0001)),
+                $"Extracted scale {matrix.Scale} does not match expected {scale}.");
+            Assert.True(matrix.Rotation.FuzzyEqual(rotation, Fixed64.CreateFromDouble(0.0001)),
                 $"Extracted rotation {matrix.Rotation} does not match expected {rotation}.");
         }
 
@@ -213,9 +215,9 @@ namespace FixedMathSharp.Tests
             // Instead of direct equality, compare the decomposed components
             Assert.True(Fixed4x4.Decompose(trsMatrix, out var decomposedScale, out var decomposedRotation, out var decomposedTranslation));
 
-            Assert.True(translation.FuzzyEqual(decomposedTranslation, new Fixed64(0.0001)));
-            Assert.True(scale.FuzzyEqual(decomposedScale, new Fixed64(0.0001)));
-            Assert.True(decomposedRotation.FuzzyEqual(rotation, new Fixed64(0.0001)),
+            Assert.True(translation.FuzzyEqual(decomposedTranslation, Fixed64.CreateFromDouble(0.0001)));
+            Assert.True(scale.FuzzyEqual(decomposedScale, Fixed64.CreateFromDouble(0.0001)));
+            Assert.True(decomposedRotation.FuzzyEqual(rotation, Fixed64.CreateFromDouble(0.0001)),
                 $"Expected {rotation} but got {decomposedRotation}");
         }
 
@@ -277,7 +279,7 @@ namespace FixedMathSharp.Tests
             var localPoint = Fixed4x4.InverseTransformPoint(transformMatrix, worldPoint);
             var transformedBack = Fixed4x4.TransformPoint(transformMatrix, localPoint);
 
-            Assert.True(worldPoint.FuzzyEqual(transformedBack, new Fixed64(0.01)),
+            Assert.True(worldPoint.FuzzyEqual(transformedBack, Fixed64.CreateFromDouble(0.01)),
                 $"Expected {worldPoint} but got {transformedBack}");
         }
 
@@ -294,7 +296,7 @@ namespace FixedMathSharp.Tests
             var worldPoint = Fixed4x4.TransformPoint(transformMatrix, localPoint);
             var inverseTransformedPoint = Fixed4x4.InverseTransformPoint(transformMatrix, worldPoint);
 
-            Assert.True(localPoint.FuzzyEqual(inverseTransformedPoint, new Fixed64(0.0001)),
+            Assert.True(localPoint.FuzzyEqual(inverseTransformedPoint, Fixed64.CreateFromDouble(0.0001)),
                 $"Expected {localPoint} but got {inverseTransformedPoint}");
         }
 
@@ -311,7 +313,7 @@ namespace FixedMathSharp.Tests
             var transformedPoint = Fixed4x4.TransformPoint(transformMatrix, originalPoint);
             var inverseTransformedPoint = Fixed4x4.InverseTransformPoint(transformMatrix, transformedPoint);
 
-            Assert.True(originalPoint.FuzzyEqual(inverseTransformedPoint, new Fixed64(0.0001)),
+            Assert.True(originalPoint.FuzzyEqual(inverseTransformedPoint, Fixed64.CreateFromDouble(0.0001)),
                 $"Expected {originalPoint} but got {inverseTransformedPoint}");
         }
 

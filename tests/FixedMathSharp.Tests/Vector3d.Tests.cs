@@ -24,9 +24,9 @@ namespace FixedMathSharp.Tests
         public void Constructor_Default_InitializesToZero()
         {
             var vector = new Vector3d();
-            Assert.Equal(Fixed64.Zero, vector.x);
-            Assert.Equal(Fixed64.Zero, vector.y);
-            Assert.Equal(Fixed64.Zero, vector.z);
+            Assert.Equal(Fixed64.Zero, vector.X);
+            Assert.Equal(Fixed64.Zero, vector.Y);
+            Assert.Equal(Fixed64.Zero, vector.Z);
         }
 
         [Fact]
@@ -36,18 +36,18 @@ namespace FixedMathSharp.Tests
             var y = new Fixed64(2);
             var z = new Fixed64(3);
             var vector = new Vector3d(x, y, z);
-            Assert.Equal(x, vector.x);
-            Assert.Equal(y, vector.y);
-            Assert.Equal(z, vector.z);
+            Assert.Equal(x, vector.X);
+            Assert.Equal(y, vector.Y);
+            Assert.Equal(z, vector.Z);
         }
 
         [Fact]
         public void Constructor_Float_InitializesComponents()
         {
             var vector = new Vector3d(1.5f, -2.5f, 3.0f);
-            Assert.Equal(new Fixed64(1.5), vector.x);
-            Assert.Equal(new Fixed64(-2.5), vector.y);
-            Assert.Equal(new Fixed64(3.0), vector.z);
+            Assert.Equal(Fixed64.CreateFromDouble(1.5), vector.X);
+            Assert.Equal(Fixed64.CreateFromDouble(-2.5), vector.Y);
+            Assert.Equal(Fixed64.CreateFromDouble(3.0), vector.Z);
         }
 
         #endregion
@@ -259,7 +259,7 @@ namespace FixedMathSharp.Tests
 
             // Lerp at t = 0.5 (should be the midpoint)
             var midpoint = new Vector3d(2, 2, 2);
-            result = Vector3d.Lerp(start, end, new Fixed64(0.5));
+            result = Vector3d.Lerp(start, end, Fixed64.CreateFromDouble(0.5));
             Assert.Equal(midpoint, result);
         }
 
@@ -313,10 +313,10 @@ namespace FixedMathSharp.Tests
             Assert.Equal(end, result);
 
             // Slerp at t = 0.5 (should return a midpoint vector on the unit circle)
-            result = Vector3d.Slerp(start, end, new Fixed64(0.5));
+            result = Vector3d.Slerp(start, end, Fixed64.CreateFromDouble(0.5));
             // Since the midpoint on a unit circle between (1, 0, 0) and (0, 1, 0) should be (0.707, 0.707, 0)
-            var expected = new Vector3d(new Fixed64(0.70710678118), new Fixed64(0.70710678118), Fixed64.Zero);
-            Assert.True(Vector3d.AreAlmostParallel(result, expected, new Fixed64(0.999)));
+            var expected = new Vector3d(Fixed64.CreateFromDouble(0.70710678118), Fixed64.CreateFromDouble(0.70710678118), Fixed64.Zero);
+            Assert.True(Vector3d.AreAlmostParallel(result, expected, Fixed64.CreateFromDouble(0.999)));
         }
 
         [Fact]
@@ -511,7 +511,7 @@ namespace FixedMathSharp.Tests
             var expected = new Vector3d(90, 180, 0);
 
             // Use FuzzyEqual with a small allowed difference
-            Assert.True(result.FuzzyEqualAbsolute(expected, new Fixed64(0.0001)));
+            Assert.True(result.FuzzyEqualAbsolute(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
         [Fact]
@@ -522,7 +522,7 @@ namespace FixedMathSharp.Tests
             var expected = new Vector3d(FixedMath.PiOver2, FixedMath.PI, Fixed64.Zero);
 
             // Use FuzzyEqual with a small allowed difference
-            Assert.True(result.FuzzyEqualAbsolute(expected, new Fixed64(0.0001)));
+            Assert.True(result.FuzzyEqualAbsolute(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
         [Fact]
@@ -530,7 +530,7 @@ namespace FixedMathSharp.Tests
         {
             var vector1 = new Vector3d(2, 2, 2);
             var vector2 = new Vector3d(2.1, 2.1, 2.1);
-            var allowedDifference = new Fixed64(0.15);
+            var allowedDifference = Fixed64.CreateFromDouble(0.15);
 
             // Should be approximately equal given the allowed difference of 0.15
             Assert.True(vector1.FuzzyEqualAbsolute(vector2, allowedDifference));
@@ -541,7 +541,7 @@ namespace FixedMathSharp.Tests
         {
             var vector1 = new Vector3d(100, 100, 100);
             var vector2 = new Vector3d(101, 101, 101);
-            var percentage = new Fixed64(0.02); // Allow a 2% difference
+            var percentage = Fixed64.CreateFromDouble(0.02); // Allow a 2% difference
 
             // Should be approximately equal within the percentage
             Assert.True(vector1.FuzzyEqual(vector2, percentage));
@@ -575,7 +575,7 @@ namespace FixedMathSharp.Tests
             var quaternion = FixedQuaternion.FromEulerAngles(new Fixed64(0), new Fixed64(0), FixedMath.PiOver2); // 90° rotation around Z-axis
 
             var result = vector.Rotate(position, quaternion);
-            Assert.True(result.FuzzyEqual(new Vector3d(0, 1, 0), new Fixed64(0.0001))); // Allow small error tolerance
+            Assert.True(result.FuzzyEqual(new Vector3d(0, 1, 0), Fixed64.CreateFromDouble(0.0001))); // Allow small error tolerance
         }
 
         [Fact]
@@ -586,7 +586,7 @@ namespace FixedMathSharp.Tests
             var quaternion = FixedQuaternion.FromEulerAngles(new Fixed64(0), new Fixed64(0), FixedMath.PiOver2); // 90° rotation around Z-axis
 
             var result = vector.InverseRotate(position, quaternion);
-            Assert.True(result.FuzzyEqual(new Vector3d(1, 0, 0), new Fixed64(0.0001))); // Allow small error tolerance
+            Assert.True(result.FuzzyEqual(new Vector3d(1, 0, 0), Fixed64.CreateFromDouble(0.0001))); // Allow small error tolerance
         }
 
         #endregion

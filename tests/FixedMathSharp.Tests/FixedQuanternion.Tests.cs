@@ -49,7 +49,7 @@ namespace FixedMathSharp.Tests
             quaternion.Normalize();
 
             var magnitudeSqr = quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w;
-            Assert.Equal(Fixed64.One, magnitudeSqr, new Fixed64(0.0001)); // Ensure magnitude squared is 1
+            Assert.Equal(Fixed64.One, magnitudeSqr, Fixed64.CreateFromDouble(0.0001)); // Ensure magnitude squared is 1
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace FixedMathSharp.Tests
             var normalized = FixedQuaternion.GetNormalized(quaternion);
 
             var magnitudeSqr = normalized.x * normalized.x + normalized.y * normalized.y + normalized.z * normalized.z + normalized.w * normalized.w;
-            Assert.Equal(Fixed64.One, magnitudeSqr, new Fixed64(0.0001));
+            Assert.Equal(Fixed64.One, magnitudeSqr, Fixed64.CreateFromDouble(0.0001));
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace FixedMathSharp.Tests
             var quaternion = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(90), new Fixed64(0), new Fixed64(0));
             var eulerAngles = quaternion.EulerAngles;
 
-            Assert.True(eulerAngles.FuzzyEqual(new Vector3d(90, 0, 0), new Fixed64(0.0001))); // Expected result: (90, 0, 0) degrees
+            Assert.True(eulerAngles.FuzzyEqual(new Vector3d(90, 0, 0), Fixed64.CreateFromDouble(0.0001))); // Expected result: (90, 0, 0) degrees
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace FixedMathSharp.Tests
             var quaternion = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(0), new Fixed64(0), new Fixed64(90));
             var expected = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, FixedMath.Sqrt(Fixed64.Half), FixedMath.Sqrt(Fixed64.Half));
 
-            Assert.True(quaternion.FuzzyEqual(expected, new Fixed64(0.0001)),
+            Assert.True(quaternion.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)),
                         $"Expected: {expected}, Actual: {quaternion}");
         }
 
@@ -117,7 +117,7 @@ namespace FixedMathSharp.Tests
             var quaternion = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(90), new Fixed64(0), new Fixed64(0));
             var eulerAngles = quaternion.ToEulerAngles();
 
-            Assert.True(eulerAngles.FuzzyEqual(new Vector3d(90, 0, 0), new Fixed64(0.0001)));
+            Assert.True(eulerAngles.FuzzyEqual(new Vector3d(90, 0, 0), Fixed64.CreateFromDouble(0.0001)));
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace FixedMathSharp.Tests
             var angularVelocity = FixedQuaternion.ToAngularVelocity(currentRotation, prevRotation, deltaTime);
 
             var expected = new Vector3d(Fixed64.Zero, FixedMath.PiOver4 / deltaTime, Fixed64.Zero); // Expect ω = θ / dt
-            Assert.True(angularVelocity.FuzzyEqual(expected, new Fixed64(0.0001)),
+            Assert.True(angularVelocity.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)),
                 $"ToAngularVelocity returned {angularVelocity}, expected {expected}");
         }
 
@@ -235,10 +235,10 @@ namespace FixedMathSharp.Tests
             var q1 = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(0), new Fixed64(0), new Fixed64(0));
             var q2 = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(90), new Fixed64(0), new Fixed64(0));
 
-            var result = FixedQuaternion.Lerp(q1, q2, new Fixed64(0.5)); // Halfway between q1 and q2
+            var result = FixedQuaternion.Lerp(q1, q2, Fixed64.CreateFromDouble(0.5)); // Halfway between q1 and q2
             var expected = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(45), new Fixed64(0), new Fixed64(0));
 
-            Assert.True(result.FuzzyEqual(expected, new Fixed64(0.0001)));
+            Assert.True(result.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
         [Fact]
@@ -247,10 +247,10 @@ namespace FixedMathSharp.Tests
             var q1 = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(0), new Fixed64(0), new Fixed64(0));
             var q2 = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(90), new Fixed64(0), new Fixed64(0));
 
-            var result = FixedQuaternion.Slerp(q1, q2, new Fixed64(0.5)); // Halfway between q1 and q2
+            var result = FixedQuaternion.Slerp(q1, q2, Fixed64.CreateFromDouble(0.5)); // Halfway between q1 and q2
             var expected = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(45), new Fixed64(0), new Fixed64(0));
 
-            Assert.True(result.FuzzyEqual(expected, new Fixed64(0.0001)));
+            Assert.True(result.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
 
@@ -335,7 +335,7 @@ namespace FixedMathSharp.Tests
             var logResult = FixedQuaternion.QuaternionLog(quaternion);
 
             var expected = new Vector3d(Fixed64.Zero, FixedMath.PiOver4, Fixed64.Zero); // Expect log(q) = θ * axis
-            Assert.True(logResult.FuzzyEqual(expected, new Fixed64(0.0001)),
+            Assert.True(logResult.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)),
                 $"QuaternionLog returned {logResult}, expected {expected}");
         }
 
@@ -362,7 +362,7 @@ namespace FixedMathSharp.Tests
             var result = q1 * q2;
             var expected = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(90), new Fixed64(0), new Fixed64(90));
 
-            Assert.True(result.FuzzyEqual(expected, new Fixed64(0.0001)));
+            Assert.True(result.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
         #endregion

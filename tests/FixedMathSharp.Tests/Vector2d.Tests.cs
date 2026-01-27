@@ -77,8 +77,8 @@ namespace FixedMathSharp.Tests
             var vector = new Vector2d(3, 4);
             vector.Normalize();
 
-            var expected = new Vector2d(new Fixed64(0.6), new Fixed64(0.8)); // Normalized vector (0.6, 0.8)
-            Assert.True(vector.FuzzyEqual(expected, new Fixed64(0.0001)));
+            var expected = new Vector2d(Fixed64.CreateFromDouble(0.6), Fixed64.CreateFromDouble(0.8)); // Normalized vector (0.6, 0.8)
+            Assert.True(vector.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace FixedMathSharp.Tests
         {
             var start = new Vector2d(0, 0);
             var end = new Vector2d(10, 10);
-            var amount = new Fixed64(0.5); // 50% interpolation
+            var amount = Fixed64.CreateFromDouble(0.5); // 50% interpolation
 
             start.LerpInPlace(end, amount);
             Assert.Equal(new Vector2d(5, 5), start); // Should be halfway between (0, 0) and (10, 10)
@@ -100,7 +100,7 @@ namespace FixedMathSharp.Tests
             var sin = FixedMath.Sin(FixedMath.PiOver2); // 90° sine
 
             vector.RotateInPlace(cos, sin);
-            Assert.True(vector.FuzzyEqual(new Vector2d(0, 1), new Fixed64(0.0001))); // (1, 0) rotated 90° becomes (0, 1)
+            Assert.True(vector.FuzzyEqual(new Vector2d(0, 1), Fixed64.CreateFromDouble(0.0001))); // (1, 0) rotated 90° becomes (0, 1)
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace FixedMathSharp.Tests
             var sin = FixedMath.Sin(FixedMath.PiOver2); // 90° sine
 
             vector.RotateInverse(cos, sin);
-            Assert.True(vector.FuzzyEqual(new Vector2d(0, -1), new Fixed64(0.0001))); // Should rotate -90° to (0, -1)
+            Assert.True(vector.FuzzyEqual(new Vector2d(0, -1), Fixed64.CreateFromDouble(0.0001))); // Should rotate -90° to (0, -1)
         }
 
         [Fact]
@@ -254,7 +254,7 @@ namespace FixedMathSharp.Tests
         {
             var vector1 = new Vector2d(2, 2);
             var vector2 = new Vector2d(2.1, 2.1);
-            var allowedDifference = new Fixed64(0.15);
+            var allowedDifference = Fixed64.CreateFromDouble(0.15);
 
             Assert.True(vector1.FuzzyEqualAbsolute(vector2, allowedDifference)); // Approximate equality with a 0.15 difference
         }
@@ -278,7 +278,7 @@ namespace FixedMathSharp.Tests
         {
             var vector1 = new Vector2d(100, 100);
             var vector2 = new Vector2d(102, 102);
-            var percentage = new Fixed64(0.02); // Allow a 2% difference
+            var percentage = Fixed64.CreateFromDouble(0.02); // Allow a 2% difference
 
             Assert.True(vector1.FuzzyEqual(vector2, percentage)); // Should be approximately equal within 2% difference
         }
@@ -310,7 +310,7 @@ namespace FixedMathSharp.Tests
             var angle = FixedMath.PiOver2; // Rotate by 90° (π/2 radians)
             var result = vector.Rotate(angle);
 
-            Assert.True(result.FuzzyEqual(new Vector2d(0, 1), new Fixed64(0.0001))); // Should rotate to (0, 1)
+            Assert.True(result.FuzzyEqual(new Vector2d(0, 1), Fixed64.CreateFromDouble(0.0001))); // Should rotate to (0, 1)
         }
 
         #region Test: Serialization

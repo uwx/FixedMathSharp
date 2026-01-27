@@ -31,7 +31,7 @@ namespace FixedMathSharp.Tests
             var baseValue = new Fixed64(2);
             var exponent = new Fixed64(-1);
             var result = FixedMath.Pow(baseValue, exponent);
-            Assert.Equal(new Fixed64(0.5), result); // 2^-1 = 0.5
+            Assert.Equal(Fixed64.CreateFromDouble(0.5), result); // 2^-1 = 0.5
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Ln_PositiveValue_ReturnsCorrectLog()
         {
-            var value = new Fixed64(Math.E);
+            var value = Fixed64.CreateFromDouble(Math.E);
             var result = FixedMath.Ln(value);
             Assert.Equal(Fixed64.One, result); // ln(e) = 1
         }
@@ -181,7 +181,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Asin_ReturnsAsinOfHalf()
         {
-            var value = new Fixed64(0.5);
+            var value = Fixed64.CreateFromDouble(0.5);
             var result = FixedMath.Asin(value);
             var expected = FixedMath.PiOver6;  // asin(0.5) ≈ π/6 ≈ 0.5236 radians
             FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -190,7 +190,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Asin_ReturnsAsinOfNegativeHalf()
         {
-            var value = new Fixed64(-0.5);
+            var value = Fixed64.CreateFromDouble(-0.5);
             var result = FixedMath.Asin(value);
             var expected = -FixedMath.PiOver6;  // asin(-0.5) ≈ -π/6 ≈ -0.5236 radians
             FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -242,7 +242,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Acos_ReturnsPiOver3ForHalf()
         {
-            var value = new Fixed64(0.5); // cos(60°) = 0.5
+            var value = Fixed64.CreateFromDouble(0.5); // cos(60°) = 0.5
             var result = FixedMath.Acos(value);
             var expected = FixedMath.PiOver3; // acos(0.5) ≈ π/3 ≈ 1.0472 radians
             FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -251,7 +251,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Acos_Returns2PiOver3ForNegativeHalf()
         {
-            var value = new Fixed64(-0.5); // cos(120°) = -0.5
+            var value = Fixed64.CreateFromDouble(-0.5); // cos(120°) = -0.5
             var result = FixedMath.Acos(value);
             var expected = FixedMath.TwoPI / 3; // acos(-0.5) ≈ 2π/3 ≈ 2.0944 radians
             FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -260,14 +260,14 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Acos_ThrowsOutOfRangeForGreaterThanOne()
         {
-            var value = new Fixed64(1.1);
+            var value = Fixed64.CreateFromDouble(1.1);
             Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
         }
 
         [Fact]
         public void Acos_ThrowsOutOfRangeForLessThanNegativeOne()
         {
-            var value = new Fixed64(-1.1);
+            var value = Fixed64.CreateFromDouble(-1.1);
             Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
         }
 
@@ -286,7 +286,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Atan_Symmetry()
         {
-            var value = new Fixed64(0.5);
+            var value = Fixed64.CreateFromDouble(0.5);
             var positiveResult = FixedMath.Atan(value);
             var negativeResult = FixedMath.Atan(-value);
             Assert.Equal(positiveResult, -negativeResult);
@@ -295,7 +295,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Atan_NearZero()
         {
-            var value = new Fixed64(0.00001);
+            var value = Fixed64.CreateFromDouble(0.00001);
             var result = FixedMath.Atan(value);
             FixedMathTestHelper.AssertWithinRelativeTolerance(value, result); // Should be close to zero
         }
@@ -303,7 +303,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Atan_NearOne()
         {
-            var value = new Fixed64(0.9999);
+            var value = Fixed64.CreateFromDouble(0.9999);
             var result = FixedMath.Atan(value);
             var expected = FixedMath.PiOver4; // atan(1) = π/4
             FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -312,7 +312,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Atan_TanInverse()
         {
-            var values = new[] { new Fixed64(0.1), new Fixed64(0.5), new Fixed64(1), new Fixed64(2) };
+            var values = new[] { Fixed64.CreateFromDouble(0.1), Fixed64.CreateFromDouble(0.5), new Fixed64(1), new Fixed64(2) };
             foreach (var value in values)
             {
                 var atanResult = FixedMath.Atan(value);

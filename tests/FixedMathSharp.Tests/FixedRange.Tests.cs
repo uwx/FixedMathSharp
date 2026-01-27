@@ -148,8 +148,8 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void FixedRange_SmallRanges_OverlapCorrectly()
         {
-            var smallRange1 = new FixedRange(new Fixed64(0.0001), new Fixed64(0.0002));
-            var smallRange2 = new FixedRange(new Fixed64(0.00015), new Fixed64(0.00025));
+            var smallRange1 = new FixedRange(Fixed64.CreateFromDouble(0.0001), Fixed64.CreateFromDouble(0.0002));
+            var smallRange2 = new FixedRange(Fixed64.CreateFromDouble(0.00015), Fixed64.CreateFromDouble(0.00025));
 
             Assert.True(smallRange1.Overlaps(smallRange2));
         }

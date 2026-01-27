@@ -1,7 +1,9 @@
 ﻿using MessagePack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace FixedMathSharp
@@ -14,7 +16,7 @@ namespace FixedMathSharp
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    public partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>
+    public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>
     {
         #region Fields and Constants
 
@@ -22,23 +24,24 @@ namespace FixedMathSharp
         /// The underlying raw long value representing the fixed-point number.
         /// </summary>
         [Key(0)]
-        public long m_rawValue;
+        public readonly long m_rawValue;
 
-        public static readonly Fixed64 MAX_VALUE = new Fixed64(FixedMath.MAX_VALUE_L);
-        public static readonly Fixed64 MIN_VALUE = new Fixed64(FixedMath.MIN_VALUE_L);
+        public static Fixed64 MAX_VALUE => new(FixedMath.MAX_VALUE_L);
+        public static Fixed64 MIN_VALUE => new(FixedMath.MIN_VALUE_L);
 
-        public static readonly Fixed64 One = new Fixed64(FixedMath.ONE_L);
-        public static readonly Fixed64 Two = One * 2;
-        public static readonly Fixed64 Three = One * 3;
-        public static readonly Fixed64 Half = One / 2;
-        public static readonly Fixed64 Quarter = One / 4;
-        public static readonly Fixed64 Eighth = One / 8;
-        public static readonly Fixed64 Zero = new Fixed64(0);
+        public static Fixed64 MinusOne => new(-FixedMath.ONE_L);
+        public static Fixed64 One => new(FixedMath.ONE_L);
+        public static Fixed64 Two { get; } = One * 2;
+        public static Fixed64 Three { get; } = One * 3;
+        public static Fixed64 Half { get; } = One / 2;
+        public static Fixed64 Quarter { get; } = One / 4;
+        public static Fixed64 Eighth { get; } = One / 8;
+        public static Fixed64 Zero { get; } = new(0);
 
         /// <inheritdoc cref="FixedMath.EPSILON_L" />
-        public static readonly Fixed64 Epsilon = new Fixed64(FixedMath.EPSILON_L);
+        public static Fixed64 Epsilon => new(FixedMath.EPSILON_L);
         /// <inheritdoc cref="FixedMath.PRECISION_L" />
-        public static readonly Fixed64 Precision = new Fixed64(FixedMath.PRECISION_L);
+        public static Fixed64 Precision => new(FixedMath.PRECISION_L);
 
         #endregion
 
@@ -66,21 +69,11 @@ namespace FixedMathSharp
         /// </summary>
         /// <param name="value">Double value to convert to </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Fixed64(double value) : this((long)Math.Round((double)value * FixedMath.ONE_L)) { }
+        public static Fixed64 CreateFromDouble(double value) => new((long)Math.Round((double)value * FixedMath.ONE_L));
 
         #endregion
 
         #region Methods (Instance)
-
-        /// <summary>
-        /// Offsets the current Fixed64 by an integer value.
-        /// </summary>
-        /// <param name="x">The integer value to add.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Offset(int x)
-        {
-            m_rawValue += (long)x << FixedMath.SHIFT_AMOUNT_I;
-        }
 
         /// <summary>
         /// Returns the raw value as a string.
@@ -102,31 +95,9 @@ namespace FixedMathSharp
         /// <param name="denominator">The denominator of the fraction.</param>
         /// <returns>A Fixed64 representing the fraction.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Fixed64 Fraction(double numerator, double denominator)
+        public static Fixed64 Fraction(Fixed64 numerator, Fixed64 denominator)
         {
-            return new Fixed64(numerator / denominator);
-        }
-
-        /// <summary>
-        /// x++ (post-increment)
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Fixed64 PostIncrement(ref Fixed64 a)
-        {
-            Fixed64 originalValue = a;
-            a.m_rawValue += One.m_rawValue;
-            return originalValue;
-        }
-
-        /// <summary>
-        /// x-- (post-decrement)
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Fixed64 PostDecrement(ref Fixed64 a)
-        {
-            Fixed64 originalValue = a;
-            a.m_rawValue -= One.m_rawValue;
-            return originalValue;
+            return numerator / denominator;
         }
 
         /// <summary>
@@ -180,21 +151,30 @@ namespace FixedMathSharp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator Fixed64(int value)
+        public static implicit operator Fixed64(int value)
         {
             return new Fixed64(value);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator int(Fixed64 value)
+        public static int RawToInt(Fixed64 value)
         {
             return (int)(value.m_rawValue >> FixedMath.SHIFT_AMOUNT_I);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator int(Fixed64 value)
+        {
+            // truncation toward zero. regularly casting fixed64 to int doesn't do that
+            if (value > Fixed64.Zero)
+                return value.FloorToInt();
+            else
+                return value.CeilToInt();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Fixed64(float value)
         {
-            return new Fixed64((double)value);
+            return CreateFromDouble((double)value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -206,7 +186,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Fixed64(double value)
         {
-            return new Fixed64(value);
+            return CreateFromDouble(value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -218,7 +198,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Fixed64(decimal value)
         {
-            return new Fixed64((double)value);
+            return CreateFromDouble((double)value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -251,7 +231,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator +(Fixed64 x, int y)
         {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) + y);
+            return x + new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I);
         }
 
         /// <summary>
@@ -259,22 +239,6 @@ namespace FixedMathSharp
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator +(int x, Fixed64 y)
-        {
-            return y + x;
-        }
-
-        /// <summary>
-        /// Adds a float to x 
-        /// </summary>
-        public static Fixed64 operator +(Fixed64 x, float y)
-        {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) + y);
-        }
-
-        /// <summary>
-        /// Adds a Fixed64 to x 
-        /// </summary>
-        public static Fixed64 operator +(float x, Fixed64 y)
         {
             return y + x;
         }
@@ -299,7 +263,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator -(Fixed64 x, int y)
         {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) - y);
+            return x - new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I);
         }
 
         /// <summary>
@@ -308,31 +272,27 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator -(int x, Fixed64 y)
         {
-            return new Fixed64(x - (y.m_rawValue * FixedMath.SCALE_FACTOR_D));
+            return new Fixed64((long)x << FixedMath.SHIFT_AMOUNT_I) - y;
         }
-
-        /// <summary>
-        /// Subtracts a float from x 
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Fixed64 operator -(Fixed64 x, float y)
+        
+        public static Fixed64 operator *(Fixed64 a, Fixed64 b)
         {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) - y);
-        }
+            // Widen to 128 bits to prevent overflow during multiplication
+            // 128-bit intrinsic is faster than hand rolled multiplication + shift
+            var mul = ((Int128)a.m_rawValue * b.m_rawValue) >> FixedMath.SHIFT_AMOUNT_I;
+        
+            if (mul < long.MinValue)
+                mul = long.MinValue;
+            else if (mul > long.MaxValue)
+                mul = long.MaxValue;
 
-        /// <summary>
-        /// Subtracts a Fixed64 from x 
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Fixed64 operator -(float x, Fixed64 y)
-        {
-            return new Fixed64(x - (y.m_rawValue * FixedMath.SCALE_FACTOR_D));
+            return new Fixed64((long)mul);
         }
 
         /// <summary>
         /// Multiplies two Fixed64 numbers, handling overflow and rounding.
         /// </summary>
-        public static Fixed64 operator *(Fixed64 x, Fixed64 y)
+        public static Fixed64 MulPrecise(Fixed64 x, Fixed64 y)
         {
             long xl = x.m_rawValue;
             long yl = y.m_rawValue;
@@ -401,7 +361,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator *(Fixed64 x, int y)
         {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) * y);
+            return x + new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I);
         }
 
         /// <summary>
@@ -421,7 +381,10 @@ namespace FixedMathSharp
             long yl = y.m_rawValue;
 
             if (yl == 0)
-                throw new DivideByZeroException($"Attempted to divide {x} by zero.");
+            {
+                ThrowDivideByZeroException(x);
+                return default;
+            }
 
             ulong remainder = (ulong)(xl < 0 ? -xl : xl);
             ulong divider = (ulong)(yl < 0 ? -yl : yl);
@@ -437,7 +400,7 @@ namespace FixedMathSharp
 
             while (remainder != 0 && bitPos >= 0)
             {
-                int shift = CountLeadingZeroes(remainder);
+                int shift = BitOperations.LeadingZeroCount(remainder);
                 if (shift > bitPos)
                     shift = bitPos;
 
@@ -465,6 +428,12 @@ namespace FixedMathSharp
                 result = -result;
 
             return new Fixed64(result);
+
+            [DoesNotReturn]
+            static void ThrowDivideByZeroException(Fixed64 a)
+            {
+                throw new DivideByZeroException($"Attempted to divide {a} by zero.");
+            }
         }
 
         /// <summary>
@@ -473,7 +442,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator /(Fixed64 x, int y)
         {
-            return new Fixed64((x.m_rawValue * FixedMath.SCALE_FACTOR_D) / y);
+            return x / new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I);
         }
 
         /// <summary>
@@ -502,8 +471,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator ++(Fixed64 a)
         {
-            a.m_rawValue += One.m_rawValue;
-            return a;
+            return a + One;
         }
 
         /// <summary>
@@ -512,8 +480,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator --(Fixed64 a)
         {
-            a.m_rawValue -= One.m_rawValue;
-            return a;
+            return a - One;
         }
 
         /// <summary>

@@ -58,11 +58,11 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void CreateShear_WorksCorrectly()
         {
-            var shearMatrix = Fixed3x3.CreateShear(new Fixed64(1.0f), new Fixed64(0.5f), new Fixed64(0.2f));
+            var shearMatrix = Fixed3x3.CreateShear(Fixed64.CreateFromDouble(1.0f), Fixed64.CreateFromDouble(0.5f), Fixed64.CreateFromDouble(0.2f));
             var expectedMatrix = new Fixed3x3(
-                Fixed64.One, new Fixed64(1.0f), new Fixed64(0.5f),
-                new Fixed64(1.0f), Fixed64.One, new Fixed64(0.2f),
-                new Fixed64(0.5f), new Fixed64(0.2f), Fixed64.One
+                Fixed64.One, Fixed64.CreateFromDouble(1.0f), Fixed64.CreateFromDouble(0.5f),
+                Fixed64.CreateFromDouble(1.0f), Fixed64.One, Fixed64.CreateFromDouble(0.2f),
+                Fixed64.CreateFromDouble(0.5f), Fixed64.CreateFromDouble(0.2f), Fixed64.One
             );
 
             Assert.Equal(expectedMatrix, shearMatrix);
@@ -72,16 +72,16 @@ namespace FixedMathSharp.Tests
         public void InvertDiagonal_WorksCorrectly()
         {
             var matrix = new Fixed3x3(
-                new Fixed64(2.0f), Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, new Fixed64(3.0f), Fixed64.Zero,
-                Fixed64.Zero, Fixed64.Zero, new Fixed64(4.0f)
+                Fixed64.CreateFromDouble(2.0f), Fixed64.Zero, Fixed64.Zero,
+                Fixed64.Zero, Fixed64.CreateFromDouble(3.0f), Fixed64.Zero,
+                Fixed64.Zero, Fixed64.Zero, Fixed64.CreateFromDouble(4.0f)
             );
 
             var inverted = matrix.InvertDiagonal();
             var expected = new Fixed3x3(
-                Fixed64.One / new Fixed64(2.0f), Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, Fixed64.One / new Fixed64(3.0f), Fixed64.Zero,
-                Fixed64.Zero, Fixed64.Zero, Fixed64.One / new Fixed64(4.0f)
+                Fixed64.One / Fixed64.CreateFromDouble(2.0f), Fixed64.Zero, Fixed64.Zero,
+                Fixed64.Zero, Fixed64.One / Fixed64.CreateFromDouble(3.0f), Fixed64.Zero,
+                Fixed64.Zero, Fixed64.Zero, Fixed64.One / Fixed64.CreateFromDouble(4.0f)
             );
 
             Assert.Equal(expected, inverted);
@@ -97,11 +97,11 @@ namespace FixedMathSharp.Tests
                 Fixed64.One, Fixed64.One, Fixed64.One
             );
 
-            var result = Fixed3x3.Lerp(matrixA, matrixB, new Fixed64(0.5f));
+            var result = Fixed3x3.Lerp(matrixA, matrixB, Fixed64.CreateFromDouble(0.5f));
             var expected = new Fixed3x3(
-                Fixed64.One, new Fixed64(0.5f), new Fixed64(0.5f),
-                new Fixed64(0.5f), Fixed64.One, new Fixed64(0.5f),
-                new Fixed64(0.5f), new Fixed64(0.5f), Fixed64.One
+                Fixed64.One, Fixed64.CreateFromDouble(0.5f), Fixed64.CreateFromDouble(0.5f),
+                Fixed64.CreateFromDouble(0.5f), Fixed64.One, Fixed64.CreateFromDouble(0.5f),
+                Fixed64.CreateFromDouble(0.5f), Fixed64.CreateFromDouble(0.5f), Fixed64.One
             );
 
             Assert.Equal(expected, result);
@@ -111,16 +111,16 @@ namespace FixedMathSharp.Tests
         public void Transpose_WorksCorrectly()
         {
             var matrix = new Fixed3x3(
-                Fixed64.One, new Fixed64(2.0f), new Fixed64(3.0f),
-                new Fixed64(4.0f), Fixed64.One, new Fixed64(5.0f),
-                new Fixed64(6.0f), new Fixed64(7.0f), Fixed64.One
+                Fixed64.One, Fixed64.CreateFromDouble(2.0f), Fixed64.CreateFromDouble(3.0f),
+                Fixed64.CreateFromDouble(4.0f), Fixed64.One, Fixed64.CreateFromDouble(5.0f),
+                Fixed64.CreateFromDouble(6.0f), Fixed64.CreateFromDouble(7.0f), Fixed64.One
             );
 
             var transposed = Fixed3x3.Transpose(matrix);
             var expected = new Fixed3x3(
-                Fixed64.One, new Fixed64(4.0f), new Fixed64(6.0f),
-                new Fixed64(2.0f), Fixed64.One, new Fixed64(7.0f),
-                new Fixed64(3.0f), new Fixed64(5.0f), Fixed64.One
+                Fixed64.One, Fixed64.CreateFromDouble(4.0f), Fixed64.CreateFromDouble(6.0f),
+                Fixed64.CreateFromDouble(2.0f), Fixed64.One, Fixed64.CreateFromDouble(7.0f),
+                Fixed64.CreateFromDouble(3.0f), Fixed64.CreateFromDouble(5.0f), Fixed64.One
             );
 
             Assert.Equal(expected, transposed);
@@ -130,18 +130,18 @@ namespace FixedMathSharp.Tests
         public void Invert_WorksCorrectly()
         {
             var matrix = new Fixed3x3(
-                new Fixed64(2.0f), Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, new Fixed64(3.0f), Fixed64.Zero,
-                Fixed64.Zero, Fixed64.Zero, new Fixed64(4.0f)
+                Fixed64.CreateFromDouble(2.0f), Fixed64.Zero, Fixed64.Zero,
+                Fixed64.Zero, Fixed64.CreateFromDouble(3.0f), Fixed64.Zero,
+                Fixed64.Zero, Fixed64.Zero, Fixed64.CreateFromDouble(4.0f)
             );
 
             var success = Fixed3x3.Invert(matrix, out var result);
             Assert.True(success);
 
             var expected = new Fixed3x3(
-                Fixed64.One / new Fixed64(2.0f), Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, Fixed64.One / new Fixed64(3.0f), Fixed64.Zero,
-                Fixed64.Zero, Fixed64.Zero, Fixed64.One / new Fixed64(4.0f)
+                Fixed64.One / Fixed64.CreateFromDouble(2.0f), Fixed64.Zero, Fixed64.Zero,
+                Fixed64.Zero, Fixed64.One / Fixed64.CreateFromDouble(3.0f), Fixed64.Zero,
+                Fixed64.Zero, Fixed64.Zero, Fixed64.One / Fixed64.CreateFromDouble(4.0f)
             );
 
             Assert.True(result?.FuzzyEqual(expected), $"Expected: {expected}, Actual: {result}");
@@ -196,7 +196,7 @@ namespace FixedMathSharp.Tests
             var extractedScale = Fixed3x3.ExtractLossyScale(rotationMatrix);
 
             Assert.True(
-                extractedScale.FuzzyEqual(globalScale, new Fixed64(0.01)),
+                extractedScale.FuzzyEqual(globalScale, Fixed64.CreateFromDouble(0.01)),
                 $"Extracted scale {extractedScale} does not match expected {globalScale}."
             );
         }
@@ -280,7 +280,7 @@ namespace FixedMathSharp.Tests
             var transformed = Fixed3x3.TransformDirection(matrix, direction).Normal;
 
             // Direction should still be normalized (scaling affects positions, not directions)
-            Assert.Equal(Fixed64.One, transformed.Magnitude, new Fixed64(0.0001));
+            Assert.Equal(Fixed64.One, transformed.Magnitude, Fixed64.CreateFromDouble(0.0001));
         }
 
         [Fact]

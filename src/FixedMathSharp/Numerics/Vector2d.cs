@@ -878,18 +878,6 @@ namespace FixedMathSharp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2d operator +(Vector2d v1, (float x, float y) v2)
-        {
-            return new Vector2d(v1.x + v2.x, v1.y + v2.y);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2d operator +((float x, float y) v1, Vector2d v2)
-        {
-            return v2 + v1;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2d operator -(Vector2d v1, Vector2d v2)
         {
             return new Vector2d(v1.x - v2.x, v1.y - v2.y);
@@ -915,18 +903,6 @@ namespace FixedMathSharp
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2d operator -((int x, int y) v1, Vector2d v2)
-        {
-            return new Vector2d(v1.x - v2.x, v1.y - v2.y);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2d operator -(Vector2d v1, (float x, float y) v2)
-        {
-            return new Vector2d(v1.x - v2.x, v1.y - v2.y);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2d operator -((float x, float y) v1, Vector2d v2)
         {
             return new Vector2d(v1.x - v2.x, v1.y - v2.y);
         }

@@ -14,9 +14,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d ClampOneInPlace(this Vector3d v)
         {
-            v.x = v.x.ClampOne();
-            v.y = v.y.ClampOne();
-            v.z = v.z.ClampOne();
+            v.X = v.X.ClampOne();
+            v.Y = v.Y.ClampOne();
+            v.Z = v.Z.ClampOne();
             return v;
         }
 
@@ -97,9 +97,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool FuzzyEqualAbsolute(this Vector3d me, Vector3d other, Fixed64 allowedDifference)
         {
-            return (me.x - other.x).Abs() <= allowedDifference &&
-                   (me.y - other.y).Abs() <= allowedDifference &&
-                   (me.z - other.z).Abs() <= allowedDifference;
+            return (me.X - other.X).Abs() <= allowedDifference &&
+                   (me.Y - other.Y).Abs() <= allowedDifference &&
+                   (me.Z - other.Z).Abs() <= allowedDifference;
         }
 
         /// <summary>
@@ -114,9 +114,9 @@ namespace FixedMathSharp
         public static bool FuzzyEqual(this Vector3d me, Vector3d other, Fixed64? percentage = null)
         {
             Fixed64 p = percentage ?? Fixed64.Epsilon;
-            return me.x.FuzzyComponentEqual(other.x, p) &&
-                    me.y.FuzzyComponentEqual(other.y, p) &&
-                    me.z.FuzzyComponentEqual(other.z, p);
+            return me.X.FuzzyComponentEqual(other.X, p) &&
+                    me.Y.FuzzyComponentEqual(other.Y, p) &&
+                    me.Z.FuzzyComponentEqual(other.Z, p);
         }
 
         #endregion

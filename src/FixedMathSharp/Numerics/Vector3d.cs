@@ -28,64 +28,43 @@ namespace FixedMathSharp
         /// The X component of the vector.
         /// </summary>
         [Key(0)]
-        public Fixed64 x;
+        public Fixed64 X;
 
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         [Key(1)]
-        public Fixed64 y;
+        public Fixed64 Y;
 
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         [Key(2)]
-        public Fixed64 z;
+        public Fixed64 Z;
 
-        /// <summary>
-        /// The upward direction vector (0, 1, 0).
-        /// </summary>
-        public static readonly Vector3d Up = new Vector3d(0, 1, 0);
+        private static Vector3d zero = new Vector3d(0, 0, 0);
+        private static Vector3d one = new Vector3d(1, 1, 1);
+        private static Vector3d unitX = new Vector3d(1, 0, 0);
+        private static Vector3d unitY = new Vector3d(0, 1, 0);
+        private static Vector3d unitZ = new Vector3d(0, 0, 1);
+        private static Vector3d up = new Vector3d(0, 1, 0);
+        private static Vector3d down = new Vector3d(0, -1, 0);
+        private static Vector3d right = new Vector3d(1, 0, 0);
+        private static Vector3d left = new Vector3d(-1, 0, 0);
+        private static Vector3d forward = new Vector3d(0, 0, -1);
+        private static Vector3d backward = new Vector3d(0, 0, 1);
 
-        /// <summary>
-        /// (1, 0, 0)
-        /// </summary>
-        public static readonly Vector3d Right = new Vector3d(1, 0, 0);
-
-        /// <summary>
-        /// (0, -1, 0)
-        /// </summary>
-        public static readonly Vector3d Down = new Vector3d(0, -1, 0);
-
-        /// <summary>
-        /// (-1, 0, 0)
-        /// </summary>
-        public static readonly Vector3d Left = new Vector3d(-1, 0, 0);
-
-        /// <summary>
-        /// The forward direction vector (0, 0, 1).
-        /// </summary>
-        public static readonly Vector3d Forward = new Vector3d(0, 0, 1);
-
-        /// <summary>
-        /// (0, 0, -1)
-        /// </summary>
-        public static readonly Vector3d Backward = new Vector3d(0, 0, -1);
-
-        /// <summary>
-        /// (1, 1, 1)
-        /// </summary>
-        public static readonly Vector3d One = new Vector3d(1, 1, 1);
-
-        /// <summary>
-        /// (-1, -1, -1)
-        /// </summary>
-        public static readonly Vector3d Negative = new Vector3d(-1, -1, -1);
-
-        /// <summary>
-        /// (0, 0, 0)
-        /// </summary>
-        public static readonly Vector3d Zero = new Vector3d(0, 0, 0);
+        public static Vector3d Zero => zero;
+        public static Vector3d One => one;
+        public static Vector3d UnitX => unitX;
+        public static Vector3d UnitY => unitY;
+        public static Vector3d UnitZ => unitZ;
+        public static Vector3d Up => up;
+        public static Vector3d Down => down;
+        public static Vector3d Right => right;
+        public static Vector3d Left => left;
+        public static Vector3d Forward => forward;
+        public static Vector3d Backward => backward;
 
         #endregion
 
@@ -100,9 +79,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d(Fixed64 xLong, Fixed64 yLong, Fixed64 zLong)
         {
-            x = xLong;
-            y = yLong;
-            z = zLong;
+            X = xLong;
+            Y = yLong;
+            Z = zLong;
         }
 
         #endregion
@@ -121,7 +100,7 @@ namespace FixedMathSharp
         public Vector3d RightHandNormal
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => new Vector3d(z, y, -x);
+            get => new Vector3d(Z, Y, -X);
         }
 
         /// <summary>
@@ -131,7 +110,7 @@ namespace FixedMathSharp
         public Vector3d LeftHandNormal
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => new Vector3d(-z, y, x);
+            get => new Vector3d(-Z, Y, X);
         }
 
         /// <inheritdoc cref="GetNormalized(Vector3d)"/>
@@ -164,9 +143,9 @@ namespace FixedMathSharp
         {
             get
             {
-                Fixed64 temp1 = FixedMath.Cos(x) * FixedMath.Sin(y);
-                Fixed64 temp2 = FixedMath.Sin(-x);
-                Fixed64 temp3 = FixedMath.Cos(x) * FixedMath.Cos(y);
+                Fixed64 temp1 = FixedMath.Cos(X) * FixedMath.Sin(Y);
+                Fixed64 temp2 = FixedMath.Sin(-X);
+                Fixed64 temp3 = FixedMath.Cos(X) * FixedMath.Cos(Y);
                 return new Vector3d(temp1, temp2, temp3);
             }
         }
@@ -179,7 +158,7 @@ namespace FixedMathSharp
         public bool IsZero
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => this.Equals(Zero);
+            get => this.Equals(zero);
         }
 
         /// <summary>
@@ -192,7 +171,7 @@ namespace FixedMathSharp
         public Fixed64 SqrMagnitude
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => (x * x) + (y * y) + (z * z);
+            get => (X * X) + (Y * Y) + (Z * Z);
         }
 
         /// <summary>
@@ -202,7 +181,7 @@ namespace FixedMathSharp
         public long LongStateHash
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => (x.m_rawValue * 31) + (y.m_rawValue * 7) + (z.m_rawValue * 11);
+            get => (X.m_rawValue * 31) + (Y.m_rawValue * 7) + (Z.m_rawValue * 11);
         }
 
         /// <summary>
@@ -223,9 +202,9 @@ namespace FixedMathSharp
             {
                 return index switch
                 {
-                    0 => x,
-                    1 => y,
-                    2 => z,
+                    0 => X,
+                    1 => Y,
+                    2 => Z,
                     _ => throw new IndexOutOfRangeException("Invalid Vector3d index!"),
                 };
             }
@@ -235,13 +214,13 @@ namespace FixedMathSharp
                 switch (index)
                 {
                     case 0:
-                        x = value;
+                        X = value;
                         break;
                     case 1:
-                        y = value;
+                        Y = value;
                         break;
                     case 2:
-                        z = value;
+                        Z = value;
                         break;
                     default:
                         throw new IndexOutOfRangeException("Invalid Vector3d index!");
@@ -258,9 +237,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d Set(Fixed64 newX, Fixed64 newY, Fixed64 newZ)
         {
-            x = newX;
-            y = newY;
-            z = newZ;
+            X = newX;
+            Y = newY;
+            Z = newZ;
             return this;
         }
 
@@ -272,9 +251,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d AddInPlace(Fixed64 amount)
         {
-            x += amount;
-            y += amount;
-            z += amount;
+            X += amount;
+            Y += amount;
+            Z += amount;
             return this;
         }
 
@@ -287,9 +266,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d AddInPlace(Fixed64 xAmount, Fixed64 yAmount, Fixed64 zAmount)
         {
-            x += xAmount;
-            y += yAmount;
-            z += zAmount;
+            X += xAmount;
+            Y += yAmount;
+            Z += zAmount;
             return this;
         }
 
@@ -300,7 +279,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d AddInPlace(Vector3d other)
         {
-            AddInPlace(other.x, other.y, other.z);
+            AddInPlace(other.X, other.Y, other.Z);
             return this;
         }
 
@@ -311,9 +290,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d SubtractInPlace(Fixed64 amount)
         {
-            x -= amount;
-            y -= amount;
-            z -= amount;
+            X -= amount;
+            Y -= amount;
+            Z -= amount;
             return this;
         }
 
@@ -326,9 +305,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d SubtractInPlace(Fixed64 xAmount, Fixed64 yAmount, Fixed64 zAmount)
         {
-            x -= xAmount;
-            y -= yAmount;
-            z -= zAmount;
+            X -= xAmount;
+            Y -= yAmount;
+            Z -= zAmount;
             return this;
         }
 
@@ -338,7 +317,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d SubtractInPlace(Vector3d other)
         {
-            SubtractInPlace(other.x, other.y, other.z);
+            SubtractInPlace(other.X, other.Y, other.Z);
             return this;
         }
 
@@ -349,9 +328,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d ScaleInPlace(Fixed64 scaleFactor)
         {
-            x *= scaleFactor;
-            y *= scaleFactor;
-            z *= scaleFactor;
+            X *= scaleFactor;
+            Y *= scaleFactor;
+            Z *= scaleFactor;
             return this;
         }
 
@@ -362,9 +341,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3d ScaleInPlace(Vector3d scale)
         {
-            x *= scale.x;
-            y *= scale.y;
-            z *= scale.z;
+            X *= scale.X;
+            Y *= scale.Y;
+            Z *= scale.Z;
             return this;
         }
 
@@ -396,9 +375,9 @@ namespace FixedMathSharp
             // If magnitude is zero, return a zero vector to avoid divide-by-zero errors
             if (mag == Fixed64.Zero)
             {
-                x = Fixed64.Zero;
-                y = Fixed64.Zero;
-                z = Fixed64.Zero;
+                X = Fixed64.Zero;
+                Y = Fixed64.Zero;
+                Z = Fixed64.Zero;
                 return this;
             }
 
@@ -406,9 +385,9 @@ namespace FixedMathSharp
             if (mag == Fixed64.One)
                 return this;
 
-            x /= mag;
-            y /= mag;
-            z /= mag;
+            X /= mag;
+            Y /= mag;
+            Z /= mag;
 
             return this;
         }
@@ -431,11 +410,11 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Fixed64 Distance(Fixed64 otherX, Fixed64 otherY, Fixed64 otherZ)
         {
-            Fixed64 temp1 = x - otherX;
+            Fixed64 temp1 = X - otherX;
             temp1 *= temp1;
-            Fixed64 temp2 = y - otherY;
+            Fixed64 temp2 = Y - otherY;
             temp2 *= temp2;
-            Fixed64 temp3 = z - otherZ;
+            Fixed64 temp3 = Z - otherZ;
             temp3 *= temp3;
             return FixedMath.Sqrt(temp1 + temp2 + temp3);
         }
@@ -447,11 +426,11 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Fixed64 SqrDistance(Fixed64 otherX, Fixed64 otherY, Fixed64 otherZ)
         {
-            Fixed64 temp1 = x - otherX;
+            Fixed64 temp1 = X - otherX;
             temp1 *= temp1;
-            Fixed64 temp2 = y - otherY;
+            Fixed64 temp2 = Y - otherY;
             temp2 *= temp2;
-            Fixed64 temp3 = z - otherZ;
+            Fixed64 temp3 = Z - otherZ;
             temp3 *= temp3;
             return temp1 + temp2 + temp3;
         }
@@ -466,7 +445,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Fixed64 Dot(Fixed64 otherX, Fixed64 otherY, Fixed64 otherZ)
         {
-            return x * otherX + y * otherY + z * otherZ;
+            return X * otherX + Y * otherY + Z * otherZ;
         }
 
         /// <summary>
@@ -479,7 +458,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Fixed64 CrossProduct(Fixed64 otherX, Fixed64 otherY, Fixed64 otherZ)
         {
-            return (y * otherZ - z * otherY) + (z * otherX - x * otherZ) + (x * otherY - y * otherX);
+            return (Y * otherZ - Z * otherY) + (Z * otherX - X * otherZ) + (X * otherY - Y * otherX);
         }
 
         /// <summary>
@@ -490,9 +469,9 @@ namespace FixedMathSharp
         public Vector3d Cross(Fixed64 otherX, Fixed64 otherY, Fixed64 otherZ)
         {
             return new Vector3d(
-                y * otherZ - z * otherY,
-                z * otherX - x * otherZ,
-                x * otherY - y * otherX);
+                Y * otherZ - Z * otherY,
+                Z * otherX - X * otherZ,
+                X * otherY - Y * otherX);
         }
 
         #endregion
@@ -510,7 +489,7 @@ namespace FixedMathSharp
         public static Vector3d Lerp(Vector3d a, Vector3d b, Fixed64 mag)
         {
             mag = FixedMath.Clamp01(mag);
-            return new Vector3d(a.x + (b.x - a.x) * mag, a.y + (b.y - a.y) * mag, a.z + (b.z - a.z) * mag);
+            return new Vector3d(a.X + (b.X - a.X) * mag, a.Y + (b.Y - a.Y) * mag, a.Z + (b.Z - a.Z) * mag);
         }
 
         /// <summary>
@@ -596,9 +575,9 @@ namespace FixedMathSharp
 
             // Normalize it exactly           
             return new Vector3d(
-                value.x / mag,
-                value.y / mag,
-                value.z / mag
+                value.X / mag,
+                value.Y / mag,
+                value.Z / mag
             );
         }
 
@@ -610,7 +589,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 GetMagnitude(Vector3d vector)
         {
-            Fixed64 mag = (vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z);
+            Fixed64 mag = (vector.X * vector.X) + (vector.Y * vector.Y) + (vector.Z * vector.Z);
 
             // If rounding error pushed magnitude slightly above 1, clamp it
             if (mag > Fixed64.One && mag <= Fixed64.One + Fixed64.Epsilon)
@@ -627,7 +606,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Abs(Vector3d value)
         {
-            return new Vector3d(value.x.Abs(), value.y.Abs(), value.z.Abs());
+            return new Vector3d(value.X.Abs(), value.Y.Abs(), value.Z.Abs());
         }
 
         /// <summary>
@@ -638,7 +617,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Sign(Vector3d value)
         {
-            return new Vector3d(value.x.Sign(), value.y.Sign(), value.z.Sign());
+            return new Vector3d(value.X.Sign(), value.Y.Sign(), value.Z.Sign());
         }
 
         /// <summary>
@@ -652,9 +631,9 @@ namespace FixedMathSharp
         public static Vector3d Clamp(Vector3d value, Vector3d min, Vector3d max)
         {
             return new Vector3d(
-                FixedMath.Clamp(value.x, min.x, max.x),
-                FixedMath.Clamp(value.y, min.y, max.y),
-                FixedMath.Clamp(value.z, min.z, max.z)
+                FixedMath.Clamp(value.X, min.X, max.X),
+                FixedMath.Clamp(value.Y, min.Y, max.Y),
+                FixedMath.Clamp(value.Z, min.Z, max.Z)
             );
         }
 
@@ -708,21 +687,21 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Midpoint(Vector3d v1, Vector3d v2)
         {
-            return new Vector3d((v1.x + v2.x) * Fixed64.Half, (v1.y + v2.y) * Fixed64.Half, (v1.z + v2.z) * Fixed64.Half);
+            return new Vector3d((v1.X + v2.X) * Fixed64.Half, (v1.Y + v2.Y) * Fixed64.Half, (v1.Z + v2.Z) * Fixed64.Half);
         }
 
         /// <inheritdoc cref="Distance(Fixed64, Fixed64, Fixed64)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 Distance(Vector3d start, Vector3d end)
         {
-            return start.Distance(end.x, end.y, end.z);
+            return start.Distance(end.X, end.Y, end.Z);
         }
 
         /// <inheritdoc cref="SqrDistance(Fixed64, Fixed64, Fixed64)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 SqrDistance(Vector3d start, Vector3d end)
         {
-            return start.SqrDistance(end.x, end.y, end.z);
+            return start.SqrDistance(end.X, end.Y, end.Z);
         }
 
         /// <summary>
@@ -822,7 +801,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 Dot(Vector3d lhs, Vector3d rhs)
         {
-            return lhs.Dot(rhs.x, rhs.y, rhs.z);
+            return lhs.Dot(rhs.X, rhs.Y, rhs.Z);
         }
 
         /// <summary>
@@ -833,7 +812,7 @@ namespace FixedMathSharp
         /// <returns></returns>
         public static Vector3d Scale(Vector3d a, Vector3d b)
         {
-            return new Vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
+            return new Vector3d(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
         }
 
         /// <summary>
@@ -845,14 +824,14 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Cross(Vector3d lhs, Vector3d rhs)
         {
-            return lhs.Cross(rhs.x, rhs.y, rhs.z);
+            return lhs.Cross(rhs.X, rhs.Y, rhs.Z);
         }
 
         /// <inheritdoc cref="CrossProduct(Fixed64, Fixed64, Fixed64)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 CrossProduct(Vector3d lhs, Vector3d rhs)
         {
-            return lhs.CrossProduct(rhs.x, rhs.y, rhs.z);
+            return lhs.CrossProduct(rhs.X, rhs.Y, rhs.Z);
         }
 
         /// <summary>
@@ -865,13 +844,13 @@ namespace FixedMathSharp
         {
             Fixed64 sqrMag = Dot(onNormal, onNormal);
             if (sqrMag < Fixed64.Epsilon)
-                return Zero;
+                return zero;
             else
             {
                 Fixed64 dot = Dot(vector, onNormal);
-                return new Vector3d(onNormal.x * dot / sqrMag,
-                    onNormal.y * dot / sqrMag,
-                    onNormal.z * dot / sqrMag);
+                return new Vector3d(onNormal.X * dot / sqrMag,
+                    onNormal.Y * dot / sqrMag,
+                    onNormal.Z * dot / sqrMag);
             }
         }
 
@@ -889,9 +868,9 @@ namespace FixedMathSharp
             else
             {
                 Fixed64 dot = Dot(vector, planeNormal);
-                return new Vector3d(vector.x - planeNormal.x * dot / sqrMag,
-                    vector.y - planeNormal.y * dot / sqrMag,
-                    vector.z - planeNormal.z * dot / sqrMag);
+                return new Vector3d(vector.X - planeNormal.X * dot / sqrMag,
+                    vector.Y - planeNormal.Y * dot / sqrMag,
+                    vector.Z - planeNormal.Z * dot / sqrMag);
             }
         }
 
@@ -926,7 +905,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Max(Vector3d value1, Vector3d value2)
         {
-            return new Vector3d((value1.x > value2.x) ? value1.x : value2.x, (value1.y > value2.y) ? value1.y : value2.y, (value1.z > value2.z) ? value1.z : value2.z);
+            return new Vector3d((value1.X > value2.X) ? value1.X : value2.X, (value1.Y > value2.Y) ? value1.Y : value2.Y, (value1.Z > value2.Z) ? value1.Z : value2.Z);
         }
 
         /// <summary>
@@ -938,7 +917,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d Min(Vector3d value1, Vector3d value2)
         {
-            return new Vector3d((value1.x < value2.x) ? value1.x : value2.x, (value1.y < value2.y) ? value1.y : value2.y, (value1.z < value2.z) ? value1.z : value2.z);
+            return new Vector3d((value1.X < value2.X) ? value1.X : value2.X, (value1.Y < value2.Y) ? value1.Y : value2.Y, (value1.Z < value2.Z) ? value1.Z : value2.Z);
         }
 
         /// <summary>
@@ -979,13 +958,13 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator +(Vector3d v1, Vector3d v2)
         {
-            return new Vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+            return new Vector3d(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator +(Vector3d v1, Fixed64 mag)
         {
-            return new Vector3d(v1.x + mag, v1.y + mag, v1.z + mag);
+            return new Vector3d(v1.X + mag, v1.Y + mag, v1.Z + mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -997,7 +976,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator +(Vector3d v1, (int x, int y, int z) v2)
         {
-            return new Vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+            return new Vector3d(v1.X + v2.x, v1.Y + v2.y, v1.Z + v2.z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1007,96 +986,72 @@ namespace FixedMathSharp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3d operator +(Vector3d v1, (float x, float y, float z) v2)
-        {
-            return new Vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3d operator +((float x, float y, float z) v1, Vector3d v2)
-        {
-            return v2 + v1;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -(Vector3d v1, Vector3d v2)
         {
-            return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+            return new Vector3d(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -(Vector3d v1, Fixed64 mag)
         {
-            return new Vector3d(v1.x - mag, v1.y - mag, v1.z - mag);
+            return new Vector3d(v1.X - mag, v1.Y - mag, v1.Z - mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -(Fixed64 mag, Vector3d v1)
         {
-            return new Vector3d(mag - v1.x, mag - v1.y, mag - v1.z);
+            return new Vector3d(mag - v1.X, mag - v1.Y, mag - v1.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -(Vector3d v1, (int x, int y, int z) v2)
         {
-            return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+            return new Vector3d(v1.X - v2.x, v1.Y - v2.y, v1.Z - v2.z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -((int x, int y, int z) v1, Vector3d v2)
         {
-            return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3d operator -(Vector3d v1, (float x, float y, float z) v2)
-        {
-            return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3d operator -((float x, float y, float z) v1, Vector3d v2)
-        {
-            return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+            return new Vector3d(v1.x - v2.X, v1.y - v2.Y, v1.z - v2.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator -(Vector3d v1)
         {
-            return new Vector3d(v1.x * -Fixed64.One, v1.y * -Fixed64.One, v1.z * -Fixed64.One);
+            return new Vector3d(v1.X * -Fixed64.One, v1.Y * -Fixed64.One, v1.Z * -Fixed64.One);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(Vector3d v1, Fixed64 mag)
         {
-            return new Vector3d(v1.x * mag, v1.y * mag, v1.z * mag);
+            return new Vector3d(v1.X * mag, v1.Y * mag, v1.Z * mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(Fixed64 mag, Vector3d v1)
         {
-            return new Vector3d(v1.x * mag, v1.y * mag, v1.z * mag);
+            return new Vector3d(v1.X * mag, v1.Y * mag, v1.Z * mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(Vector3d v1, int mag)
         {
-            return new Vector3d(v1.x * mag, v1.y * mag, v1.z * mag);
+            return new Vector3d(v1.X * mag, v1.Y * mag, v1.Z * mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(int mag, Vector3d v1)
         {
-            return new Vector3d(v1.x * mag, v1.y * mag, v1.z * mag);
+            return new Vector3d(v1.X * mag, v1.Y * mag, v1.Z * mag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(Fixed3x3 matrix, Vector3d vector)
         {
             return new Vector3d(
-                matrix.m00 * vector.x + matrix.m01 * vector.y + matrix.m02 * vector.z,
-                matrix.m10 * vector.x + matrix.m11 * vector.y + matrix.m12 * vector.z,
-                matrix.m20 * vector.x + matrix.m21 * vector.y + matrix.m22 * vector.z
+                matrix.m00 * vector.X + matrix.m01 * vector.Y + matrix.m02 * vector.Z,
+                matrix.m10 * vector.X + matrix.m11 * vector.Y + matrix.m12 * vector.Z,
+                matrix.m20 * vector.X + matrix.m21 * vector.Y + matrix.m22 * vector.Z
             );
         }
 
@@ -1112,20 +1067,20 @@ namespace FixedMathSharp
             if (matrix.IsAffine)
             {
                 return new Vector3d(
-                    matrix.m00 * point.x + matrix.m01 * point.y + matrix.m02 * point.z + matrix.m03 + matrix.m30,
-                    matrix.m10 * point.x + matrix.m11 * point.y + matrix.m12 * point.z + matrix.m13 + matrix.m31,
-                    matrix.m20 * point.x + matrix.m21 * point.y + matrix.m22 * point.z + matrix.m23 + matrix.m32
+                    matrix.m00 * point.X + matrix.m01 * point.Y + matrix.m02 * point.Z + matrix.m03 + matrix.m30,
+                    matrix.m10 * point.X + matrix.m11 * point.Y + matrix.m12 * point.Z + matrix.m13 + matrix.m31,
+                    matrix.m20 * point.X + matrix.m21 * point.Y + matrix.m22 * point.Z + matrix.m23 + matrix.m32
                 );
             }
 
             // Full 4×4 transformation
-            Fixed64 w = matrix.m03 * point.x + matrix.m13 * point.y + matrix.m23 * point.z + matrix.m33;
+            Fixed64 w = matrix.m03 * point.X + matrix.m13 * point.Y + matrix.m23 * point.Z + matrix.m33;
             if (w == Fixed64.Zero) w = Fixed64.One;  // Prevent divide-by-zero
 
             return new Vector3d(
-                (matrix.m00 * point.x + matrix.m01 * point.y + matrix.m02 * point.z + matrix.m03 + matrix.m30) / w,
-                (matrix.m10 * point.x + matrix.m11 * point.y + matrix.m12 * point.z + matrix.m13 + matrix.m31) / w,
-                (matrix.m20 * point.x + matrix.m21 * point.y + matrix.m22 * point.z + matrix.m23 + matrix.m32) / w
+                (matrix.m00 * point.X + matrix.m01 * point.Y + matrix.m02 * point.Z + matrix.m03 + matrix.m30) / w,
+                (matrix.m10 * point.X + matrix.m11 * point.Y + matrix.m12 * point.Z + matrix.m13 + matrix.m31) / w,
+                (matrix.m20 * point.X + matrix.m21 * point.Y + matrix.m22 * point.Z + matrix.m23 + matrix.m32) / w
             );
         }
 
@@ -1138,34 +1093,34 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator *(Vector3d v1, Vector3d v2)
         {
-            return new Vector3d(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+            return new Vector3d(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator /(Vector3d v1, Fixed64 div)
         {
-            return div == Fixed64.Zero ? Zero : new Vector3d(v1.x / div, v1.y / div, v1.z / div);
+            return div == Fixed64.Zero ? zero : new Vector3d(v1.X / div, v1.Y / div, v1.Z / div);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator /(Vector3d v1, Vector3d v2)
         {
             return new Vector3d(
-                v2.x == Fixed64.Zero ? Fixed64.Zero : v1.x / v2.x,
-                v2.y == Fixed64.Zero ? Fixed64.Zero : v1.y / v2.y,
-                v2.z == Fixed64.Zero ? Fixed64.Zero : v1.z / v2.z);
+                v2.X == Fixed64.Zero ? Fixed64.Zero : v1.X / v2.X,
+                v2.Y == Fixed64.Zero ? Fixed64.Zero : v1.Y / v2.Y,
+                v2.Z == Fixed64.Zero ? Fixed64.Zero : v1.Z / v2.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator /(Vector3d v1, int div)
         {
-            return div == 0 ? Zero : new Vector3d(v1.x / div, v1.y / div, v1.z / div);
+            return div == 0 ? zero : new Vector3d(v1.X / div, v1.Y / div, v1.Z / div);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3d operator /(Fixed64 div, Vector3d v1)
         {
-            return new Vector3d(div / v1.x, div / v1.y, div / v1.z);
+            return new Vector3d(div / v1.X, div / v1.Y, div / v1.Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1190,9 +1145,9 @@ namespace FixedMathSharp
             Fixed64 num11 = rotation.w * num2;
             Fixed64 num12 = rotation.w * num3;
             Vector3d vector3 = new Vector3d(
-                (Fixed64.One - (num5 + num6)) * point.x + (num7 - num12) * point.y + (num8 + num11) * point.z,
-                (num7 + num12) * point.x + (Fixed64.One - (num4 + num6)) * point.y + (num9 - num10) * point.z,
-                (num8 - num11) * point.x + (num9 + num10) * point.y + (Fixed64.One - (num4 + num5)) * point.z
+                (Fixed64.One - (num5 + num6)) * point.X + (num7 - num12) * point.Y + (num8 + num11) * point.Z,
+                (num7 + num12) * point.X + (Fixed64.One - (num4 + num6)) * point.Y + (num9 - num10) * point.Z,
+                (num8 - num11) * point.X + (num9 + num10) * point.Y + (Fixed64.One - (num4 + num5)) * point.Z
             );
             return vector3;
         }
@@ -1212,33 +1167,33 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator >(Vector3d left, Vector3d right)
         {
-            return left.x > right.x
-                && left.y > right.y
-                && left.z > right.z;
+            return left.X > right.X
+                && left.Y > right.Y
+                && left.Z > right.Z;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <(Vector3d left, Vector3d right)
         {
-            return left.x < right.x
-                && left.y < right.y
-                && left.z < right.z;
+            return left.X < right.X
+                && left.Y < right.Y
+                && left.Z < right.Z;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator >=(Vector3d left, Vector3d right)
         {
-            return left.x >= right.x
-                && left.y >= right.y
-                && left.z >= right.z;
+            return left.X >= right.X
+                && left.Y >= right.Y
+                && left.Z >= right.Z;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <=(Vector3d left, Vector3d right)
         {
-            return left.x <= right.x
-                && left.y <= right.y
-                && left.z <= right.z;
+            return left.X <= right.X
+                && left.Y <= right.Y
+                && left.Z <= right.Z;
         }
 
         #endregion
@@ -1248,7 +1203,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", x.ToFormattedDouble(), y.ToFormattedDouble(), z.ToFormattedDouble());
+            return string.Format("({0}, {1}, {2})", X.ToFormattedDouble(), Y.ToFormattedDouble(), Z.ToFormattedDouble());
         }
 
         /// <summary>
@@ -1262,23 +1217,23 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector2d ToVector2d()
         {
-            return new Vector2d(x, z);
+            return new Vector2d(X, Z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Deconstruct(out float x, out float y, out float z)
         {
-            x = this.x.ToPreciseFloat();
-            y = this.y.ToPreciseFloat();
-            z = this.z.ToPreciseFloat();
+            x = this.X.ToPreciseFloat();
+            y = this.Y.ToPreciseFloat();
+            z = this.Z.ToPreciseFloat();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Deconstruct(out int x, out int y, out int z)
         {
-            x = this.x.RoundToInt();
-            y = this.y.RoundToInt();
-            z = this.z.RoundToInt();
+            x = this.X.RoundToInt();
+            y = this.Y.RoundToInt();
+            z = this.Z.RoundToInt();
         }
 
         /// <summary>
@@ -1290,9 +1245,9 @@ namespace FixedMathSharp
         public static Vector3d ToDegrees(Vector3d radians)
         {
             return new Vector3d(
-                FixedMath.RadToDeg(radians.x),
-                FixedMath.RadToDeg(radians.y),
-                FixedMath.RadToDeg(radians.z));
+                FixedMath.RadToDeg(radians.X),
+                FixedMath.RadToDeg(radians.Y),
+                FixedMath.RadToDeg(radians.Z));
         }
 
         /// <summary>
@@ -1304,9 +1259,9 @@ namespace FixedMathSharp
         public static Vector3d ToRadians(Vector3d degrees)
         {
             return new Vector3d(
-                FixedMath.DegToRad(degrees.x),
-                FixedMath.DegToRad(degrees.y),
-                FixedMath.DegToRad(degrees.z));
+                FixedMath.DegToRad(degrees.X),
+                FixedMath.DegToRad(degrees.Y),
+                FixedMath.DegToRad(degrees.Z));
         }
 
         #endregion
@@ -1322,7 +1277,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector3d other)
         {
-            return other.x == x && other.y == y && other.z == z;
+            return other.X == X && other.Y == Y && other.Z == Z;
         }
 
         public bool Equals(Vector3d x, Vector3d y)

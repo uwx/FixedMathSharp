@@ -7,7 +7,7 @@ namespace FixedMathSharp
     {
         #region Fields and Constants
 
-        public static readonly int[] Pow10Lookup = {
+        public static ReadOnlySpan<int> Pow10Lookup => [
             1,           // 10^0 = 1
             10,          // 10^1 = 10
             100,         // 10^2 = 100
@@ -18,7 +18,7 @@ namespace FixedMathSharp
             10000000,    // 10^7 = 1000000
             100000000,   // 10^8 = 1000000
             1000000000,  // 10^9 = 1000000
-        };
+        ];
 
         // Trigonometric and logarithmic constants
         internal const double PI_D = 3.14159265358979323846;
@@ -258,7 +258,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 RadToDeg(Fixed64 rad)
         {
-            return new Fixed64((double)rad * RAD2DEG_D);
+            return rad * Rad2Deg;
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 DegToRad(Fixed64 deg)
         {
-            return new Fixed64((double)deg * DEG2RAD_D);
+            return deg * Deg2Rad;
         }
 
         /// <summary>
@@ -315,13 +315,12 @@ namespace FixedMathSharp
                 x = PI - x;
 
             // Precompute x^2
-            Fixed64 x2 = x * x;
+            Fixed64 x2 = Fixed64.MulPrecise(x, x);
 
             // Optimized Chebyshev Polynomial for Sin(x)
-            Fixed64 result = x * (Fixed64.One
-                - x2 * SIN_COEFF_3
-                + (x2 * x2) * SIN_COEFF_5
-                - (x2 * x2 * x2) * SIN_COEFF_7);
+            Fixed64 result = x * (Fixed64.One - Fixed64.MulPrecise(x2, SIN_COEFF_3) +
+                                  Fixed64.MulPrecise(Fixed64.MulPrecise(x2, x2), SIN_COEFF_5) -
+                                  Fixed64.MulPrecise(Fixed64.MulPrecise(Fixed64.MulPrecise(x2, x2), x2), SIN_COEFF_7));
 
             return flip ? -result : result;
         }

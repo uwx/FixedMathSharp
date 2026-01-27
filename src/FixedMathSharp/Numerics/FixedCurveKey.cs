@@ -33,14 +33,14 @@ namespace FixedMathSharp
         /// <summary>
         /// Creates a keyframe with a specified time and value.
         /// </summary>
-        public FixedCurveKey(double time, double value)
-            : this(new Fixed64(time), new Fixed64(value)) { }
+        public static FixedCurveKey CreateFromDouble(double time, double value)
+            => new(Fixed64.CreateFromDouble(time), Fixed64.CreateFromDouble(value));
 
         /// <summary>
         /// Creates a keyframe with optional tangents for cubic interpolation.
         /// </summary>
-        public FixedCurveKey(double time, double value, double inTangent, double outTangent)
-            : this(new Fixed64(time), new Fixed64(value), new Fixed64(inTangent), new Fixed64(outTangent)) { }
+        public static FixedCurveKey CreateFromDouble(double time, double value, double inTangent, double outTangent)
+            => new(Fixed64.CreateFromDouble(time), Fixed64.CreateFromDouble(value), Fixed64.CreateFromDouble(inTangent), Fixed64.CreateFromDouble(outTangent));
 
         /// <summary>
         /// Creates a keyframe with a specified time and value.

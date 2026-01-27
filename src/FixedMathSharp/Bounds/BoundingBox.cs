@@ -191,9 +191,9 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Vector3d point)
         {
-            return point.x >= Min.x && point.x <= Max.x
-                && point.y >= Min.y && point.y <= Max.y
-                && point.z >= Min.z && point.z <= Max.z;
+            return point.X >= Min.X && point.X <= Max.X
+                && point.Y >= Min.Y && point.Y <= Max.Y
+                && point.Z >= Min.Z && point.Z <= Max.Z;
         }
 
         /// <summary>
@@ -213,9 +213,9 @@ namespace FixedMathSharp
                             return true;  // Full containment
 
                         // General intersection logic (allowing for overlap)
-                        return !(Max.x <= other.Min.x || Min.x >= other.Max.x ||
-                                 Max.y <= other.Min.y || Min.y >= other.Max.y ||
-                                 Max.z <= other.Min.z || Min.z >= other.Max.z);
+                        return !(Max.X <= other.Min.X || Min.X >= other.Max.X ||
+                                 Max.Y <= other.Min.Y || Min.Y >= other.Max.Y ||
+                                 Max.Z <= other.Min.Z || Min.Z >= other.Max.Z);
                     }
                 case BoundingSphere sphere:
                     // project the sphere’s center onto the 3D volume and checks the distance to the surface.
@@ -253,9 +253,9 @@ namespace FixedMathSharp
         {
             // Clamp the point to the nearest point on the box's surface
             Vector3d clampedPoint = new Vector3d(
-                FixedMath.Clamp(point.x, Min.x, Max.x),
-                FixedMath.Clamp(point.y, Min.y, Max.y),
-                FixedMath.Clamp(point.z, Min.z, Max.z)
+                FixedMath.Clamp(point.X, Min.X, Max.X),
+                FixedMath.Clamp(point.Y, Min.Y, Max.Y),
+                FixedMath.Clamp(point.Z, Min.Z, Max.Z)
             );
 
             // If the point is inside the box, return 0
@@ -284,33 +284,33 @@ namespace FixedMathSharp
             if (Contains(point))
             {
                 // Calculate distances to each face and return the closest face.
-                Fixed64 distToMinX = point.x - Min.x;
-                Fixed64 distToMaxX = Max.x - point.x;
-                Fixed64 distToMinY = point.y - Min.y;
-                Fixed64 distToMaxY = Max.y - point.y;
-                Fixed64 distToMinZ = point.z - Min.z;
-                Fixed64 distToMaxZ = Max.z - point.z;
+                Fixed64 distToMinX = point.X - Min.X;
+                Fixed64 distToMaxX = Max.X - point.X;
+                Fixed64 distToMinY = point.Y - Min.Y;
+                Fixed64 distToMaxY = Max.Y - point.Y;
+                Fixed64 distToMinZ = point.Z - Min.Z;
+                Fixed64 distToMaxZ = Max.Z - point.Z;
 
                 Fixed64 minDistToFace = FixedMath.Min(distToMinX, FixedMath.Min(distToMaxX, FixedMath.Min(distToMinY, FixedMath.Min(distToMaxY, FixedMath.Min(distToMinZ, distToMaxZ)))));
 
                 // Adjust the closest point based on the face.
-                if (minDistToFace == distToMinX) point.x = Min.x;
-                else if (minDistToFace == distToMaxX) point.x = Max.x;
+                if (minDistToFace == distToMinX) point.X = Min.X;
+                else if (minDistToFace == distToMaxX) point.X = Max.X;
 
-                if (minDistToFace == distToMinY) point.y = Min.y;
-                else if (minDistToFace == distToMaxY) point.y = Max.y;
+                if (minDistToFace == distToMinY) point.Y = Min.Y;
+                else if (minDistToFace == distToMaxY) point.Y = Max.Y;
 
-                if (minDistToFace == distToMinZ) point.z = Min.z;
-                else if (minDistToFace == distToMaxZ) point.z = Max.z;
+                if (minDistToFace == distToMinZ) point.Z = Min.Z;
+                else if (minDistToFace == distToMaxZ) point.Z = Max.Z;
 
                 return point;
             }
 
             // If the point is outside the box, clamp to the nearest surface.
             return new Vector3d(
-                FixedMath.Clamp(point.x, Min.x, Max.x),
-                FixedMath.Clamp(point.y, Min.y, Max.y),
-                FixedMath.Clamp(point.z, Min.z, Max.z)
+                FixedMath.Clamp(point.X, Min.X, Max.X),
+                FixedMath.Clamp(point.Y, Min.Y, Max.Y),
+                FixedMath.Clamp(point.Z, Min.Z, Max.Z)
             );
         }
 
@@ -347,14 +347,14 @@ namespace FixedMathSharp
         {
             if (_isDirty)
             {
-                _vertices[0] = _center + _vertices[0].Set(-Scope.x, -Scope.y, -Scope.z);
-                _vertices[1] = _center + _vertices[1].Set(Scope.x, -Scope.y, -Scope.z);
-                _vertices[2] = _center + _vertices[2].Set(-Scope.x, Scope.y, -Scope.z);
-                _vertices[3] = _center + _vertices[3].Set(Scope.x, Scope.y, -Scope.z);
-                _vertices[4] = _center + _vertices[4].Set(-Scope.x, -Scope.y, Scope.z);
-                _vertices[5] = _center + _vertices[5].Set(Scope.x, -Scope.y, Scope.z);
-                _vertices[6] = _center + _vertices[6].Set(-Scope.x, Scope.y, Scope.z);
-                _vertices[7] = _center + _vertices[7].Set(Scope.x, Scope.y, Scope.z);
+                _vertices[0] = _center + _vertices[0].Set(-Scope.X, -Scope.Y, -Scope.Z);
+                _vertices[1] = _center + _vertices[1].Set(Scope.X, -Scope.Y, -Scope.Z);
+                _vertices[2] = _center + _vertices[2].Set(-Scope.X, Scope.Y, -Scope.Z);
+                _vertices[3] = _center + _vertices[3].Set(Scope.X, Scope.Y, -Scope.Z);
+                _vertices[4] = _center + _vertices[4].Set(-Scope.X, -Scope.Y, Scope.Z);
+                _vertices[5] = _center + _vertices[5].Set(Scope.X, -Scope.Y, Scope.Z);
+                _vertices[6] = _center + _vertices[6].Set(-Scope.X, Scope.Y, Scope.Z);
+                _vertices[7] = _center + _vertices[7].Set(Scope.X, Scope.Y, Scope.Z);
 
                 _isDirty = false;
             }

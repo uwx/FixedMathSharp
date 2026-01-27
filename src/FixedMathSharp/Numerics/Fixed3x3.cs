@@ -83,7 +83,7 @@ namespace FixedMathSharp
             Vector3d m00_m01_m02,
             Vector3d m10_m11_m12,
             Vector3d m20_m21_m22
-        ) : this(m00_m01_m02.x, m00_m01_m02.y, m00_m01_m02.z, m10_m11_m12.x, m10_m11_m12.y, m10_m11_m12.z, m20_m21_m22.x, m20_m21_m22.y, m20_m21_m22.z) { }
+        ) : this(m00_m01_m02.X, m00_m01_m02.Y, m00_m01_m02.Z, m10_m11_m12.X, m10_m11_m12.Y, m10_m11_m12.Z, m20_m21_m22.X, m20_m21_m22.Y, m20_m21_m22.Z) { }
 
         #endregion
 
@@ -276,9 +276,9 @@ namespace FixedMathSharp
         public static Fixed3x3 CreateScale(Vector3d scale)
         {
             return new Fixed3x3(
-                scale.x, Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, scale.y, Fixed64.Zero,
-                Fixed64.Zero, Fixed64.Zero, scale.z
+                scale.X, Fixed64.Zero, Fixed64.Zero,
+                Fixed64.Zero, scale.Y, Fixed64.Zero,
+                Fixed64.Zero, Fixed64.Zero, scale.Z
             );
         }
 
@@ -311,9 +311,9 @@ namespace FixedMathSharp
             var y = new Vector3d(matrix.m10, matrix.m11, matrix.m12).Normalize();
             var z = Vector3d.Cross(x, y).Normalize();
 
-            matrix.m00 = x.x; matrix.m01 = x.y; matrix.m02 = x.z;
-            matrix.m10 = y.x; matrix.m11 = y.y; matrix.m12 = y.z;
-            matrix.m20 = z.x; matrix.m21 = z.y; matrix.m22 = z.z;
+            matrix.m00 = x.X; matrix.m01 = x.Y; matrix.m02 = x.Z;
+            matrix.m10 = y.X; matrix.m11 = y.Y; matrix.m12 = y.Z;
+            matrix.m20 = z.X; matrix.m21 = z.Y; matrix.m22 = z.Z;
 
             return matrix;
         }
@@ -334,7 +334,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed3x3 SetLossyScale(Vector3d scale)
         {
-            return SetLossyScale(scale.x, scale.y, scale.z);
+            return SetLossyScale(scale.X, scale.Y, scale.Z);
         }
 
         /// <summary>
@@ -357,9 +357,9 @@ namespace FixedMathSharp
         /// <param name="localScale">A Vector3d representing the local scale to apply.</param>
         public static Fixed3x3 SetScale(Fixed3x3 matrix, Vector3d localScale)
         {
-            matrix.m00 = localScale.x; // Apply scale on X-axis
-            matrix.m11 = localScale.y; // Apply scale on Y-axis
-            matrix.m22 = localScale.z; // Apply scale on Z-axis
+            matrix.m00 = localScale.X; // Apply scale on X-axis
+            matrix.m11 = localScale.Y; // Apply scale on Y-axis
+            matrix.m22 = localScale.Z; // Apply scale on Z-axis
 
             return matrix;
         }
@@ -385,9 +385,9 @@ namespace FixedMathSharp
 
             // Compute the new local scale by dividing the desired global scale by the current global scale
             Vector3d newLocalScale = new Vector3d(
-                globalScale.x / Fixed64.One,
-                globalScale.y / Fixed64.One,
-                globalScale.z / Fixed64.One
+                globalScale.X / Fixed64.One,
+                globalScale.Y / Fixed64.One,
+                globalScale.Z / Fixed64.One
             );
 
             // Apply the new local scale to the matrix
@@ -492,9 +492,9 @@ namespace FixedMathSharp
         public static Vector3d TransformDirection(Fixed3x3 matrix, Vector3d direction)
         {
             return new Vector3d(
-                matrix.m00 * direction.x + matrix.m01 * direction.y + matrix.m02 * direction.z,
-                matrix.m10 * direction.x + matrix.m11 * direction.y + matrix.m12 * direction.z,
-                matrix.m20 * direction.x + matrix.m21 * direction.y + matrix.m22 * direction.z
+                matrix.m00 * direction.X + matrix.m01 * direction.Y + matrix.m02 * direction.Z,
+                matrix.m10 * direction.X + matrix.m11 * direction.Y + matrix.m12 * direction.Z,
+                matrix.m20 * direction.X + matrix.m21 * direction.Y + matrix.m22 * direction.Z
             );
         }
 
@@ -511,9 +511,9 @@ namespace FixedMathSharp
                 throw new InvalidOperationException("Matrix is not invertible.");
 
             return new Vector3d(
-                inverseMatrix.Value.m00 * direction.x + inverseMatrix.Value.m01 * direction.y + inverseMatrix.Value.m02 * direction.z,
-                inverseMatrix.Value.m10 * direction.x + inverseMatrix.Value.m11 * direction.y + inverseMatrix.Value.m12 * direction.z,
-                inverseMatrix.Value.m20 * direction.x + inverseMatrix.Value.m21 * direction.y + inverseMatrix.Value.m22 * direction.z
+                inverseMatrix.Value.m00 * direction.X + inverseMatrix.Value.m01 * direction.Y + inverseMatrix.Value.m02 * direction.Z,
+                inverseMatrix.Value.m10 * direction.X + inverseMatrix.Value.m11 * direction.Y + inverseMatrix.Value.m12 * direction.Z,
+                inverseMatrix.Value.m20 * direction.X + inverseMatrix.Value.m21 * direction.Y + inverseMatrix.Value.m22 * direction.Z
             );
         }
 

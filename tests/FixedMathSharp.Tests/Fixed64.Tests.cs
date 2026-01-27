@@ -113,13 +113,13 @@ namespace FixedMathSharp.Tests
         public void Convert_FromFloat_ReturnsCorrectFixed64()
         {
             Fixed64 result = (Fixed64)5.5f;
-            Assert.Equal(new Fixed64(5.5f), result);
+            Assert.Equal(Fixed64.CreateFromDouble(5.5f), result);
         }
 
         [Fact]
         public void Convert_ToDouble_ReturnsCorrectDouble()
         {
-            var fixedValue = new Fixed64(5.5f);
+            var fixedValue = Fixed64.CreateFromDouble(5.5f);
             double result = (double)fixedValue;
             Assert.Equal(5.5, result);
         }
@@ -131,8 +131,8 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void Fraction_CreatesCorrectFixed64Value()
         {
-            var result = Fixed64.Fraction(1, 2);
-            Assert.Equal(new Fixed64(0.5f), result);
+            var result = Fixed64.Fraction(Fixed64.CreateFromDouble(1), Fixed64.CreateFromDouble(2));
+            Assert.Equal(Fixed64.CreateFromDouble(0.5f), result);
         }
 
         #endregion
@@ -185,14 +185,14 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void IsInteger_PositiveDecimal_ReturnsFalse()
         {
-            var a = new Fixed64(4.2);
+            var a = Fixed64.CreateFromDouble(4.2);
             Assert.False(a.IsInteger());
         }
 
         [Fact]
         public void IsInteger_NegativeDecimal_ReturnsFalse()
         {
-            var a = new Fixed64(-4.2);
+            var a = Fixed64.CreateFromDouble(-4.2);
             Assert.False(a.IsInteger());
         }
 
