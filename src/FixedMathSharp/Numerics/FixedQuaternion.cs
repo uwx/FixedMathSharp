@@ -278,38 +278,38 @@ namespace FixedMathSharp
             if (trace > Fixed64.Zero)
             {
                 Fixed64 s = FixedMath.Sqrt(trace + Fixed64.One);
-                w = Fixed64.MulPrecise(s, Fixed64.Half);
+                w = s * Fixed64.Half;
                 s = Fixed64.Half / s;
-                x = Fixed64.MulPrecise((matrix.m21 - matrix.m12), s);
-                y = Fixed64.MulPrecise((matrix.m02 - matrix.m20), s);
-                z = Fixed64.MulPrecise((matrix.m10 - matrix.m01), s);
+                x = (matrix.m21 - matrix.m12) * s;
+                y = (matrix.m02 - matrix.m20) * s;
+                z = (matrix.m10 - matrix.m01) * s;
             }
             else if (matrix.m00 > matrix.m11 && matrix.m00 > matrix.m22)
             {
                 Fixed64 s = FixedMath.Sqrt(Fixed64.One + matrix.m00 - matrix.m11 - matrix.m22);
-                x = Fixed64.MulPrecise(s, Fixed64.Half);
+                x = s * Fixed64.Half;
                 s = Fixed64.Half / s;
-                y = Fixed64.MulPrecise((matrix.m10 + matrix.m01), s);
-                z = Fixed64.MulPrecise((matrix.m02 + matrix.m20), s);
-                w = Fixed64.MulPrecise((matrix.m21 - matrix.m12), s);
+                y = (matrix.m10 + matrix.m01) * s;
+                z = (matrix.m02 + matrix.m20) * s;
+                w = (matrix.m21 - matrix.m12) * s;
             }
             else if (matrix.m11 > matrix.m22)
             {
                 Fixed64 s = FixedMath.Sqrt(Fixed64.One + matrix.m11 - matrix.m00 - matrix.m22);
-                y = Fixed64.MulPrecise(s, Fixed64.Half);
+                y = s * Fixed64.Half;
                 s = Fixed64.Half / s;
-                z = Fixed64.MulPrecise((matrix.m21 + matrix.m12), s);
-                x = Fixed64.MulPrecise((matrix.m10 + matrix.m01), s);
-                w = Fixed64.MulPrecise((matrix.m02 - matrix.m20), s);
+                z = (matrix.m21 + matrix.m12) * s;
+                x = (matrix.m10 + matrix.m01) * s;
+                w = (matrix.m02 - matrix.m20) * s;
             }
             else
             {
                 Fixed64 s = FixedMath.Sqrt(Fixed64.One + matrix.m22 - matrix.m00 - matrix.m11);
-                z = Fixed64.MulPrecise(s, Fixed64.Half);
+                z = s * Fixed64.Half;
                 s = Fixed64.Half / s;
-                x = Fixed64.MulPrecise((matrix.m02 + matrix.m20), s);
-                y = Fixed64.MulPrecise((matrix.m21 + matrix.m12), s);
-                w = Fixed64.MulPrecise((matrix.m10 - matrix.m01), s);
+                x = (matrix.m02 + matrix.m20) * s;
+                y = (matrix.m21 + matrix.m12) * s;
+                w = (matrix.m10 - matrix.m01) * s;
             }
 
             return new FixedQuaternion(x, y, z, w);
@@ -737,31 +737,31 @@ namespace FixedMathSharp
         /// <returns>A FixedMatrix3x3 representing the same rotation as the quaternion.</returns>
         public Fixed3x3 ToMatrix3x3()
         {
-            Fixed64 x2 = Fixed64.MulPrecise(x, x);
-            Fixed64 y2 = Fixed64.MulPrecise(y, y);
-            Fixed64 z2 = Fixed64.MulPrecise(z, z);
-            Fixed64 xy = Fixed64.MulPrecise(x, y);
-            Fixed64 xz = Fixed64.MulPrecise(x, z);
-            Fixed64 yz = Fixed64.MulPrecise(y, z);
-            Fixed64 xw = Fixed64.MulPrecise(x, w);
-            Fixed64 yw = Fixed64.MulPrecise(y, w);
-            Fixed64 zw = Fixed64.MulPrecise(z, w);
+            Fixed64 x2 = x * x;
+            Fixed64 y2 = y * y;
+            Fixed64 z2 = z * z;
+            Fixed64 xy = x * y;
+            Fixed64 xz = x * z;
+            Fixed64 yz = y * z;
+            Fixed64 xw = x * w;
+            Fixed64 yw = y * w;
+            Fixed64 zw = z * w;
 
             Fixed3x3 result = new Fixed3x3();
-            Fixed64 scale = Fixed64.Two;
+            Fixed64 scale = Fixed64.One * 2;
 
-            result.m00 = Fixed64.One - Fixed64.MulPrecise(scale, (y2 + z2));
-            result.m01 = Fixed64.MulPrecise(scale, (xy - zw));
-            result.m02 = Fixed64.MulPrecise(scale, (xz + yw));
+            result.m00 = Fixed64.One - scale * (y2 + z2);
+            result.m01 = scale * (xy - zw);
+            result.m02 = scale * (xz + yw);
 
-            result.m10 = Fixed64.MulPrecise(scale, (xy + zw));
-            result.m11 = Fixed64.One - Fixed64.MulPrecise(scale, (x2 + z2));
-            result.m12 = Fixed64.MulPrecise(scale, (yz - xw));
+            result.m10 = scale * (xy + zw);
+            result.m11 = Fixed64.One - scale * (x2 + z2);
+            result.m12 = scale * (yz - xw);
 
-            result.m20 = Fixed64.MulPrecise(scale, (xz - yw));
-            result.m21 = Fixed64.MulPrecise(scale, (yz + xw));
-            result.m22 = Fixed64.One - Fixed64.MulPrecise(scale, (x2 + y2));
-
+            result.m20 = scale * (xz - yw);
+            result.m21 = scale * (yz + xw);
+            result.m22 = Fixed64.One - scale * (x2 + y2);
+            
             return result;
         }
 

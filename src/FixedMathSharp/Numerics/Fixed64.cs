@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace FixedMathSharp
 {
@@ -50,11 +51,13 @@ namespace FixedMathSharp
         /// <summary>
         /// Internal constructor for a Fixed64 from a raw long value.
         /// </summary>
-        /// <param name="rawValue">Raw long value representing the fixed-point number.</param>
+        /// <param name="m_rawValue">Raw long value representing the fixed-point number.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Fixed64(long rawValue)
+        [SerializationConstructor, JsonConstructor]
+        // ReSharper disable once InconsistentNaming
+        internal Fixed64(long m_rawValue)
         {
-            m_rawValue = rawValue;
+            this.m_rawValue = m_rawValue;
         }
 
         /// <summary>

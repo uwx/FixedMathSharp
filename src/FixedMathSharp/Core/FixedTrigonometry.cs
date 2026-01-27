@@ -315,12 +315,13 @@ namespace FixedMathSharp
                 x = PI - x;
 
             // Precompute x^2
-            Fixed64 x2 = Fixed64.MulPrecise(x, x);
+            Fixed64 x2 = x * x;
 
             // Optimized Chebyshev Polynomial for Sin(x)
-            Fixed64 result = x * (Fixed64.One - Fixed64.MulPrecise(x2, SIN_COEFF_3) +
-                                  Fixed64.MulPrecise(Fixed64.MulPrecise(x2, x2), SIN_COEFF_5) -
-                                  Fixed64.MulPrecise(Fixed64.MulPrecise(Fixed64.MulPrecise(x2, x2), x2), SIN_COEFF_7));
+            Fixed64 result = x * (Fixed64.One
+                                  - x2 * SIN_COEFF_3
+                                  + (x2 * x2) * SIN_COEFF_5
+                                  - (x2 * x2 * x2) * SIN_COEFF_7);
 
             return flip ? -result : result;
         }

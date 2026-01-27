@@ -1,6 +1,7 @@
 ﻿using MessagePack;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace FixedMathSharp
 {
@@ -24,40 +25,40 @@ namespace FixedMathSharp
     {
         #region Fields and Constants
 
-        [Key(0)]
+        [Key(0), JsonPropertyName("m00")]
         public Fixed64 m00;
-        [Key(1)]
+        [Key(1), JsonPropertyName("m01")]
         public Fixed64 m01;
-        [Key(2)]
+        [Key(2), JsonPropertyName("m02")]
         public Fixed64 m02;
-        [Key(3)]
+        [Key(3), JsonPropertyName("m03")]
         public Fixed64 m03;
 
-        [Key(4)]
+        [Key(4), JsonPropertyName("m10")]
         public Fixed64 m10;
-        [Key(5)]
+        [Key(5), JsonPropertyName("m11")]
         public Fixed64 m11;
-        [Key(6)]
+        [Key(6), JsonPropertyName("m12")]
         public Fixed64 m12;
-        [Key(7)]
+        [Key(7), JsonPropertyName("m13")]
         public Fixed64 m13;
 
-        [Key(8)]
+        [Key(8), JsonPropertyName("m20")]
         public Fixed64 m20;
-        [Key(9)]
+        [Key(9), JsonPropertyName("m21")]
         public Fixed64 m21;
-        [Key(10)]
+        [Key(10), JsonPropertyName("m22")]
         public Fixed64 m22;
-        [Key(11)]
+        [Key(11), JsonPropertyName("m23")]
         public Fixed64 m23;
 
-        [Key(12)]
+        [Key(12), JsonPropertyName("m30")]
         public Fixed64 m30;
-        [Key(13)]
+        [Key(13), JsonPropertyName("m31")]
         public Fixed64 m31;
-        [Key(14)]
+        [Key(14), JsonPropertyName("m32")]
         public Fixed64 m32;
-        [Key(15)]
+        [Key(15), JsonPropertyName("m33")]
         public Fixed64 m33;
 
         /// <summary>
@@ -86,6 +87,7 @@ namespace FixedMathSharp
         /// Initializes a new FixedMatrix4x4 with individual elements.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [JsonConstructor]
         public Fixed4x4(
             Fixed64 m00, Fixed64 m01, Fixed64 m02, Fixed64 m03,
             Fixed64 m10, Fixed64 m11, Fixed64 m12, Fixed64 m13,
