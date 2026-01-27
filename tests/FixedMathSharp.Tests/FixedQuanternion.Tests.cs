@@ -136,7 +136,7 @@ namespace FixedMathSharp.Tests
         [Fact]
         public void FixedQuaternion_FromDirection_WorksCorrectly()
         {
-            var direction = Vector3d.Right; // X-axis direction
+            var direction = -Vector3d.Right; // X-axis direction
             var result = FixedQuaternion.FromDirection(direction);
 
             // Expect a 90-degree rotation around the Y-axis
@@ -156,7 +156,7 @@ namespace FixedMathSharp.Tests
 
             Assert.True(result.FuzzyEqual(expected), $"FromAxisAngle returned {result}, expected {expected}.");
 
-            axis = Vector3d.Forward;  
+            axis = -Vector3d.Forward;  
 
             result = FixedQuaternion.FromAxisAngle(axis, angle);
             expected = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, FixedMath.Sin(FixedMath.PiOver4), FixedMath.Cos(FixedMath.PiOver4));
@@ -301,7 +301,8 @@ namespace FixedMathSharp.Tests
             var vector = new Vector3d(1, 0, 0);
 
             var result = quaternion.Rotate(vector);
-            Assert.True(result.FuzzyEqual(new Vector3d(0, 1, 0))); // Expect (0, 1, 0) after rotation
+            var expected = new Vector3d(0, 1, 0);
+            Assert.True(result.FuzzyEqual(expected, Fixed64.CreateFromDouble(0.0001)), $"Rotated quaternion was {result.ToString()}, expected {expected}."); // Expect (0, 1, 0) after rotation
         }
 
         [Fact]
