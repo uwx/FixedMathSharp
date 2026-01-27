@@ -1203,7 +1203,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", X.ToFormattedDouble(), Y.ToFormattedDouble(), Z.ToFormattedDouble());
+            return string.Format("({0}, {1}, {2})", (double)X, (double)Y, (double)Z);
         }
 
         /// <summary>
