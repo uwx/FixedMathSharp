@@ -9,57 +9,44 @@ using System.Text.Json.Serialization;
 namespace FixedMathSharp
 {
     /// <summary>
-    /// Specifies the interpolation method used when evaluating a <see cref="FixedCurve"/>.
-    /// </summary>
-    public enum FixedCurveMode : byte
-    {
-        /// <summary>Linear interpolation between keyframes.</summary>
-        Linear,
-
-        /// <summary>Step interpolation, instantly jumping between keyframe values.</summary>
-        Step,
-
-        /// <summary>Smooth interpolation using a cosine function (SmoothStep).</summary>
-        Smooth,
-
-        /// <summary>Cubic interpolation for smoother curves using tangents.</summary>
-        Cubic
-    }
-
-    /// <summary>
     /// A deterministic fixed-point curve that interpolates values between keyframes.
     /// Used for animations, physics calculations, and procedural data.
     /// </summary>
-    [Serializable]
-    [MessagePackObject]
-    public struct FixedCurve : IEquatable<FixedCurve>
+    public ref struct RefFixedCurve : IEquatable<RefFixedCurve>
     {
-        [Key(0)]
         public FixedCurveMode Mode { get; private set; }
 
-        [Key(1)]
-        public FixedCurveKey[] Keyframes { get; private set; }
+        public ReadOnlySpan<FixedCurveKey> Keyframes { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedCurve"/> with a default linear interpolation mode.
+        /// Initializes a new instance of the <see cref="RefFixedCurve"/> with a default linear interpolation mode.
         /// </summary>
         /// <param name="keyframes">The keyframes defining the curve.</param>
-        public FixedCurve(params FixedCurveKey[] keyframes)
+        public RefFixedCurve(ReadOnlySpan<FixedCurveKey> keyframes)
             : this(FixedCurveMode.Linear, keyframes) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedCurve"/> with a specified interpolation mode.
+        /// Initializes a new instance of the <see cref="RefFixedCurve"/> with a specified interpolation mode.
         /// </summary>
         /// <param name="mode">The interpolation method to use.</param>
         /// <param name="keyframes">The keyframes defining the curve.</param>
-#if NET8_0_OR_GREATER
-        [JsonConstructor]
-#endif
-        [SerializationConstructor]
-        public FixedCurve(FixedCurveMode mode, params FixedCurveKey[] keyframes)
+        public RefFixedCurve(FixedCurveMode mode, ReadOnlySpan<FixedCurveKey> keyframes)
         {
-            Keyframes = keyframes.OrderBy(k => k.Time).ToArray();
+            // Throw if keyframes are not sorted by time
+            for (var i = 1; i < keyframes.Length; i++)
+            {
+                if (keyframes[i].Time < keyframes[i - 1].Time)
+                    ThrowKeyframesNotInOrder();
+            }
+
+            Keyframes = keyframes;
             Mode = mode;
+            return;
+
+            static void ThrowKeyframesNotInOrder()
+            {
+                throw new ArgumentException("Keyframes must be sorted by time in ascending order.");
+            }
         }
 
         /// <summary>
@@ -99,12 +86,12 @@ namespace FixedMathSharp
             return Fixed64.One; // Fallback (should never be hit)
         }
 
-        public bool Equals(FixedCurve other)
+        public bool Equals(RefFixedCurve other)
         {
             return Mode == other.Mode && Keyframes.SequenceEqual(other.Keyframes);
         }
 
-        public override bool Equals(object? obj) => obj is FixedCurve other && Equals(other);
+        public override bool Equals(object? obj) => false; // ref struct cannot be boxed
 
         public override int GetHashCode()
         {
@@ -117,8 +104,17 @@ namespace FixedMathSharp
             }
         }
 
-        public static bool operator ==(FixedCurve left, FixedCurve right) => left.Equals(right);
+        public static bool operator ==(RefFixedCurve left, RefFixedCurve right) => left.Equals(right);
 
-        public static bool operator !=(FixedCurve left, FixedCurve right) => !(left == right);
+        public static bool operator !=(RefFixedCurve left, RefFixedCurve right) => !(left == right);
+        
+        public static implicit operator RefFixedCurve(FixedCurve curve)
+        {
+            return new RefFixedCurve(curve.Mode, curve.Keyframes);
+        }
+        public static implicit operator FixedCurve(RefFixedCurve refCurve)
+        {
+            return new FixedCurve(refCurve.Mode, refCurve.Keyframes.ToArray());
+        }
     }
 }
