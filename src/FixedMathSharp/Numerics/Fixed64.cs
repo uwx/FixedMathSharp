@@ -281,16 +281,24 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 operator *(Fixed64 a, Fixed64 b)
         {
-            // Widen to 128 bits to prevent overflow during multiplication
-            // 128-bit intrinsic is faster than hand rolled multiplication + shift
-            var mul = ((Int128)a.m_rawValue * b.m_rawValue) >> FixedMath.SHIFT_AMOUNT_I;
-        
-            if (mul < long.MinValue)
-                mul = long.MinValue;
-            else if (mul > long.MaxValue)
-                mul = long.MaxValue;
+            // Use Math.BigMul to get 128-bit result as high and low parts
+            long high = Math.BigMul(a.m_rawValue, b.m_rawValue, out long low);
 
-            return new Fixed64((long)mul);
+            // Check the most significant bit that will be dropped for rounding
+            ulong roundBit = 1UL << (FixedMath.SHIFT_AMOUNT_I - 1);
+
+            // Combine high and low parts, shifting right by SHIFT_AMOUNT_I
+            long result = (high << (64 - FixedMath.SHIFT_AMOUNT_I)) | (low >>> FixedMath.SHIFT_AMOUNT_I);
+
+            // Apply rounding
+            if (((ulong)low & roundBit) != 0) result++;
+
+            // Overflow check: if high bits don't match sign extension, clamp
+            long signCheck = high >> (FixedMath.SHIFT_AMOUNT_I - 1);
+            if (signCheck != 0 && signCheck != -1)
+                result = high < 0 ? long.MinValue : long.MaxValue;
+
+            return new Fixed64(result);
         }
 
         /// <summary>

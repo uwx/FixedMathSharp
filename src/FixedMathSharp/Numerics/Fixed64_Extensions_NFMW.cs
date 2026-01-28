@@ -183,4 +183,9 @@ public partial struct Fixed64
     {
         return a < b ? a : b;
     }
+
+    public static Fixed64 CreateRaw(long value)
+    {
+        return new Fixed64(value);
+    }
 }
