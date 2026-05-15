@@ -68,6 +68,7 @@
   <!-- Dependencies and Package References -->
   <ItemGroup>
 	<PackageReference Include="MessagePack" Version="3.1.4" />
+	<PackageReference Include="MessagePack.Annotations" Version="3.1.4" />
 	<PackageReference Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
