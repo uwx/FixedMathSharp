@@ -36,7 +36,7 @@ public class BoundingBoxTests
         var box = new BoundingBox(center, size);
 
         Assert.Equal(center, box.Center);
-        Assert.Equal(size, box.Proportions);
+        Assert.Equal(size, box.Size);
         Assert.Equal(new Vector3d(-1, -1, -1), box.Min);
         Assert.Equal(new Vector3d(1, 1, 1), box.Max);
     }
@@ -232,7 +232,7 @@ public class BoundingBoxTests
         var newScope = new Vector3d(3, 3, 3);
         box.SetBoundingBox(new Vector3d(1, 1, 1), newScope);
 
-        Assert.Equal(newScope * Fixed64.Two, box.Proportions);
+        Assert.Equal(newScope * Fixed64.Two, box.Size);
     }
 
     [Fact]
@@ -296,7 +296,7 @@ public class BoundingBoxTests
         box.SetMinMax(new Vector3d(0, 0, 0), new Vector3d(4, 4, 4));
 
         Assert.Equal(new Vector3d(2, 2, 2), box.Center);
-        Assert.Equal(new Vector3d(4, 4, 4), box.Proportions);
+        Assert.Equal(new Vector3d(4, 4, 4), box.Size);
     }
 
     [Fact]
@@ -307,7 +307,7 @@ public class BoundingBoxTests
         box.Center = new Vector3d(5, -1, 3);
 
         Assert.Equal(new Vector3d(5, -1, 3), box.Center);
-        Assert.Equal(new Vector3d(4, 6, 8), box.Proportions);
+        Assert.Equal(new Vector3d(4, 6, 8), box.Size);
         Assert.Equal(new Vector3d(3, -4, -1), box.Min);
         Assert.Equal(new Vector3d(7, 2, 7), box.Max);
     }
@@ -317,7 +317,7 @@ public class BoundingBoxTests
     {
         var box = new BoundingBox(new Vector3d(1, 2, 3), new Vector3d(4, 4, 4));
 
-        box.Proportions = new Vector3d(6, 8, 10);
+        box.Size = new Vector3d(6, 8, 10);
 
         Assert.Equal(new Vector3d(1, 2, 3), box.Center);
         Assert.Equal(new Vector3d(-2, -2, -2), box.Min);
@@ -332,7 +332,7 @@ public class BoundingBoxTests
         box.Orient(new Vector3d(10, 20, 30), null);
 
         Assert.Equal(new Vector3d(10, 20, 30), box.Center);
-        Assert.Equal(new Vector3d(4, 6, 8), box.Proportions);
+        Assert.Equal(new Vector3d(4, 6, 8), box.Size);
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class BoundingBoxTests
         box.Orient(new Vector3d(1, 2, 3), new Vector3d(2, 4, 6));
 
         Assert.Equal(new Vector3d(1, 2, 3), box.Center);
-        Assert.Equal(new Vector3d(2, 4, 6), box.Proportions);
+        Assert.Equal(new Vector3d(2, 4, 6), box.Size);
         Assert.Equal(new Vector3d(0, 0, 0), box.Min);
         Assert.Equal(new Vector3d(2, 4, 6), box.Max);
     }
@@ -439,7 +439,7 @@ public class BoundingBoxTests
 
         deserialized.Resize(new Vector3d(2, 2, 2));
 
-        Assert.Equal(new Vector3d(2, 2, 2), deserialized.Proportions);
+        Assert.Equal(new Vector3d(2, 2, 2), deserialized.Size);
     }
 
     #endregion

@@ -1,6 +1,8 @@
 ﻿using MessagePack;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+using MemoryPack;
 
 namespace FixedMathSharp
 {
@@ -19,7 +21,8 @@ namespace FixedMathSharp
 
     [Serializable]
     [MessagePackObject]
-    public struct BoundingArea : IBound, IEquatable<BoundingArea>
+    [MemoryPackable]
+    public partial struct BoundingArea : IBound, IEquatable<BoundingArea>
     {
         #region Fields
 
@@ -27,12 +30,16 @@ namespace FixedMathSharp
         /// One of the corner points of the bounding area.
         /// </summary>
         [Key(0)]
+        [JsonInclude]
+        [MemoryPackOrder(0)]
         public Vector3d Corner1;
 
         /// <summary>
         /// The opposite corner point of the bounding area.
         /// </summary>
         [Key(1)]
+        [JsonInclude]
+        [MemoryPackOrder(1)]
         public Vector3d Corner2;
 
         #endregion
@@ -53,6 +60,7 @@ namespace FixedMathSharp
         /// Initializes a new instance of the BoundingArea struct with two corner points.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [JsonConstructor]
         public BoundingArea(Vector3d corner1, Vector3d corner2)
         {
             Corner1 = corner1;

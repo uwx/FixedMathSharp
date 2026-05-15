@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using MemoryPack;
 
 
 #if NET8_0_OR_GREATER
@@ -24,45 +25,46 @@ namespace FixedMathSharp
     /// </remarks>
     [Serializable]
     [MessagePackObject(AllowPrivate = true)]
-    public struct BoundingBox : IBound, IEquatable<BoundingBox>, IDeserializationCallback
+    [MemoryPackable]
+    public partial struct BoundingBox : IBound, IEquatable<BoundingBox>, IDeserializationCallback
     {
         #region Fields
 
         /// <summary>
         /// The center of the bounding box.
         /// </summary>
-        [IgnoreMember]
-        private Vector3d _center;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d _center;
 
-        [IgnoreMember]
-        private Vector3d _size;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d _size;
 
         /// <summary>
         /// The range (half-size) of the bounding box in all directions. Always half of the total size.
         /// </summary>
-        [IgnoreMember]
-        private Vector3d _scope;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d _scope;
 
         /// <summary>
         /// The minimum corner of the bounding box.
         /// </summary>
-        [IgnoreMember]
-        private Vector3d _min;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d _min;
 
         /// <summary>
         /// The maximum corner of the bounding box.
         /// </summary>
-        [IgnoreMember]
-        private Vector3d _max;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d _max;
 
-        [IgnoreMember]
-        private bool _isDirty;
+        [MemoryPackIgnore]
+        [IgnoreMember] private bool _isDirty;
 
         /// <summary>
         /// Vertices of the bounding box.
         /// </summary>
-        [IgnoreMember]
-        private Vector3d[] _vertices;
+        [MemoryPackIgnore]
+        [IgnoreMember] private Vector3d[] _vertices;
 
         #endregion
 
@@ -92,6 +94,8 @@ namespace FixedMathSharp
 
         /// <inheritdoc cref="_center" />
         [Key(0)]
+        [JsonInclude]
+        [MemoryPackOrder(0)]
         public Vector3d Center
         {
             get => _center;
@@ -105,6 +109,7 @@ namespace FixedMathSharp
 
         /// <inheritdoc cref="_scope" />
         [IgnoreMember]
+        [MemoryPackIgnore]
         public Vector3d Scope
         {
             get => _scope;
@@ -112,6 +117,7 @@ namespace FixedMathSharp
 
         /// <inheritdoc cref="_min" />
         [IgnoreMember]
+        [MemoryPackIgnore]
         public Vector3d Min
         {
             get => _min;
@@ -119,6 +125,7 @@ namespace FixedMathSharp
 
         /// <inheritdoc cref="_max" />
         [IgnoreMember]
+        [MemoryPackIgnore]
         public Vector3d Max
         {
             get => _max;
@@ -126,6 +133,7 @@ namespace FixedMathSharp
 
         /// <inheritdoc cref="_vertices" />
         [IgnoreMember]
+        [MemoryPackIgnore]
         public Vector3d[] Vertices
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,7 +144,9 @@ namespace FixedMathSharp
         /// The total size of the box (Width, Height, Depth). This is always twice the scope.
         /// </summary>
         [Key(1)]
-        public Vector3d Proportions
+        [JsonInclude]
+        [MemoryPackOrder(1)]
+        public Vector3d Size
         {
             get => _size;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

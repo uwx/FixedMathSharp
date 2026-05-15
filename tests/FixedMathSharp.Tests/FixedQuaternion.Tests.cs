@@ -349,6 +349,8 @@ public class FixedQuaternionTests
     [Fact]
     public void FixedQuaternion_FromAxisAngle_Equals_FromEulerAngles()
     {
+        // MAXINE: added fuzziness to the check here because it's likely impossible to get the DegToRad conversion to be infinitely precise at square angles
+
         var quaternion = FixedQuaternion.FromAxisAngle(Vector3d.Up, FixedMath.PiOver2);
         var expectedQuaternion = FixedQuaternion.FromEulerAnglesInDegrees(new Fixed64(0), new Fixed64(90), new Fixed64(0));
 
