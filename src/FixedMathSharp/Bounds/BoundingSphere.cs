@@ -1,6 +1,7 @@
-﻿using MessagePack;
+﻿using MemoryPack;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace FixedMathSharp
 {
@@ -17,21 +18,23 @@ namespace FixedMathSharp
     /// - Suitable for encapsulating objects with roughly spherical shapes or objects that rotate frequently, where the bounding box may need constant updates.
     /// </remarks>
     [Serializable]
-    [MessagePackObject]
-    public struct BoundingSphere : IBound, IEquatable<BoundingSphere>
+    [MemoryPackable]
+    public partial struct BoundingSphere : IBound, IEquatable<BoundingSphere>
     {
         #region Fields
 
         /// <summary>
         /// The center point of the sphere.
         /// </summary>
-        [Key(0)]
+        [JsonInclude]
+        [MemoryPackOrder(0)]
         public Vector3d Center;
 
         /// <summary>
         /// The radius of the sphere.
         /// </summary>
-        [Key(1)]
+        [JsonInclude]
+        [MemoryPackOrder(1)]
         public Fixed64 Radius;
 
         #endregion
@@ -41,7 +44,7 @@ namespace FixedMathSharp
         /// <summary>
         /// Initializes a new instance of the BoundingSphere struct with the specified center and radius.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [JsonConstructor]
         public BoundingSphere(Vector3d center, Fixed64 radius)
         {
             Center = center;
@@ -50,16 +53,32 @@ namespace FixedMathSharp
 
         #endregion
 
-        #region Properties and Methods (Instance)
+        #region Properties
 
-        [IgnoreMember]
+        /// <summary>
+        /// Gets the coordinates of the minimum corner of the bounding box that contains the sphere.
+        /// </summary>
+        /// <remarks>
+        /// The minimum corner is calculated by subtracting the radius from each component of the sphere's center. 
+        /// This property is useful for spatial queries and bounding box calculations.
+        /// </remarks>
+        [JsonIgnore]
+        [MemoryPackIgnore]
         public Vector3d Min
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => Center - new Vector3d(Radius, Radius, Radius);
         }
 
-        [IgnoreMember]
+        /// <summary>
+        /// Gets the coordinates of the maximum corner of the bounding box that contains the sphere.
+        /// </summary>
+        /// <remarks>
+        /// The maximum corner is calculated as the center of the sphere plus the radius in each dimension. 
+        /// This property is useful for spatial queries and bounding volume calculations.
+        /// </remarks>
+        [JsonIgnore]
+        [MemoryPackIgnore]
         public Vector3d Max
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,12 +88,17 @@ namespace FixedMathSharp
         /// <summary>
         /// The squared radius of the sphere.
         /// </summary>
-        [IgnoreMember]
+        [JsonIgnore]
+        [MemoryPackIgnore]
         public Fixed64 SqrRadius
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => Radius * Radius;
         }
+
+        #endregion
+
+        #region Methods (Instance)
 
         /// <summary>
         /// Checks if a point is inside the sphere.
@@ -96,9 +120,9 @@ namespace FixedMathSharp
             switch (other)
             {
                 case BoundingBox or BoundingArea:
-                        // Find the closest point on the BoundingArea to the sphere's center
-                        // Check if the closest point is within the sphere's radius
-                        return Vector3d.SqrDistance(Center, other.ProjectPointWithinBounds(Center)) <= SqrRadius;
+                    // Find the closest point on the BoundingArea to the sphere's center
+                    // Check if the closest point is within the sphere's radius
+                    return Vector3d.SqrDistance(Center, other.ProjectPointWithinBounds(Center)) <= SqrRadius;
                 case BoundingSphere otherSphere:
                     {
                         Fixed64 distanceSquared = Vector3d.SqrDistance(Center, otherSphere.Center);
@@ -107,7 +131,7 @@ namespace FixedMathSharp
                     }
 
                 default: return false; // Default case for unknown or unsupported types
-            };
+            }
         }
 
         /// <summary>
@@ -136,9 +160,15 @@ namespace FixedMathSharp
 
         #region Operators
 
+        /// <summary>
+        /// Determines whether two BoundingSphere instances are equal.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(BoundingSphere left, BoundingSphere right) => left.Equals(right);
 
+        /// <summary>
+        /// Determines whether two BoundingSphere instances are not equal.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(BoundingSphere left, BoundingSphere right) => !left.Equals(right);
 
@@ -146,12 +176,15 @@ namespace FixedMathSharp
 
         #region Equality and HashCode Overrides
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is BoundingSphere other && Equals(other);
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(BoundingSphere other) => Center.Equals(other.Center) && Radius.Equals(other.Radius);
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {

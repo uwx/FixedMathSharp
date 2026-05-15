@@ -15,6 +15,17 @@ namespace FixedMathSharp.Utility
 
         #region Construction / Seeding
 
+        /// <summary>
+        /// Initializes a new instance of the DeterministicRandom class using the specified seed value.
+        /// </summary>
+        /// <remarks>
+        /// This constructor expands the provided seed into the internal state required for deterministic random number generation. 
+        /// The generated sequence is fully determined by the seed value.
+        /// </remarks>
+        /// <param name="seed">
+        /// The initial seed value used to generate the internal state. 
+        /// Using the same seed will produce the same sequence of random numbers.
+        /// </param>
         public DeterministicRandom(ulong seed)
         {
             // Expand a single seed into two 64-bit state words via splitmix64.
@@ -74,8 +85,8 @@ namespace FixedMathSharp.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Next(int maxExclusive)
         {
-            return maxExclusive <= 0 
-                ? throw new ArgumentOutOfRangeException(nameof(maxExclusive)) 
+            return maxExclusive <= 0
+                ? throw new ArgumentOutOfRangeException(nameof(maxExclusive))
                 : (int)NextBounded((uint)maxExclusive);
         }
 
@@ -85,7 +96,7 @@ namespace FixedMathSharp.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Next(int minInclusive, int maxExclusive)
         {
-            if (minInclusive >= maxExclusive) 
+            if (minInclusive >= maxExclusive)
                 throw new ArgumentException("min >= max");
             uint range = (uint)(maxExclusive - minInclusive);
             return minInclusive + (int)NextBounded(range);

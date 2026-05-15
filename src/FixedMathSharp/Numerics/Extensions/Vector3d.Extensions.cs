@@ -2,6 +2,9 @@
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for the Vector3d type to support additional vector operations, comparisons, and conversions.
+/// </summary>
 public static partial class Vector3dExtensions
 {
     #region Vector3d Operations
@@ -20,6 +23,7 @@ public static partial class Vector3dExtensions
         return v;
     }
 
+    /// <inheritdoc cref="Vector3d.ClampMagnitude(Vector3d, Fixed64)" />
     public static Vector3d ClampMagnitude(this Vector3d value, Fixed64 maxMagnitude)
     {
         return Vector3d.ClampMagnitude(value, maxMagnitude);

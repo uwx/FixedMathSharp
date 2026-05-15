@@ -1,7 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿﻿using System.Runtime.CompilerServices;
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for the Fixed4x4 structure to simplify common matrix operations 
+/// such as extracting scale, setting transformation components, and transforming points.
+/// </summary>
 public static class Fixed4x4Extensions
 {
     #region Extraction, and Setters
@@ -29,6 +33,13 @@ public static class Fixed4x4Extensions
     public static Fixed4x4 SetRotation(this ref Fixed4x4 matrix, FixedQuaternion rotation)
     {
         return matrix = Fixed4x4.SetRotation(matrix, rotation);
+    }
+
+    /// <inheritdoc cref="Fixed4x4.NormalizeRotationMatrix(Fixed4x4)" />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Fixed4x4 NormalizeRotationMatrix(this ref Fixed4x4 matrix)
+    {
+        return matrix = Fixed4x4.NormalizeRotationMatrix(matrix);
     }
 
     /// <inheritdoc cref="Fixed4x4.TransformPoint(Fixed4x4, Vector3d)" />

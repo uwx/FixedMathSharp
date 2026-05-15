@@ -2,3 +2,4 @@
 src/FixedMathSharp/FixedMathSharp.csproj.user
 bin
 obj
+.codex

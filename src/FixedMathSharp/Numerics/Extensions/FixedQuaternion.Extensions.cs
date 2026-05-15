@@ -1,7 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿﻿using System.Runtime.CompilerServices;
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for performing operations and comparisons on FixedQuaternion instances, including
+/// approximate equality checks and angular velocity calculations.
+/// </summary>
 public static partial class FixedQuaternionExtensions
 {
     /// <inheritdoc cref="FixedQuaternion.ToAngularVelocity" />

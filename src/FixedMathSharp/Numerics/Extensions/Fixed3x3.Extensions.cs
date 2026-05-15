@@ -1,7 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿﻿using System.Runtime.CompilerServices;
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for the Fixed3x3 structure, enabling additional transformation and comparison operations.
+/// </summary>
 public static class Fixed3x3Extensions
 {
     #region Transformations

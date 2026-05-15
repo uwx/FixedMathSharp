@@ -1,4 +1,4 @@
-﻿using MessagePack;
+﻿using MemoryPack;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -9,32 +9,52 @@ namespace FixedMathSharp;
 /// Quaternions are useful for representing rotations and can be used to perform smooth rotations and avoid gimbal lock.
 /// </summary>
 [Serializable]
-[MessagePackObject]
-public struct FixedQuaternion : IEquatable<FixedQuaternion>
+[MemoryPackable]
+public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
 {
-    #region Fields and Constants
-
-    [Key(0)]
-    public Fixed64 x;
-
-    [Key(1)]
-    public Fixed64 y;
-
-    [Key(2)]
-    public Fixed64 z;
-
-    [Key(3)]
-    public Fixed64 w;
+    #region Static Readonly Fields
 
     /// <summary>
     /// Identity quaternion (0, 0, 0, 1).
     /// </summary>
-    public static readonly FixedQuaternion Identity = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.One);
+    public static readonly FixedQuaternion Identity = new(Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.One);
 
     /// <summary>
     /// Empty quaternion (0, 0, 0, 0).
     /// </summary>
-    public static readonly FixedQuaternion Zero = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.Zero);
+    public static readonly FixedQuaternion Zero = new(Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.Zero);
+
+    #endregion
+
+    #region Fields and Constants
+
+    /// <summary>
+    /// Represents the X component of the vector as a fixed-point value.
+    /// </summary>
+    [JsonInclude]
+    [MemoryPackOrder(0)]
+    public Fixed64 x;
+
+    /// <summary>
+    /// Represents the Y component of the vector as a fixed-point value.
+    /// </summary>
+    [JsonInclude]
+    [MemoryPackOrder(1)]
+    public Fixed64 y;
+
+    /// <summary>
+    /// Represents the Z component of the vector as a fixed-point value.
+    /// </summary>
+    [JsonInclude]
+    [MemoryPackOrder(2)]
+    public Fixed64 z;
+
+    /// <summary>
+    /// Represents the W component of the vector as a fixed-point value.
+    /// </summary>
+    [JsonInclude]
+    [MemoryPackOrder(3)]
+    public Fixed64 w;
 
     #endregion
 
@@ -43,7 +63,6 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// <summary>
     /// Creates a new FixedQuaternion with the specified components.
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public FixedQuaternion(Fixed64 x, Fixed64 y, Fixed64 z, Fixed64 w)
     {
         this.x = x;
@@ -54,12 +73,13 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
 
     #endregion
 
-    #region Properties and Methods (Instance)
+    #region Properties
 
     /// <summary>
     /// Normalized version of this quaternion.
     /// </summary>
-    [IgnoreMember]
+    [JsonIgnore]
+    [MemoryPackIgnore]
     public FixedQuaternion Normal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,7 +89,8 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// <summary>
     /// Returns the Euler angles (in degrees) of this quaternion.
     /// </summary>
-    [IgnoreMember]
+    [JsonIgnore]
+    [MemoryPackIgnore]
     public Vector3d EulerAngles
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,7 +99,15 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         set => this = FromEulerAnglesInDegrees(value.X, value.Y, value.Z);
     }
 
-    [IgnoreMember]
+    /// <summary>
+    /// Gets or sets the component value at the specified index.
+    /// </summary>
+    /// <remarks>Index 0 corresponds to the x component, 1 to y, 2 to z, and 3 to w.</remarks>
+    /// <param name="index">The zero-based index of the component to access. Valid values are 0 (x), 1 (y), 2 (z), and 3 (w).</param>
+    /// <returns>The value of the component at the specified index.</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown when the specified index is less than 0 or greater than 3.</exception>
+    [JsonIgnore]
+    [MemoryPackIgnore]
     public Fixed64 this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -115,6 +144,10 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
             }
         }
     }
+
+    #endregion
+
+    #region Methods (Instance)
 
     /// <summary>
     /// Set x, y, z and w components of an existing Quaternion.
@@ -169,10 +202,10 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
     public Vector3d Rotate(Vector3d v)
     {
         FixedQuaternion normalizedQuat = Normal;
-        FixedQuaternion vQuat = new FixedQuaternion(v.X, v.Y, v.Z, Fixed64.Zero);
-        FixedQuaternion invQuat = normalizedQuat.Inverse();
-        FixedQuaternion rotatedVQuat = normalizedQuat * vQuat * invQuat;
-        return new Vector3d(rotatedVQuat.x, rotatedVQuat.y, rotatedVQuat.z).Normalize();
+        FixedQuaternion vQuat = new(v.X, v.Y, v.Z, Fixed64.Zero);
+        FixedQuaternion invQuat = normalizedQuat.Conjugate();
+        FixedQuaternion rotatedVQuat = (normalizedQuat * vQuat) * invQuat;
+        return new Vector3d(rotatedVQuat.X, rotatedVQuat.Y, rotatedVQuat.Z);
     }
 
     /// <summary>
@@ -210,6 +243,14 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         return FixedMath.Abs(mag - Fixed64.One) <= Fixed64.Epsilon;
     }
 
+    /// <summary>
+    /// Calculates the magnitude (or length) of the specified quaternion.
+    /// </summary>
+    /// <remarks>
+    /// If rounding errors cause the computed magnitude to be slightly greater than 1 but within epsilon, the result is clamped to 1. 
+    /// This helps maintain numerical stability when working with normalized quaternions.</remarks>
+    /// <param name="q">The quaternion for which to compute the magnitude.</param>
+    /// <returns>The magnitude of the quaternion as a Fixed64 value. Returns 0 if the quaternion is the zero quaternion.</returns>
     public static Fixed64 GetMagnitude(FixedQuaternion q)
     {
         Fixed64 mag = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
@@ -233,7 +274,7 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
             return new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.One);
 
         // If already normalized, return as-is
-        if (mag == Fixed64.One)
+        if (FixedMath.Abs(mag - Fixed64.One) <= Fixed64.Epsilon)
             return q;
 
         // Normalize it exactly
@@ -372,13 +413,17 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
 
         // Check if the angle is in a valid range (-pi, pi)
         if (angle < -FixedMath.PI || angle > FixedMath.PI)
-            throw new ArgumentOutOfRangeException("Angle must be in the range (-pi, pi)");
+            throw new ArgumentOutOfRangeException(nameof(angle), angle, $"Angle must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {angle}");
 
         Fixed64 halfAngle = angle / Fixed64.Two;  // Half-angle formula
         Fixed64 sinHalfAngle = FixedMath.Sin(halfAngle);
         Fixed64 cosHalfAngle = FixedMath.Cos(halfAngle);
 
-        return new FixedQuaternion(axis.X * sinHalfAngle, axis.Y * sinHalfAngle, axis.Z * sinHalfAngle, cosHalfAngle);
+        return GetNormalized(new FixedQuaternion(
+            axis.X * sinHalfAngle,
+            axis.Y * sinHalfAngle,
+            axis.Z * sinHalfAngle,
+            cosHalfAngle));
     }
 
     /// <summary>
@@ -396,39 +441,42 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         roll = FixedMath.DegToRad(roll);
 
         // Call the original method that expects angles in radians
-        return FromEulerAngles(pitch, yaw, roll).Normalize();
+        return FromEulerAngles(pitch, yaw, roll);
     }
 
     /// <summary>
-    /// Converts Euler angles (pitch, yaw, roll) to a quaternion and normalizes the result afterwards. Assumes the input angles are in radians.
+    /// Converts Euler angles (pitch, yaw, roll) to a quaternion and normalizes the result afterwards. 
+    /// Assumes the input angles are in radians.
     /// </summary>
     /// <remarks>
-    /// The order of operations is YZX or yaw-roll-pitch, commonly used in applications such as robotics.
+    /// The order of operations is YXZ or yaw-pitch-roll
     /// </remarks>
     public static FixedQuaternion FromEulerAngles(Fixed64 pitch, Fixed64 yaw, Fixed64 roll)
     {
         // Check if the angles are in a valid range (-pi, pi)
-        if (pitch < -FixedMath.PI || pitch > FixedMath.PI ||
-            yaw < -FixedMath.PI || yaw > FixedMath.PI ||
-            roll < -FixedMath.PI || roll > FixedMath.PI)
-        {
-            throw new ArgumentOutOfRangeException("Euler angles must be in the range (-pi, pi)");
-        }
+        if (pitch < -FixedMath.PI || pitch > FixedMath.PI)
+            throw new ArgumentOutOfRangeException(nameof(pitch), pitch, $"Pitch must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {pitch}");
+        if (yaw < -FixedMath.PI || yaw > FixedMath.PI)
+            throw new ArgumentOutOfRangeException(nameof(yaw), yaw, $"Yaw must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {yaw}");
+        if (roll < -FixedMath.PI || roll > FixedMath.PI)
+            throw new ArgumentOutOfRangeException(nameof(roll), roll, $"Roll must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {roll}");
 
-        Fixed64 c1 = FixedMath.Cos(yaw / Fixed64.Two);
-        Fixed64 s1 = FixedMath.Sin(yaw / Fixed64.Two);
-        Fixed64 c2 = FixedMath.Cos(roll / Fixed64.Two);
-        Fixed64 s2 = FixedMath.Sin(roll / Fixed64.Two);
-        Fixed64 c3 = FixedMath.Cos(pitch / Fixed64.Two);
-        Fixed64 s3 = FixedMath.Sin(pitch / Fixed64.Two);
+        Fixed64 halfPitch = pitch / Fixed64.Two;
+        Fixed64 halfYaw = yaw / Fixed64.Two;
+        Fixed64 halfRoll = roll / Fixed64.Two;
 
-        Fixed64 c1c2 = c1 * c2;
-        Fixed64 s1s2 = s1 * s2;
+        Fixed64 sx = FixedMath.Sin(halfPitch);
+        Fixed64 cx = FixedMath.Cos(halfPitch);
+        Fixed64 sy = FixedMath.Sin(halfYaw);
+        Fixed64 cy = FixedMath.Cos(halfYaw);
+        Fixed64 sz = FixedMath.Sin(halfRoll);
+        Fixed64 cz = FixedMath.Cos(halfRoll);
 
-        Fixed64 w = c1c2 * c3 - s1s2 * s3;
-        Fixed64 x = c1c2 * s3 + s1s2 * c3;
-        Fixed64 y = s1 * c2 * c3 + c1 * s2 * s3;
-        Fixed64 z = c1 * s2 * c3 - s1 * c2 * s3;
+        // q = qy * qx * qz
+        Fixed64 x = (cx * sy * sz) + (cy * cz * sx);
+        Fixed64 y = (cx * cz * sy) - (cy * sx * sz);
+        Fixed64 z = (cx * cy * sz) - (cz * sx * sy);
+        Fixed64 w = (cx * cy * cz) + (sx * sy * sz);
 
         return GetNormalized(new FixedQuaternion(x, y, z, w));
     }
@@ -452,7 +500,7 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         q = q.Normal;
 
         // Extract vector part
-        Vector3d v = new Vector3d(q.x, q.y, q.z);
+        Vector3d v = new(q.x, q.y, q.z);
         Fixed64 vLength = v.Magnitude;
 
         // If rotation is very small, avoid division by zero
@@ -532,7 +580,7 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         Fixed64 k0, k1;
 
         // If the quaternions are close, use linear interpolation
-        if (cosOmega > Fixed64.One - Fixed64.Precision)
+        if (cosOmega > Fixed64.One - Fixed64.Epsilon)
         {
             k0 = Fixed64.One - t;
             k1 = t;
@@ -623,53 +671,88 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
 
     #region Operators
 
+    /// <summary>
+    /// Multiplies two quaternions, combining their rotations into a single quaternion.
+    /// </summary>
+    /// <remarks>
+    /// Quaternion multiplication is not commutative; the order of operands affects the result. 
+    /// This operation is commonly used to concatenate rotations.
+    /// </remarks>
+    /// <param name="a">The first quaternion to multiply.</param>
+    /// <param name="b">The second quaternion to multiply.</param>
+    /// <returns>A new FixedQuaternion representing the combined rotation of the two input quaternions.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FixedQuaternion operator *(FixedQuaternion a, FixedQuaternion b)
     {
         return new FixedQuaternion(
-            a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-            a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-            a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-            a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+            (a.w * b.x) + (a.x * b.w) + (a.y * b.z) - (a.z * b.y),
+            (a.w * b.y) - (a.x * b.z) + (a.y * b.w) + (a.z * b.x),
+            (a.w * b.z) + (a.x * b.y) - (a.y * b.x) + (a.z * b.w),
+            (a.w * b.w) - (a.x * b.x) - (a.y * b.y) - (a.z * b.z)
         );
     }
 
+    /// <summary>
+    /// Multiplies each component of the specified quaternion by the given scalar value.
+    /// </summary>
+    /// <param name="q">The quaternion whose components are to be multiplied.</param>
+    /// <param name="scalar">The scalar value by which to multiply each component of the quaternion.</param>
+    /// <returns>A new FixedQuaternion whose components are the result of multiplying the corresponding components of the input
+    /// quaternion by the scalar value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FixedQuaternion operator *(FixedQuaternion q, Fixed64 scalar)
     {
         return new FixedQuaternion(q.x * scalar, q.y * scalar, q.z * scalar, q.w * scalar);
     }
 
+    /// <inheritdoc cref="operator *(FixedQuaternion, Fixed64)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FixedQuaternion operator *(Fixed64 scalar, FixedQuaternion q)
     {
         return new FixedQuaternion(q.x * scalar, q.y * scalar, q.z * scalar, q.w * scalar);
     }
 
+    /// <summary>
+    /// Divides each component of the specified quaternion by the given scalar value.
+    /// </summary>
+    /// <remarks>Division by zero will result in an exception or undefined behavior.</remarks>
+    /// <param name="q">The quaternion whose components are to be divided.</param>
+    /// <param name="scalar">The scalar value by which to divide each component of the quaternion.</param>
+    /// <returns>A new FixedQuaternion whose components are the result of dividing the corresponding components of the input
+    /// quaternion by the scalar value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FixedQuaternion operator /(FixedQuaternion q, Fixed64 scalar)
     {
         return new FixedQuaternion(q.x / scalar, q.y / scalar, q.z / scalar, q.w / scalar);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FixedQuaternion operator /(Fixed64 scalar, FixedQuaternion q)
-    {
-        return new FixedQuaternion(q.x / scalar, q.y / scalar, q.z / scalar, q.w / scalar);
-    }
-
+    /// <summary>
+    /// Adds two quaternions component-wise and returns the resulting quaternion.
+    /// </summary>
+    /// <remarks>
+    /// This operation performs a simple component-wise addition.
+    /// </remarks>
+    /// <param name="q1">The first quaternion to add.</param>
+    /// <param name="q2">The second quaternion to add.</param>
+    /// <returns>A new FixedQuaternion whose components are the sums of the corresponding components of q1 and q2.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FixedQuaternion operator +(FixedQuaternion q1, FixedQuaternion q2)
     {
         return new FixedQuaternion(q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w);
     }
 
+    /// <summary>
+    /// Determines whether two FixedQuaternion instances are equal.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(FixedQuaternion left, FixedQuaternion right)
     {
         return left.Equals(right);
     }
 
+    /// <summary>
+    /// Determines whether two FixedQuaternion instances are not equal.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(FixedQuaternion left, FixedQuaternion right)
     {
@@ -681,40 +764,52 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
     #region Conversion
 
     /// <summary>
-    /// Converts this FixedQuaternion to Euler angles (pitch, yaw, roll).
+    /// Converts this quaternion to Euler angles in degrees.
+    /// Returns angles as (pitch, yaw, roll), where:
+    /// pitch = rotation around X
+    /// yaw   = rotation around Y
+    /// roll  = rotation around Z
+    /// 
+    /// The extraction matches FromEulerAngles(), which composes rotations in YXZ order:
+    /// q = qy * qx * qz
     /// </summary>
-    /// <remarks>
-    /// Handles the case where the pitch angle (asin of sinp) would be out of the range -π/2 to π/2. 
-    /// This is known as the gimbal lock situation, where the pitch angle reaches ±90 degrees and we lose one degree of freedom in our rotation (we can't distinguish between yaw and roll). 
-    /// In this case, we simply set the pitch to ±90 degrees depending on the sign of sinp.
-    /// </remarks>
-    /// <returns>A Vector3d representing the Euler angles (in degrees) equivalent to this FixedQuaternion in YZX order (yaw, pitch, roll).</returns>
     public Vector3d ToEulerAngles()
     {
-        // roll (x-axis rotation)
-        Fixed64 sinr_cosp = 2 * (w * x + y * z);
-        Fixed64 cosr_cosp = Fixed64.One - 2 * (x * x + y * y);
-        Fixed64 roll = FixedMath.Atan2(sinr_cosp, cosr_cosp);
+        Fixed3x3 m = ToMatrix3x3();
 
-        // pitch (y-axis rotation)
-        Fixed64 sinp = 2 * (w * y - z * x);
         Fixed64 pitch;
-        if (sinp.Abs() >= Fixed64.One)
-            pitch = FixedMath.CopySign(FixedMath.PiOver2, sinp); // use 90 degrees if out of range
+        Fixed64 yaw;
+        Fixed64 roll;
+
+        // For YXZ:
+        // m12 = -sin(pitch)
+        // m02 =  sin(yaw) * cos(pitch)
+        // m22 =  cos(yaw) * cos(pitch)
+        // m10 =  sin(roll) * cos(pitch)
+        // m11 =  cos(roll) * cos(pitch)
+
+        Fixed64 sinPitch = -m.m12;
+
+        if (sinPitch.Abs() >= Fixed64.One)
+        {
+            // Gimbal lock: pitch is ±90°, yaw/roll are coupled.
+            pitch = FixedMath.CopySign(FixedMath.PiOver2, sinPitch);
+
+            // Choose roll = 0 and solve remaining yaw from matrix.
+            roll = Fixed64.Zero;
+            yaw = FixedMath.Atan2(-m.m20, m.m00);
+        }
         else
-            pitch = FixedMath.Asin(sinp);
+        {
+            pitch = FixedMath.Asin(sinPitch);
+            yaw = FixedMath.Atan2(m.m02, m.m22);
+            roll = FixedMath.Atan2(m.m10, m.m11);
+        }
 
-        // yaw (z-axis rotation)
-        Fixed64 siny_cosp = 2 * (w * z + x * y);
-        Fixed64 cosy_cosp = Fixed64.One - 2 * (y * y + z * z);
-        Fixed64 yaw = FixedMath.Atan2(siny_cosp, cosy_cosp);
-
-        // Convert radians to degrees
-        roll = FixedMath.RadToDeg(roll);
-        pitch = FixedMath.RadToDeg(pitch);
-        yaw = FixedMath.RadToDeg(yaw);
-
-        return new Vector3d(roll, pitch, yaw);
+        return new Vector3d(
+            FixedMath.RadToDeg(pitch),
+            FixedMath.RadToDeg(yaw),
+            FixedMath.RadToDeg(roll));
     }
 
     /// <summary>
@@ -747,7 +842,7 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
         Fixed64 yw = y * w;
         Fixed64 zw = z * w;
 
-        Fixed3x3 result = new Fixed3x3();
+        Fixed3x3 result = new();
         Fixed64 scale = Fixed64.One * 2;
 
         result.m00 = Fixed64.One - scale * (y2 + z2);
@@ -769,18 +864,21 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
 
     #region Equality and HashCode Overrides
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is FixedQuaternion other && Equals(other);
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(FixedQuaternion other)
     {
-        return other.x == x && other.y == y && other.z == z && other.w == w;
+        return x == other.x && y == other.y && z == other.z && w == other.w;
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
@@ -788,8 +886,9 @@ public struct FixedQuaternion : IEquatable<FixedQuaternion>
     }
 
     /// <summary>
-    /// Returns a formatted string for this quaternion.
+    /// Returns a string that represents the current object in the format "(x, y, z, w)".
     /// </summary>
+    /// <returns>A string containing the values of the object formatted as a tuple.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {

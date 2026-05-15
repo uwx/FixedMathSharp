@@ -1,441 +1,648 @@
 ﻿using System;
 using Xunit;
 
-namespace FixedMathSharp.Tests
+namespace FixedMathSharp.Tests;
+
+public class FixedTrigonometryTests
 {
-    public class FixedTrigonometryTests
+    #region Test: Pow Method
+
+    [Fact]
+    public void Pow_RaisesValueToPositiveExponent()
     {
-        #region Test: Pow Method
-
-        [Fact]
-        public void Pow_RaisesValueToPositiveExponent()
-        {
-            var baseValue = new Fixed64(2);
-            var exponent = new Fixed64(3);
-            var result = FixedMath.Pow(baseValue, exponent);
-            Assert.Equal(new Fixed64(8), result); // 2^3 = 8
-        }
-
-        [Fact]
-        public void Pow_RaisesValueToZeroExponent_ReturnsOne()
-        {
-            var baseValue = new Fixed64(5);
-            var exponent = Fixed64.Zero;
-            var result = FixedMath.Pow(baseValue, exponent);
-            Assert.Equal(Fixed64.One, result); // Any number raised to 0 is 1
-        }
-
-        [Fact]
-        public void Pow_RaisesToNegativeExponent()
-        {
-            var baseValue = new Fixed64(2);
-            var exponent = new Fixed64(-1);
-            var result = FixedMath.Pow(baseValue, exponent);
-            Assert.Equal(Fixed64.CreateFromDouble(0.5), result); // 2^-1 = 0.5
-        }
-
-        [Fact]
-        public void Pow_ZeroToNegativeExponent_ThrowsException()
-        {
-            var baseValue = Fixed64.Zero;
-            var exponent = new Fixed64(-1);
-            Assert.Throws<DivideByZeroException>(() => FixedMath.Pow(baseValue, exponent));
-        }
-
-        #endregion
-
-        #region Test: Sqrt Method
-
-        [Fact]
-        public void Sqrt_PositiveValue_ReturnsSquareRoot()
-        {
-            var value = new Fixed64(4);
-            var result = FixedMath.Sqrt(value);
-            Assert.Equal(new Fixed64(2), result); // sqrt(4) = 2
-        }
-
-        [Fact]
-        public void Sqrt_NegativeValue_ThrowsException()
-        {
-            var value = new Fixed64(-4);
-            Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Sqrt(value));
-        }
-
-        [Fact]
-        public void Sqrt_Zero_ReturnsZero()
-        {
-            var value = Fixed64.Zero;
-            var result = FixedMath.Sqrt(value);
-            Assert.Equal(Fixed64.Zero, result);
-        }
-
-        #endregion
-
-        #region Test: Log2 and Ln Methods
-
-        [Fact]
-        public void Value_ReturnsCorrectLog()
-        {
-            var value = new Fixed64(8);
-            var result = FixedMath.Log2(value);
-            Assert.Equal(new Fixed64(3), result); // log2(8) = 3
-        }
-
-        [Fact]
-        public void Log2_Zero_ThrowsException()
-        {
-            var value = Fixed64.Zero;
-            Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Log2(value));
-        }
-
-        [Fact]
-        public void Ln_PositiveValue_ReturnsCorrectLog()
-        {
-            var value = Fixed64.CreateFromDouble(Math.E);
-            var result = FixedMath.Ln(value);
-            Assert.Equal(Fixed64.One, result); // ln(e) = 1
-        }
-
-        [Fact]
-        public void Ln_NegativeValue_ThrowsException()
-        {
-            var value = new Fixed64(-1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Ln(value));
-        }
-
-        #endregion
-
-        #region Test: Rad2Deg and Deg2Rad Methods
-
-        [Fact]
-        public void Rad2Deg_ConvertsRadiansToDegrees()
-        {
-            var radians = FixedMath.PiOver2; // π/2 radians
-            var result = FixedMath.RadToDeg(radians);
-            var expected = new Fixed64(90);
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Deg2Rad_ConvertsDegreesToRadians()
-        {
-            var degrees = (Fixed64)180;
-            var result = FixedMath.DegToRad(degrees);
-            var expected = FixedMath.PI; // 180 degrees = π radians
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        #endregion
-
-        #region Test: Sin and Cos Methods
-
-        [Fact]
-        public void Sin_ReturnsSineOfAngle()
-        {
-            var angle = FixedMath.PiOver2; // π/2 radians = 90 degrees
-            var result = FixedMath.Sin(angle);
-            Assert.Equal(Fixed64.One, result); // sin(90°) = 1
-        }
-
-        [Fact]
-        public void Cos_ReturnsCosineOfAngle()
-        {
-            var angle = FixedMath.PI; // π radians = 180 degrees
-            var result = FixedMath.Cos(angle);
-            Assert.Equal(-Fixed64.One, result); // cos(180°) = -1
-        }
-
-        #endregion
-
-        #region Test: Tan Method
-
-        [Fact]
-        public void Tan_ReturnsTangentOfAngle()
-        {
-            var angle = new Fixed64(45); // 45 degrees in radians
-            var result = FixedMath.Tan(FixedMath.DegToRad(angle));
-            var expected = Fixed64.One; // tan(45°) ≈ 1.0
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        #endregion
-
-        #region Test: Asin Method
-
-        [Fact]
-        public void Asin_ReturnsArcsine()
-        {
-            var value = Fixed64.One; // sin(90°) = 1
-            var result = FixedMath.Asin(value);
-            Assert.Equal(FixedMath.PiOver2, result); // asin(1) = π/2
-        }
-
-        [Fact]
-        public void Asin_ReturnsNegativePiOver2()
-        {
-            var value = -Fixed64.One; // sin(-90°) = -1
-            var result = FixedMath.Asin(value);
-            Assert.Equal(-FixedMath.PiOver2, result); // asin(-1) = -π/2
-        }
-
-        [Fact]
-        public void Asin_ReturnsAsinOfHalf()
-        {
-            var value = Fixed64.CreateFromDouble(0.5);
-            var result = FixedMath.Asin(value);
-            var expected = FixedMath.PiOver6;  // asin(0.5) ≈ π/6 ≈ 0.5236 radians
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Asin_ReturnsAsinOfNegativeHalf()
-        {
-            var value = Fixed64.CreateFromDouble(-0.5);
-            var result = FixedMath.Asin(value);
-            var expected = -FixedMath.PiOver6;  // asin(-0.5) ≈ -π/6 ≈ -0.5236 radians
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Asin_ThrowsForOutOfDomain()
-        {
-            var value = new Fixed64(2); // Value greater than 1
-            Assert.Throws<ArithmeticException>(() => FixedMath.Asin(value));
-        }
-
-        [Fact]
-        public void Asin_ReturnsZeroForZero()
-        {
-            var value = Fixed64.Zero;
-            var result = FixedMath.Asin(value);
-            Assert.Equal(Fixed64.Zero, result); // asin(0) = 0
-        }
-
-        #endregion
-
-        #region Test: Acos Method
-
-        [Fact]
-        public void Acos_ReturnsArccosine()
-        {
-            var value = Fixed64.Zero; // cos(90°) = 0
-            var result = FixedMath.Acos(value);
-            Assert.Equal(FixedMath.PiOver2, result); // acos(0) = π/2
-        }
-
-        [Fact]
-        public void Acos_ReturnsZeroForOne()
-        {
-            var value = Fixed64.One; // cos(0°) = 1
-            var result = FixedMath.Acos(value);
-            Assert.Equal(Fixed64.Zero, result); // acos(1) = 0
-        }
-
-        [Fact]
-        public void Acos_ReturnsPiForNegativeOne()
-        {
-            var value = -Fixed64.One; // cos(180°) = -1
-            var result = FixedMath.Acos(value);
-            Assert.Equal(FixedMath.PI, result); // acos(-1) = π
-        }
-
-        [Fact]
-        public void Acos_ReturnsPiOver3ForHalf()
-        {
-            var value = Fixed64.CreateFromDouble(0.5); // cos(60°) = 0.5
-            var result = FixedMath.Acos(value);
-            var expected = FixedMath.PiOver3; // acos(0.5) ≈ π/3 ≈ 1.0472 radians
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Acos_Returns2PiOver3ForNegativeHalf()
-        {
-            var value = Fixed64.CreateFromDouble(-0.5); // cos(120°) = -0.5
-            var result = FixedMath.Acos(value);
-            var expected = FixedMath.TwoPI / 3; // acos(-0.5) ≈ 2π/3 ≈ 2.0944 radians
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Acos_ThrowsOutOfRangeForGreaterThanOne()
-        {
-            var value = Fixed64.CreateFromDouble(1.1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
-        }
-
-        [Fact]
-        public void Acos_ThrowsOutOfRangeForLessThanNegativeOne()
-        {
-            var value = Fixed64.CreateFromDouble(-1.1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
-        }
-
-        #endregion
-
-        #region Test: Atan
-
-        [Fact]
-        public void Atan_ReturnsArctangent()
-        {
-            var value = Fixed64.One; // tan(45°) = 1
-            var result = FixedMath.Atan(value);
-            Assert.Equal(FixedMath.PiOver4, result); // atan(1) = π/4
-        }
-
-        [Fact]
-        public void Atan_Symmetry()
-        {
-            var value = Fixed64.CreateFromDouble(0.5);
-            var positiveResult = FixedMath.Atan(value);
-            var negativeResult = FixedMath.Atan(-value);
-            Assert.Equal(positiveResult, -negativeResult);
-        }
-
-        [Fact]
-        public void Atan_NearZero()
-        {
-            var value = Fixed64.CreateFromDouble(0.00001);
-            var result = FixedMath.Atan(value);
-            FixedMathTestHelper.AssertWithinRelativeTolerance(value, result); // Should be close to zero
-        }
-
-        [Fact]
-        public void Atan_NearOne()
-        {
-            var value = Fixed64.CreateFromDouble(0.9999);
-            var result = FixedMath.Atan(value);
-            var expected = FixedMath.PiOver4; // atan(1) = π/4
-            FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
-        }
-
-        [Fact]
-        public void Atan_TanInverse()
-        {
-            var values = new[] { Fixed64.CreateFromDouble(0.1), Fixed64.CreateFromDouble(0.5), new Fixed64(1), new Fixed64(2) };
-            foreach (var value in values)
-            {
-                var atanResult = FixedMath.Atan(value);
-                var tanResult = FixedMath.Tan(atanResult);
-                FixedMathTestHelper.AssertWithinRelativeTolerance(value, tanResult, message: $"Relative error exceeds tolerance for value {value}");
-            }
-        }
-
-        [Fact]
-        public void Atan_RangeLimits()
-        {
-            var values = new[] { new Fixed64(-10), new Fixed64(-1), new Fixed64(0), new Fixed64(1), new Fixed64(10) };
-            foreach (var value in values)
-            {
-                var result = FixedMath.Atan(value);
-                FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, FixedMath.PiOver2, $"Result {result} is out of range for input {value}");
-            }
-        }
-
-        [Fact]
-        public void Atan_LargeInputs()
-        {
-            var values = new[] { new Fixed64(1000), new Fixed64(-1000), new Fixed64(1000000), new Fixed64(-1000000) };
-            foreach (var value in values)
-            {
-                var result = FixedMath.Atan(value);
-                FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, FixedMath.PiOver2, $"Result {result} is out of range for input {value}");
-            }
-        }
-
-        #endregion
-
-        #region Test: Atan2 Method
-
-        [Fact]
-        public void Atan2_ReturnsArctangentOfQuotient()
-        {
-            var y = Fixed64.One;
-            var x = Fixed64.One;
-            var result = FixedMath.Atan2(y, x);
-            Assert.Equal(FixedMath.PiOver4, result); // atan2(1, 1) = π/4
-        }
-
-        [Fact]
-        public void Atan2_Symmetry()
-        {
-            var y = Fixed64.One;
-            var x = Fixed64.One;
-            var positiveResult = FixedMath.Atan2(y, x);
-            var negativeResult = FixedMath.Atan2(-y, -x);
-            Assert.Equal(positiveResult - FixedMath.PI, negativeResult);
-        }
-
-        [Fact]
-        public void Atan2_ZeroY()
-        {
-            var x = Fixed64.One;
-            var result = FixedMath.Atan2(Fixed64.Zero, x);
-            Assert.Equal(Fixed64.Zero, result); // atan2(0, x) should be 0 for positive x
-
-            result = FixedMath.Atan2(Fixed64.Zero, -x);
-            Assert.Equal(FixedMath.PI, result); // atan2(0, -x) should be π for negative x
-        }
-
-        [Fact]
-        public void Atan2_ZeroX()
-        {
-            var y = Fixed64.One;
-            var result = FixedMath.Atan2(y, Fixed64.Zero);
-            Assert.Equal(FixedMath.PiOver2, result); // atan2(y, 0) should be π/2 for positive y
-
-            result = FixedMath.Atan2(-y, Fixed64.Zero);
-            Assert.Equal(-FixedMath.PiOver2, result); // atan2(-y, 0) should be -π/2 for negative y
-        }
-
-        [Fact]
-        public void Atan2_Quadrants()
-        {
-            var result = FixedMath.Atan2(Fixed64.One, Fixed64.One); // Q1
-            FixedMathTestHelper.AssertWithinRange(result, Fixed64.Zero, FixedMath.PiOver2);
-
-            result = FixedMath.Atan2(Fixed64.One, -Fixed64.One); // Q2
-            FixedMathTestHelper.AssertWithinRange(result, FixedMath.PiOver2, FixedMath.PI);
-
-            result = FixedMath.Atan2(-Fixed64.One, -Fixed64.One); // Q3
-            FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PI, -FixedMath.PiOver2);
-
-            result = FixedMath.Atan2(-Fixed64.One, Fixed64.One); // Q4
-            FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, -Fixed64.Zero);
-        }
-
-        [Fact]
-        public void Atan2_SpecificAngles()
-        {
-            FixedMathTestHelper.AssertWithinRelativeTolerance(FixedMath.PiOver4, FixedMath.Atan2(Fixed64.One, Fixed64.One)); // 45 degrees
-            FixedMathTestHelper.AssertWithinRelativeTolerance(-FixedMath.PiOver4, FixedMath.Atan2(-Fixed64.One, Fixed64.One)); // -45 degrees
-            FixedMathTestHelper.AssertWithinRelativeTolerance(3 * FixedMath.PiOver4, FixedMath.Atan2(Fixed64.One, -Fixed64.One)); // 135 degrees
-            FixedMathTestHelper.AssertWithinRelativeTolerance(-3 * FixedMath.PiOver4, FixedMath.Atan2(-Fixed64.One, -Fixed64.One)); // -135 degrees          
-        }
-
-        [Fact]
-        public void Atan2_LargeValues()
-        {
-            var largeValue = new Fixed64(1000000);
-            var result = FixedMath.Atan2(largeValue, largeValue);
-            FixedMathTestHelper.AssertWithinRelativeTolerance(FixedMath.PiOver4, result);  // atan2(1000000, 1000000) should be π/4
-
-            result = FixedMath.Atan2(-largeValue, -largeValue);
-            FixedMathTestHelper.AssertWithinRelativeTolerance(-3 * FixedMath.PiOver4, result);  // atan2(-1000000, -1000000) should be -3π/4
-        }
-
-        #endregion
-
-        #region Test: SinToCos Method
-
-        [Fact]
-        public void SinToCos_ReturnsCosine()
-        {
-            var sinValue = Fixed64.One; // sin(90°) = 1
-            var result = FixedMath.SinToCos(sinValue);
-            Assert.Equal(Fixed64.Zero, result); // cos(90°) = 0
-        }
-
-        #endregion
+        var baseValue = new Fixed64(2);
+        var exponent = new Fixed64(3);
+        var result = FixedMath.Pow(baseValue, exponent);
+        Assert.Equal(new Fixed64(8), result); // 2^3 = 8
     }
+
+    [Fact]
+    public void Pow_RaisesValueToZeroExponent_ReturnsOne()
+    {
+        var baseValue = new Fixed64(5);
+        var exponent = Fixed64.Zero;
+        var result = FixedMath.Pow(baseValue, exponent);
+        Assert.Equal(Fixed64.One, result); // Any number raised to 0 is 1
+    }
+
+    [Fact]
+    public void Pow_RaisesToNegativeExponent()
+    {
+        var baseValue = new Fixed64(2);
+        var exponent = new Fixed64(-1);
+        var result = FixedMath.Pow(baseValue, exponent);
+        Assert.Equal(Fixed64.CreateFromDouble(0.5), result); // 2^-1 = 0.5
+    }
+
+    [Fact]
+    public void Pow_ZeroToNegativeExponent_ThrowsException()
+    {
+        var baseValue = Fixed64.Zero;
+        var exponent = new Fixed64(-1);
+        Assert.Throws<DivideByZeroException>(() => FixedMath.Pow(baseValue, exponent));
+    }
+
+    [Fact]
+    public void Pow_OneBase_ReturnsOneForAnyExponent()
+    {
+        var result = FixedMath.Pow(Fixed64.One, new Fixed64(7.5));
+        Assert.Equal(Fixed64.One, result);
+    }
+
+    [Fact]
+    public void Pow_ZeroBaseWithPositiveExponent_ReturnsZero()
+    {
+        var result = FixedMath.Pow(Fixed64.Zero, new Fixed64(3));
+        Assert.Equal(Fixed64.Zero, result);
+    }
+
+    #endregion
+
+    #region Test: Pow2 Method
+
+    [Fact]
+    public void Pow2_ZeroExponent_ReturnsOne()
+    {
+        var result = FixedMath.Pow2(Fixed64.Zero);
+        Assert.Equal(Fixed64.One, result);
+    }
+
+    [Fact]
+    public void Pow2_PositiveAndNegativeOne_ReturnExpectedPowers()
+    {
+        Assert.Equal(Fixed64.Two, FixedMath.Pow2(Fixed64.One));
+        Assert.Equal(Fixed64.Half, FixedMath.Pow2(-Fixed64.One));
+    }
+
+    [Fact]
+    public void Pow2_FractionalNegativeExponent_UsesReciprocalPath()
+    {
+        var exponent = new Fixed64(-2.5);
+        var expected = new Fixed64(Math.Pow(2d, -2.5));
+        var result = FixedMath.Pow2(exponent);
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Pow2_LargeMagnitudes_Saturate()
+    {
+        Assert.Equal(Fixed64.MAX_VALUE, FixedMath.Pow2(FixedMath.LOG_2_MAX));
+        Assert.Equal(Fixed64.One / Fixed64.MAX_VALUE, FixedMath.Pow2(-FixedMath.LOG_2_MAX));
+    }
+
+    #endregion
+
+    #region Test: Sqrt Method
+
+    [Fact]
+    public void Sqrt_PositiveValue_ReturnsSquareRoot()
+    {
+        var value = new Fixed64(4);
+        var result = FixedMath.Sqrt(value);
+        Assert.Equal(new Fixed64(2), result); // sqrt(4) = 2
+    }
+
+    [Fact]
+    public void Sqrt_NegativeValue_ThrowsException()
+    {
+        var value = new Fixed64(-4);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Sqrt(value));
+    }
+
+    [Fact]
+    public void Sqrt_Zero_ReturnsZero()
+    {
+        var value = Fixed64.Zero;
+        var result = FixedMath.Sqrt(value);
+        Assert.Equal(Fixed64.Zero, result);
+    }
+
+    [Fact]
+    public void Sqrt_NonPerfectSquare_ReturnsApproximateSquareRoot()
+    {
+        var value = new Fixed64(2);
+        var result = FixedMath.Sqrt(value);
+        var expected = new Fixed64(Math.Sqrt(2d));
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Sqrt_LargeRawValue_UsesLargeRemainderPath()
+    {
+        var value = Fixed64.FromRaw(7610643186905657857L);
+        var result = FixedMath.Sqrt(value);
+        var expected = new Fixed64(Math.Sqrt((double)value));
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, new Fixed64(0.001));
+    }
+
+    #endregion
+
+    #region Test: Log2 and Ln Methods
+
+    [Fact]
+    public void Value_ReturnsCorrectLog()
+    {
+        var value = new Fixed64(8);
+        var result = FixedMath.Log2(value);
+        Assert.Equal(new Fixed64(3), result); // log2(8) = 3
+    }
+
+    [Fact]
+    public void Log2_Zero_ThrowsException()
+    {
+        var value = Fixed64.Zero;
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Log2(value));
+    }
+
+    [Fact]
+    public void Log2_Fraction_ReturnsNegativePower()
+    {
+        var result = FixedMath.Log2(Fixed64.Half);
+        Assert.Equal(-Fixed64.One, result);
+    }
+
+    [Fact]
+    public void Ln_PositiveValue_ReturnsCorrectLog()
+    {
+        var value = Fixed64.CreateFromDouble(Math.E);
+        var result = FixedMath.Ln(value);
+        Assert.Equal(Fixed64.One, result); // ln(e) = 1
+    }
+
+    [Fact]
+    public void Ln_NegativeValue_ThrowsException()
+    {
+        var value = new Fixed64(-1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Ln(value));
+    }
+
+    #endregion
+
+    #region Test: Rad2Deg and Deg2Rad Methods
+
+    [Fact]
+    public void Rad2Deg_ConvertsRadiansToDegrees()
+    {
+        var radians = FixedMath.PiOver2; // π/2 radians
+        var result = FixedMath.RadToDeg(radians);
+        var expected = new Fixed64(90);
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Deg2Rad_ConvertsDegreesToRadians()
+    {
+        var degrees = (Fixed64)180;
+        var result = FixedMath.DegToRad(degrees);
+        var expected = FixedMath.PI; // 180 degrees = π radians
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    #endregion
+
+    #region Test: Sin and Cos Methods
+
+    [Fact]
+    public void Sin_ReturnsSineOfAngle()
+    {
+        var angle = FixedMath.PiOver2; // π/2 radians = 90 degrees
+        var result = FixedMath.Sin(angle);
+        Assert.Equal(Fixed64.One, result); // sin(90°) = 1
+    }
+
+    [Fact]
+    public void Cos_ReturnsCosineOfAngle()
+    {
+        var angle = FixedMath.PI; // π radians = 180 degrees
+        var result = FixedMath.Cos(angle);
+        Assert.Equal(-Fixed64.One, result); // cos(180°) = -1
+    }
+
+    [Fact]
+    public void Cos_NegativePiOver2_ReturnsZero()
+    {
+        var result = FixedMath.Cos(-FixedMath.PiOver2);
+        Assert.Equal(Fixed64.Zero, result);
+    }
+
+    [Fact]
+    public void Sin_HandlesSpecialCasesExactly()
+    {
+        Assert.Equal(-Fixed64.One, FixedMath.Sin(-FixedMath.PiOver2));
+        Assert.Equal(Fixed64.Zero, FixedMath.Sin(FixedMath.PI));
+        Assert.Equal(Fixed64.Zero, FixedMath.Sin(-FixedMath.PI));
+        Assert.Equal(Fixed64.Zero, FixedMath.Sin(FixedMath.TwoPI));
+        Assert.Equal(Fixed64.Zero, FixedMath.Sin(-FixedMath.TwoPI));
+    }
+
+    [Fact]
+    public void Sin_NormalizesAnglesOutsidePrincipalRange()
+    {
+        var positiveAngle = FixedMath.PI + FixedMath.PiOver4;
+        var negativeAngle = -positiveAngle;
+        var expectedPositive = -FixedMath.Sqrt(Fixed64.Half);
+        var expectedNegative = FixedMath.Sqrt(Fixed64.Half);
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expectedPositive, FixedMath.Sin(positiveAngle));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expectedNegative, FixedMath.Sin(negativeAngle));
+    }
+
+    #endregion
+
+    #region Test: Tan Method
+
+    [Fact]
+    public void Tan_ReturnsTangentOfAngle()
+    {
+        var angle = new Fixed64(45); // 45 degrees in radians
+        var result = FixedMath.Tan(FixedMath.DegToRad(angle));
+        var expected = Fixed64.One; // tan(45°) ≈ 1.0
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Tan_HandlesSpecialCasesExactly()
+    {
+        Assert.Equal(Fixed64.Zero, FixedMath.Tan(Fixed64.Zero));
+        Assert.Equal(-Fixed64.One, FixedMath.Tan(-FixedMath.PiOver4));
+    }
+
+    [Fact]
+    public void Tan_NormalizesAnglesOutsideHalfPiRange()
+    {
+        FixedMathTestHelper.AssertWithinRelativeTolerance(-Fixed64.One, FixedMath.Tan(3 * FixedMath.PiOver4));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(Fixed64.One, FixedMath.Tan(-3 * FixedMath.PiOver4));
+    }
+
+    [Fact]
+    public void Tan_TinyRawValue_RemainsNearIdentity()
+    {
+        var value = Fixed64.FromRaw(1);
+        var result = FixedMath.Tan(value);
+
+        Assert.Equal(value, result);
+    }
+
+    [Fact]
+    public void Tan_NearestConvergenceCandidate_StillDiffersByOneRawUnit()
+    {
+        var value = Fixed64.FromRaw(6262398315L);
+        var x = value % FixedMath.PI;
+        var x2 = x * x;
+        var denominator = Fixed64.One;
+        var prevDenominator = denominator;
+        var minGap = Fixed64.MAX_VALUE;
+        var minGapIteration = 0;
+        var start = x.Abs() > FixedMath.PiOver6 ? 19 : 13;
+
+        for (var i = start; i >= 1; i -= 2)
+        {
+            denominator = (Fixed64)i - (x2 / denominator);
+            var gap = (denominator - prevDenominator).Abs();
+
+            if (gap < minGap)
+            {
+                minGap = gap;
+                minGapIteration = i;
+            }
+
+            prevDenominator = denominator;
+        }
+
+        Assert.Equal(Fixed64.MinIncrement, minGap);
+        Assert.Equal(17, minGapIteration);
+    }
+
+    #endregion
+
+    #region Test: Asin Method
+
+    [Fact]
+    public void Asin_ReturnsArcsine()
+    {
+        var value = Fixed64.One; // sin(90°) = 1
+        var result = FixedMath.Asin(value);
+        Assert.Equal(FixedMath.PiOver2, result); // asin(1) = π/2
+    }
+
+    [Fact]
+    public void Asin_ReturnsNegativePiOver2()
+    {
+        var value = -Fixed64.One; // sin(-90°) = -1
+        var result = FixedMath.Asin(value);
+        Assert.Equal(-FixedMath.PiOver2, result); // asin(-1) = -π/2
+    }
+
+    [Fact]
+    public void Asin_ReturnsAsinOfHalf()
+    {
+        var value = Fixed64.CreateFromDouble(0.5);
+        var result = FixedMath.Asin(value);
+        var expected = FixedMath.PiOver6;  // asin(0.5) ≈ π/6 ≈ 0.5236 radians
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Asin_ReturnsAsinOfNegativeHalf()
+    {
+        var value = Fixed64.CreateFromDouble(-0.5);
+        var result = FixedMath.Asin(value);
+        var expected = -FixedMath.PiOver6;  // asin(-0.5) ≈ -π/6 ≈ -0.5236 radians
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Asin_ThrowsForOutOfDomain()
+    {
+        var value = new Fixed64(2); // Value greater than 1
+        Assert.Throws<ArithmeticException>(() => FixedMath.Asin(value));
+    }
+
+    [Fact]
+    public void Asin_ThrowsForLessThanNegativeOne()
+    {
+        var value = new Fixed64(-2);
+        Assert.Throws<ArithmeticException>(() => FixedMath.Asin(value));
+    }
+
+    [Fact]
+    public void Asin_ReturnsZeroForZero()
+    {
+        var value = Fixed64.Zero;
+        var result = FixedMath.Asin(value);
+        Assert.Equal(Fixed64.Zero, result); // asin(0) = 0
+    }
+
+    [Fact]
+    public void Asin_UsesPadeApproximationForSmallValues()
+    {
+        var value = new Fixed64(0.25);
+        var result = FixedMath.Asin(value);
+        var expected = new Fixed64(Math.Asin(0.25d));
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, new Fixed64(0.001));
+    }
+
+    [Fact]
+    public void Asin_UsesAcosIdentityForLargeMagnitudes()
+    {
+        var positive = new Fixed64(0.75);
+        var negative = new Fixed64(-0.75);
+
+        FixedMathTestHelper.AssertWithinRelativeTolerance(new Fixed64(Math.Asin(0.75d)), FixedMath.Asin(positive));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(new Fixed64(Math.Asin(-0.75d)), FixedMath.Asin(negative));
+    }
+
+    #endregion
+
+    #region Test: Acos Method
+
+    [Fact]
+    public void Acos_ReturnsArccosine()
+    {
+        var value = Fixed64.Zero; // cos(90°) = 0
+        var result = FixedMath.Acos(value);
+        Assert.Equal(FixedMath.PiOver2, result); // acos(0) = π/2
+    }
+
+    [Fact]
+    public void Acos_ReturnsZeroForOne()
+    {
+        var value = Fixed64.One; // cos(0°) = 1
+        var result = FixedMath.Acos(value);
+        Assert.Equal(Fixed64.Zero, result); // acos(1) = 0
+    }
+
+    [Fact]
+    public void Acos_ReturnsPiForNegativeOne()
+    {
+        var value = -Fixed64.One; // cos(180°) = -1
+        var result = FixedMath.Acos(value);
+        Assert.Equal(FixedMath.PI, result); // acos(-1) = π
+    }
+
+    [Fact]
+    public void Acos_ReturnsPiOver3ForHalf()
+    {
+        var value = Fixed64.CreateFromDouble(0.5); // cos(60°) = 0.5
+        var result = FixedMath.Acos(value);
+        var expected = FixedMath.PiOver3; // acos(0.5) ≈ π/3 ≈ 1.0472 radians
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Acos_Returns2PiOver3ForNegativeHalf()
+    {
+        var value = Fixed64.CreateFromDouble(-0.5); // cos(120°) = -0.5
+        var result = FixedMath.Acos(value);
+        var expected = FixedMath.TwoPI / 3; // acos(-0.5) ≈ 2π/3 ≈ 2.0944 radians
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Acos_ThrowsOutOfRangeForGreaterThanOne()
+    {
+        var value = Fixed64.CreateFromDouble(1.1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
+    }
+
+    [Fact]
+    public void Acos_ThrowsOutOfRangeForLessThanNegativeOne()
+    {
+        var value = Fixed64.CreateFromDouble(-1.1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.Acos(value));
+    }
+
+    #endregion
+
+    #region Test: Atan
+
+    [Fact]
+    public void Atan_ReturnsArctangent()
+    {
+        var value = Fixed64.One; // tan(45°) = 1
+        var result = FixedMath.Atan(value);
+        Assert.Equal(FixedMath.PiOver4, result); // atan(1) = π/4
+    }
+
+    [Fact]
+    public void Atan_HandlesZeroAndNegativeOneExactly()
+    {
+        Assert.Equal(Fixed64.Zero, FixedMath.Atan(Fixed64.Zero));
+        Assert.Equal(-FixedMath.PiOver4, FixedMath.Atan(-Fixed64.One));
+    }
+
+    [Fact]
+    public void Atan_Symmetry()
+    {
+        var value = Fixed64.CreateFromDouble(0.5);
+        var positiveResult = FixedMath.Atan(value);
+        var negativeResult = FixedMath.Atan(-value);
+        Assert.Equal(positiveResult, -negativeResult);
+    }
+
+    [Fact]
+    public void Atan_NearZero()
+    {
+        var value = Fixed64.CreateFromDouble(0.00001);
+        var result = FixedMath.Atan(value);
+        FixedMathTestHelper.AssertWithinRelativeTolerance(value, result); // Should be close to zero
+    }
+
+    [Fact]
+    public void Atan_NearOne()
+    {
+        var value = Fixed64.CreateFromDouble(0.9999);
+        var result = FixedMath.Atan(value);
+        var expected = FixedMath.PiOver4; // atan(1) = π/4
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
+    }
+
+    [Fact]
+    public void Atan_TanInverse()
+    {
+        var values = new[] { Fixed64.CreateFromDouble(0.1), Fixed64.CreateFromDouble(0.5), new Fixed64(1), new Fixed64(2) };
+        foreach (var value in values)
+        {
+            var atanResult = FixedMath.Atan(value);
+            var tanResult = FixedMath.Tan(atanResult);
+            FixedMathTestHelper.AssertWithinRelativeTolerance(value, tanResult, message: $"Relative error exceeds tolerance for value {value}");
+        }
+    }
+
+    [Fact]
+    public void Atan_RangeLimits()
+    {
+        var values = new[] { new Fixed64(-10), new Fixed64(-1), new Fixed64(0), new Fixed64(1), new Fixed64(10) };
+        foreach (var value in values)
+        {
+            var result = FixedMath.Atan(value);
+            FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, FixedMath.PiOver2, $"Result {result} is out of range for input {value}");
+        }
+    }
+
+    [Fact]
+    public void Atan_LargeInputs()
+    {
+        var values = new[] { new Fixed64(1000), new Fixed64(-1000), new Fixed64(1000000), new Fixed64(-1000000) };
+        foreach (var value in values)
+        {
+            var result = FixedMath.Atan(value);
+            FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, FixedMath.PiOver2, $"Result {result} is out of range for input {value}");
+        }
+    }
+
+    [Fact]
+    public void Atan_TinyRawValue_UsesEarlySeriesTermination()
+    {
+        var value = Fixed64.FromRaw(1);
+        var result = FixedMath.Atan(value);
+
+        Assert.Equal(value, result);
+    }
+
+    #endregion
+
+    #region Test: Atan2 Method
+
+    [Fact]
+    public void Atan2_ReturnsArctangentOfQuotient()
+    {
+        var y = Fixed64.One;
+        var x = Fixed64.One;
+        var result = FixedMath.Atan2(y, x);
+        Assert.Equal(FixedMath.PiOver4, result); // atan2(1, 1) = π/4
+    }
+
+    [Fact]
+    public void Atan2_Symmetry()
+    {
+        var y = Fixed64.One;
+        var x = Fixed64.One;
+        var positiveResult = FixedMath.Atan2(y, x);
+        var negativeResult = FixedMath.Atan2(-y, -x);
+        Assert.Equal(positiveResult - FixedMath.PI, negativeResult);
+    }
+
+    [Fact]
+    public void Atan2_ZeroY()
+    {
+        var x = Fixed64.One;
+        var result = FixedMath.Atan2(Fixed64.Zero, x);
+        Assert.Equal(Fixed64.Zero, result); // atan2(0, x) should be 0 for positive x
+
+        result = FixedMath.Atan2(Fixed64.Zero, -x);
+        Assert.Equal(FixedMath.PI, result); // atan2(0, -x) should be π for negative x
+    }
+
+    [Fact]
+    public void Atan2_ZeroX()
+    {
+        var y = Fixed64.One;
+        var result = FixedMath.Atan2(y, Fixed64.Zero);
+        Assert.Equal(FixedMath.PiOver2, result); // atan2(y, 0) should be π/2 for positive y
+
+        result = FixedMath.Atan2(-y, Fixed64.Zero);
+        Assert.Equal(-FixedMath.PiOver2, result); // atan2(-y, 0) should be -π/2 for negative y
+    }
+
+    [Fact]
+    public void Atan2_ZeroXAndZeroY_ReturnsZero()
+    {
+        var result = FixedMath.Atan2(Fixed64.Zero, Fixed64.Zero);
+        Assert.Equal(Fixed64.Zero, result);
+    }
+
+    [Fact]
+    public void Atan2_Quadrants()
+    {
+        var result = FixedMath.Atan2(Fixed64.One, Fixed64.One); // Q1
+        FixedMathTestHelper.AssertWithinRange(result, Fixed64.Zero, FixedMath.PiOver2);
+
+        result = FixedMath.Atan2(Fixed64.One, -Fixed64.One); // Q2
+        FixedMathTestHelper.AssertWithinRange(result, FixedMath.PiOver2, FixedMath.PI);
+
+        result = FixedMath.Atan2(-Fixed64.One, -Fixed64.One); // Q3
+        FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PI, -FixedMath.PiOver2);
+
+        result = FixedMath.Atan2(-Fixed64.One, Fixed64.One); // Q4
+        FixedMathTestHelper.AssertWithinRange(result, -FixedMath.PiOver2, -Fixed64.Zero);
+    }
+
+    [Fact]
+    public void Atan2_SpecificAngles()
+    {
+        FixedMathTestHelper.AssertWithinRelativeTolerance(FixedMath.PiOver4, FixedMath.Atan2(Fixed64.One, Fixed64.One)); // 45 degrees
+        FixedMathTestHelper.AssertWithinRelativeTolerance(-FixedMath.PiOver4, FixedMath.Atan2(-Fixed64.One, Fixed64.One)); // -45 degrees
+        FixedMathTestHelper.AssertWithinRelativeTolerance(3 * FixedMath.PiOver4, FixedMath.Atan2(Fixed64.One, -Fixed64.One)); // 135 degrees
+        FixedMathTestHelper.AssertWithinRelativeTolerance(-3 * FixedMath.PiOver4, FixedMath.Atan2(-Fixed64.One, -Fixed64.One)); // -135 degrees          
+    }
+
+    [Fact]
+    public void Atan2_LargeValues()
+    {
+        var largeValue = new Fixed64(1000000);
+        var result = FixedMath.Atan2(largeValue, largeValue);
+        FixedMathTestHelper.AssertWithinRelativeTolerance(FixedMath.PiOver4, result);  // atan2(1000000, 1000000) should be π/4
+
+        result = FixedMath.Atan2(-largeValue, -largeValue);
+        FixedMathTestHelper.AssertWithinRelativeTolerance(-3 * FixedMath.PiOver4, result);  // atan2(-1000000, -1000000) should be -3π/4
+    }
+
+    #endregion
+
+    #region Test: SinToCos Method
+
+    [Fact]
+    public void SinToCos_ReturnsCosine()
+    {
+        var sinValue = Fixed64.One; // sin(90°) = 1
+        var result = FixedMath.SinToCos(sinValue);
+        Assert.Equal(Fixed64.Zero, result); // cos(90°) = 0
+    }
+
+    #endregion
 }

@@ -1,9 +1,6 @@
-﻿using MessagePack;
+﻿using MemoryPack;
 using System;
-
-#if NET8_0_OR_GREATER
 using System.Text.Json.Serialization;
-#endif
 
 namespace FixedMathSharp;
 
@@ -11,25 +8,39 @@ namespace FixedMathSharp;
 /// Represents a keyframe in a <see cref="FixedCurve"/>, defining a value at a specific time.
 /// </summary>
 [Serializable]
+[MemoryPackable]
 [MessagePackObject]
-public struct FixedCurveKey : IEquatable<FixedCurveKey>
+public partial struct FixedCurveKey : IEquatable<FixedCurveKey>
 {
+    #region Fields
+
     /// <summary>The time at which this keyframe occurs.</summary>
     [Key(0)]
+    [JsonInclude]
+    [MemoryPackOrder(0)]
     public Fixed64 Time;
 
     /// <summary>The value of the curve at this keyframe.</summary>
     [Key(1)]
+    [JsonInclude]
+    [MemoryPackOrder(1)]
     public Fixed64 Value;
 
     /// <summary>The incoming tangent for cubic interpolation.</summary>
     [Key(2)]
+    [JsonInclude]
+    [MemoryPackOrder(2)]
     public Fixed64 InTangent;
 
     /// <summary>The outgoing tangent for cubic interpolation.</summary>
     [Key(3)]
+    [JsonInclude]
+    [MemoryPackOrder(3)]
     public Fixed64 OutTangent;
 
+    #endregion
+
+    #region Constructors
     /// <summary>
     /// Creates a keyframe with a specified time and value.
     /// </summary>
@@ -51,9 +62,7 @@ public struct FixedCurveKey : IEquatable<FixedCurveKey>
     /// <summary>
     /// Creates a keyframe with optional tangents for cubic interpolation.
     /// </summary>
-#if NET8_0_OR_GREATER
     [JsonConstructor]
-#endif
     public FixedCurveKey(Fixed64 time, Fixed64 value, Fixed64 inTangent, Fixed64 outTangent)
     {
         Time = time;
@@ -62,6 +71,11 @@ public struct FixedCurveKey : IEquatable<FixedCurveKey>
         OutTangent = outTangent;
     }
 
+    #endregion
+
+    #region Equality
+
+    /// <inheritdoc/>
     public bool Equals(FixedCurveKey other)
     {
         return Time == other.Time &&
@@ -70,21 +84,24 @@ public struct FixedCurveKey : IEquatable<FixedCurveKey>
                OutTangent == other.OutTangent;
     }
 
+    /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is FixedCurveKey other && Equals(other);
 
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
-        unchecked
-        {
-            int hash = Time.GetHashCode();
-            hash = (hash * 31) ^ Value.GetHashCode();
-            hash = (hash * 31) ^ InTangent.GetHashCode();
-            hash = (hash * 31) ^ OutTangent.GetHashCode();
-            return hash;
-        }
+        return HashCode.Combine(Time, Value, InTangent, OutTangent);
     }
 
+    /// <summary>
+    /// Determines whether two FixedCurveKey instances are equal.
+    /// </summary>
     public static bool operator ==(FixedCurveKey left, FixedCurveKey right) => left.Equals(right);
 
+    /// <summary>
+    /// Determines whether two FixedCurveKey instances are not equal.
+    /// </summary>
     public static bool operator !=(FixedCurveKey left, FixedCurveKey right) => !(left == right);
+
+    #endregion
 }

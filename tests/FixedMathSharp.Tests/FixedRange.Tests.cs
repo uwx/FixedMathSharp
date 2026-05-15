@@ -1,217 +1,363 @@
-﻿using MessagePack;
-
-#if NET48_OR_GREATER
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-#endif
-
-#if NET8_0_OR_GREATER
+﻿using MemoryPack;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-#endif
-
 using Xunit;
 
-namespace FixedMathSharp.Tests
+namespace FixedMathSharp.Tests;
+
+public class FixedRangeTests
 {
-    public class FixedRangeTests
+    [Fact]
+    public void FixedRange_InitializesCorrectly()
     {
-        [Fact]
-        public void FixedRange_InitializesCorrectly()
-        {
-            var min = new Fixed64(-10);
-            var max = new Fixed64(10);
-            var range = new FixedRange(min, max);
+        var min = new Fixed64(-10);
+        var max = new Fixed64(10);
+        var range = new FixedRange(min, max);
 
-            Assert.Equal(min, range.Min);
-            Assert.Equal(max, range.Max);
-        }
-
-        [Fact]
-        public void FixedRange_Constructor_EnforcesOrder()
-        {
-            var range = new FixedRange(new Fixed64(10), new Fixed64(-10));
-
-            Assert.Equal(new Fixed64(-10), range.Min);
-            Assert.Equal(new Fixed64(10), range.Max);
-        }
-
-        [Fact]
-        public void FixedRange_Length_ComputesCorrectly()
-        {
-            var range = new FixedRange(new Fixed64(-5), new Fixed64(15));
-            Assert.Equal(new Fixed64(20), range.Length); // Length = 15 - (-5) = 20
-        }
-
-        [Fact]
-        public void FixedRange_MidPoint_ComputesCorrectly()
-        {
-            var range = new FixedRange(new Fixed64(-5), new Fixed64(15));
-            Assert.Equal(new Fixed64(5), range.MidPoint); // Midpoint = (-5 + 15) / 2 = 5
-        }
-
-        [Fact]
-        public void FixedRange_InRange_Fixed64Value_ReturnsTrue()
-        {
-            var range = new FixedRange(new Fixed64(0), new Fixed64(10));
-            Assert.True(range.InRange(new Fixed64(5))); // 5 is in [0, 10)
-        }
-
-        [Fact]
-        public void FixedRange_InRange_Fixed64Value_ReturnsFalse()
-        {
-            var range = new FixedRange(new Fixed64(0), new Fixed64(10));
-            Assert.False(range.InRange(new Fixed64(10))); // 10 is not included in [0, 10)
-        }
-
-        [Fact]
-        public void FixedRange_InRange_IntValue_ReturnsTrue()
-        {
-            var range = new FixedRange(new Fixed64(0), new Fixed64(10));
-            Assert.True(range.InRange((Fixed64)5)); // 5 is in [0, 10)
-        }
-
-        [Fact]
-        public void FixedRange_InRange_FloatValue_ReturnsTrue()
-        {
-            var range = new FixedRange(new Fixed64(0), new Fixed64(10));
-            Assert.True(range.InRange((Fixed64)5.5f)); // 5.5 is in [0, 10)
-        }
-
-        [Fact]
-        public void FixedRange_Overlaps_ReturnsTrue()
-        {
-            var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
-            var range2 = new FixedRange(new Fixed64(5), new Fixed64(15));
-            Assert.True(range1.Overlaps(range2)); // Ranges [0, 10) and [5, 15) overlap
-        }
-
-        [Fact]
-        public void FixedRange_Overlaps_ReturnsFalse()
-        {
-            var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
-            var range2 = new FixedRange(new Fixed64(10), new Fixed64(20));
-            Assert.False(range1.Overlaps(range2)); // No overlap between [0, 10) and [10, 20)
-        }
-
-        [Fact]
-        public void FixedRange_AddInPlace_AddsToRangeCorrectly()
-        {
-            var range = new FixedRange(new Fixed64(0), new Fixed64(10));
-            range.AddInPlace(new Fixed64(5));
-
-            Assert.Equal(new Fixed64(5), range.Min);
-            Assert.Equal(new Fixed64(15), range.Max); // Range should now be [5, 15)
-        }
-
-        [Fact]
-        public void FixedRange_GetDirection_ReturnsCorrectDirection()
-        {
-            var range1 = new FixedRange(new Fixed64(0), new Fixed64(5));
-            var range2 = new FixedRange(new Fixed64(10), new Fixed64(15));
-
-            Fixed64? sign;
-            var result = FixedRange.GetDirection(range1, range2, out sign);
-            Assert.True(result);
-            Assert.Equal(-Fixed64.One, sign); // range1 is to the left of range2
-        }
-
-        [Fact]
-        public void FixedRange_ComputeOverlapDepth_ComputesCorrectly()
-        {
-            var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
-            var range2 = new FixedRange(new Fixed64(5), new Fixed64(15));
-
-            var overlapDepth = FixedRange.ComputeOverlapDepth(range1, range2);
-            Assert.Equal(new Fixed64(5), overlapDepth); // Overlap depth is 5
-        }
-
-        [Fact]
-        public void FixedRange_EqualMinMax_DoesNotOverlapWithAnyOtherRange()
-        {
-            var pointRange = new FixedRange(new Fixed64(5), new Fixed64(5)); // Zero-length range at 5
-            var range = new FixedRange(new Fixed64(0), new Fixed64(4)); // Does not contain 5
-
-            Assert.False(pointRange.Overlaps(range)); // Point range (5-5) should not overlap with (0-4)
-        }
-
-        [Fact]
-        public void FixedRange_EqualMinMax_ContainedInLargerRange()
-        {
-            var range1 = new FixedRange(new Fixed64(5), new Fixed64(5)); // Zero-length range
-            var range2 = new FixedRange(new Fixed64(0), new Fixed64(10));
-
-            Assert.True(range2.Overlaps(range1)); // Zero-length range (5-5) is contained within (0-10)
-        }
-
-
-        [Fact]
-        public void FixedRange_SmallRanges_OverlapCorrectly()
-        {
-            var smallRange1 = new FixedRange(Fixed64.CreateFromDouble(0.0001), Fixed64.CreateFromDouble(0.0002));
-            var smallRange2 = new FixedRange(Fixed64.CreateFromDouble(0.00015), Fixed64.CreateFromDouble(0.00025));
-
-            Assert.True(smallRange1.Overlaps(smallRange2));
-        }
-
-
-        [Fact]
-        public void FixedRange_LargeRanges_OverlapCorrectly()
-        {
-            var largeRange1 = new FixedRange(new Fixed64(long.MinValue), new Fixed64(0));
-            var largeRange2 = new FixedRange(new Fixed64(-1000), new Fixed64(long.MaxValue));
-
-            Assert.True(largeRange1.Overlaps(largeRange2));
-        }
-
-        #region Test: Serialization
-
-
-        [Fact]
-        public void FixedRange_NetSerialization_RoundTripMaintainsData()
-        {
-            var originalRange = new FixedRange(new Fixed64(-10), new Fixed64(10));
-
-            // Serialize the FixedRange object
-#if NET48_OR_GREATER
-            var formatter = new BinaryFormatter();
-            using var stream = new MemoryStream();
-            formatter.Serialize(stream, originalRange);
-
-            // Reset stream position and deserialize
-            stream.Seek(0, SeekOrigin.Begin);
-            var deserializedRange = (FixedRange)formatter.Deserialize(stream);
-#endif
-
-#if NET8_0_OR_GREATER
-            var jsonOptions = new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                IncludeFields = true,
-                IgnoreReadOnlyProperties = true
-            };
-            var json = JsonSerializer.SerializeToUtf8Bytes(originalRange, jsonOptions);
-            var deserializedRange = JsonSerializer.Deserialize<FixedRange>(json, jsonOptions);
-#endif
-
-            // Check that deserialized values match the original
-            Assert.Equal(originalRange.Min, deserializedRange.Min);
-            Assert.Equal(originalRange.Max, deserializedRange.Max);
-        }
-
-        [Fact]
-        public void FixedRange_MsgPackSerialization_RoundTripMaintainsData()
-        {
-            FixedRange originalValue = new FixedRange(new Fixed64(-10), new Fixed64(10));
-
-            byte[] bytes = MessagePackSerializer.Serialize(originalValue);
-            FixedRange deserializedValue = MessagePackSerializer.Deserialize<FixedRange>(bytes);
-
-            // Check that deserialized values match the original
-            Assert.Equal(originalValue, deserializedValue);
-        }
-
-        #endregion
+        Assert.Equal(min, range.Min);
+        Assert.Equal(max, range.Max);
     }
+
+    [Fact]
+    public void FixedRange_Constructor_EnforcesOrder()
+    {
+        var range = new FixedRange(new Fixed64(10), new Fixed64(-10));
+
+        Assert.Equal(new Fixed64(-10), range.Min);
+        Assert.Equal(new Fixed64(10), range.Max);
+    }
+
+    [Fact]
+    public void FixedRange_Length_ComputesCorrectly()
+    {
+        var range = new FixedRange(new Fixed64(-5), new Fixed64(15));
+        Assert.Equal(new Fixed64(20), range.Length); // Length = 15 - (-5) = 20
+    }
+
+    [Fact]
+    public void FixedRange_MidPoint_ComputesCorrectly()
+    {
+        var range = new FixedRange(new Fixed64(-5), new Fixed64(15));
+        Assert.Equal(new Fixed64(5), range.MidPoint); // Midpoint = (-5 + 15) / 2 = 5
+    }
+
+    [Fact]
+    public void FixedRange_InRange_Fixed64Value_ReturnsTrue()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+        Assert.True(range.InRange(new Fixed64(5))); // 5 is in [0, 10)
+    }
+
+    [Fact]
+    public void FixedRange_InRange_Fixed64Value_ReturnsFalse()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+        Assert.False(range.InRange(new Fixed64(10))); // 10 is not included in [0, 10)
+    }
+
+    [Fact]
+    public void FixedRange_InRange_Fixed64Value_CoversLowerBoundAndOutsideCases()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        Assert.True(range.InRange(Fixed64.Zero));
+        Assert.False(range.InRange(new Fixed64(-1)));
+        Assert.False(range.InRange(new Fixed64(-1), includeMax: true));
+        Assert.True(range.InRange(new Fixed64(10), includeMax: true));
+        Assert.False(range.InRange(new Fixed64(11), includeMax: true));
+    }
+
+    [Fact]
+    public void FixedRange_InRange_IntValue_ReturnsTrue()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+        Assert.True(range.InRange((Fixed64)5)); // 5 is in [0, 10)
+    }
+
+    [Fact]
+    public void FixedRange_InRange_FloatValue_ReturnsTrue()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+        Assert.True(range.InRange((Fixed64)5.5f)); // 5.5 is in [0, 10)
+    }
+
+    [Fact]
+    public void FixedRange_Overlaps_ReturnsTrue()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(5), new Fixed64(15));
+        Assert.True(range1.Overlaps(range2)); // Ranges [0, 10) and [5, 15) overlap
+    }
+
+    [Fact]
+    public void FixedRange_Overlaps_ReturnsFalse()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(10), new Fixed64(20));
+        Assert.False(range1.Overlaps(range2)); // No overlap between [0, 10) and [10, 20)
+    }
+
+    [Fact]
+    public void FixedRange_AddInPlace_AddsToRangeCorrectly()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+        range.AddInPlace(new Fixed64(5));
+
+        Assert.Equal(new Fixed64(5), range.Min);
+        Assert.Equal(new Fixed64(15), range.Max); // Range should now be [5, 15)
+    }
+
+    [Fact]
+    public void FixedRange_GetDirection_ReturnsCorrectDirection()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(5));
+        var range2 = new FixedRange(new Fixed64(10), new Fixed64(15));
+
+        Fixed64? sign;
+        var result = FixedRange.GetDirection(range1, range2, out sign);
+        Assert.True(result);
+        Assert.Equal(-Fixed64.One, sign); // range1 is to the left of range2
+    }
+
+    [Fact]
+    public void FixedRange_ComputeOverlapDepth_ComputesCorrectly()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(5), new Fixed64(15));
+
+        var overlapDepth = FixedRange.ComputeOverlapDepth(range1, range2);
+        Assert.Equal(new Fixed64(5), overlapDepth); // Overlap depth is 5
+    }
+
+    [Fact]
+    public void FixedRange_Constructor_WithEnforceOrderFalse_PreservesInputOrder()
+    {
+        var range = new FixedRange(new Fixed64(10), new Fixed64(-10), enforceOrder: false);
+
+        Assert.Equal(new Fixed64(10), range.Min);
+        Assert.Equal(new Fixed64(-10), range.Max);
+    }
+
+    [Fact]
+    public void FixedRange_SetMinMax_UpdatesEndpointsWithoutReordering()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        range.SetMinMax(new Fixed64(8), new Fixed64(-2));
+
+        Assert.Equal(new Fixed64(8), range.Min);
+        Assert.Equal(new Fixed64(-2), range.Max);
+    }
+
+    [Fact]
+    public void FixedRange_InRange_DoubleValue_RespectsUpperBoundMode()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        Assert.True(range.InRange(9.5));
+        Assert.False(range.InRange(10.0));
+        Assert.True(range.InRange(10.0, includeMax: true));
+    }
+
+    [Fact]
+    public void FixedRange_InRange_DoubleValue_ReturnsFalseBelowMin()
+    {
+        var range = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        Assert.False(range.InRange(-0.5));
+        Assert.False(range.InRange(-0.5, includeMax: true));
+        Assert.False(range.InRange(10.5, includeMax: true));
+    }
+
+    [Fact]
+    public void FixedRange_GetDirection_ReturnsFalseAndNull_WhenRangesOverlap()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(5), new Fixed64(15));
+
+        var result = FixedRange.GetDirection(range1, range2, out Fixed64? sign);
+
+        Assert.False(result);
+        Assert.Null(sign);
+    }
+
+    [Fact]
+    public void FixedRange_GetDirection_ReturnsPositiveDirection_WhenFirstRangeIsRightOfSecond()
+    {
+        var leftRange = new FixedRange(new Fixed64(0), new Fixed64(5));
+        var rightRange = new FixedRange(new Fixed64(10), new Fixed64(15));
+
+        var result = FixedRange.GetDirection(rightRange, leftRange, out Fixed64? sign);
+
+        Assert.True(result);
+        Assert.Equal(Fixed64.One, sign);
+    }
+
+    [Fact]
+    public void FixedRange_ComputeOverlapDepth_WhenRangeAIsInsideB_UsesContainedBranch()
+    {
+        var rangeA = new FixedRange(new Fixed64(3), new Fixed64(7));
+        var rangeB = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        Assert.Equal(new Fixed64(7), FixedRange.ComputeOverlapDepth(rangeA, rangeB));
+    }
+
+    [Fact]
+    public void FixedRange_ComputeOverlapDepth_WhenRangeBIsInsideA_UsesContainedBranch()
+    {
+        var rangeA = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var rangeB = new FixedRange(new Fixed64(3), new Fixed64(7));
+
+        Assert.Equal(new Fixed64(7), FixedRange.ComputeOverlapDepth(rangeA, rangeB));
+    }
+
+    [Fact]
+    public void FixedRange_ComputeOverlapDepth_WhenRangesDoNotOverlap_ReturnsZero()
+    {
+        var rangeA = new FixedRange(new Fixed64(0), new Fixed64(3));
+        var rangeB = new FixedRange(new Fixed64(5), new Fixed64(8));
+
+        Assert.Equal(Fixed64.Zero, FixedRange.ComputeOverlapDepth(rangeA, rangeB));
+    }
+
+    [Fact]
+    public void FixedRange_CheckOverlap_ReturnsVectorAndDepth_WhenOverlapIsBelowLimit()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(8), new Fixed64(12));
+
+        var result = FixedRange.CheckOverlap(Vector3d.Right, range1, range2, new Fixed64(5), -Fixed64.One, out var output);
+
+        Assert.True(result);
+        Assert.NotNull(output);
+        Assert.Equal(new Fixed64(2), output!.Value.Depth);
+        Assert.Equal(new Vector3d(-2, 0, 0), output.Value.Vector);
+    }
+
+    [Fact]
+    public void FixedRange_CheckOverlap_ReturnsFalse_WhenOverlapIsNotBelowLimit()
+    {
+        var range1 = new FixedRange(new Fixed64(0), new Fixed64(10));
+        var range2 = new FixedRange(new Fixed64(8), new Fixed64(12));
+
+        var result = FixedRange.CheckOverlap(Vector3d.Up, range1, range2, new Fixed64(2), Fixed64.One, out var output);
+
+        Assert.False(result);
+        Assert.Null(output);
+    }
+
+    [Fact]
+    public void FixedRange_OperatorsAndEquality_WorkCorrectly()
+    {
+        var left = new FixedRange(new Fixed64(3), new Fixed64(5));
+        var right = new FixedRange(new Fixed64(1), new Fixed64(2));
+        var same = new FixedRange(new Fixed64(3), new Fixed64(5));
+
+        Assert.Equal(new FixedRange(new Fixed64(4), new Fixed64(7)), left + right);
+        Assert.Equal(new FixedRange(new Fixed64(2), new Fixed64(3)), left - right);
+        Assert.True(left == same);
+        Assert.False(left != same);
+        Assert.True(left.Equals((object)same));
+        Assert.False(left.Equals("not-a-range"));
+        Assert.Equal(left.GetHashCode(), same.GetHashCode());
+    }
+
+    [Fact]
+    public void FixedRange_EqualsTyped_ReturnsFalseForDifferentRange()
+    {
+        var left = new FixedRange(new Fixed64(1), new Fixed64(2));
+        var right = new FixedRange(new Fixed64(1), new Fixed64(3));
+
+        Assert.False(left.Equals(right));
+    }
+
+    [Fact]
+    public void FixedRange_EqualsTyped_ReturnsFalseWhenMinDiffers()
+    {
+        var left = new FixedRange(new Fixed64(1), new Fixed64(2));
+        var right = new FixedRange(new Fixed64(0), new Fixed64(2));
+
+        Assert.False(left.Equals(right));
+    }
+
+    [Fact]
+    public void FixedRange_ToString_FormatsMinAndMax()
+    {
+        var range = new FixedRange(new Fixed64(-1.25), new Fixed64(2.5));
+
+        Assert.Equal("-1.25 - 2.5", range.ToString());
+    }
+
+    [Fact]
+    public void FixedRange_EqualMinMax_DoesNotOverlapWithAnyOtherRange()
+    {
+        var pointRange = new FixedRange(new Fixed64(5), new Fixed64(5)); // Zero-length range at 5
+        var range = new FixedRange(new Fixed64(0), new Fixed64(4)); // Does not contain 5
+
+        Assert.False(pointRange.Overlaps(range)); // Point range (5-5) should not overlap with (0-4)
+    }
+
+    [Fact]
+    public void FixedRange_EqualMinMax_ContainedInLargerRange()
+    {
+        var range1 = new FixedRange(new Fixed64(5), new Fixed64(5)); // Zero-length range
+        var range2 = new FixedRange(new Fixed64(0), new Fixed64(10));
+
+        Assert.True(range2.Overlaps(range1)); // Zero-length range (5-5) is contained within (0-10)
+    }
+
+
+    [Fact]
+    public void FixedRange_SmallRanges_OverlapCorrectly()
+    {
+        var smallRange1 = new FixedRange(Fixed64.CreateFromDouble(0.0001), Fixed64.CreateFromDouble(0.0002));
+        var smallRange2 = new FixedRange(Fixed64.CreateFromDouble(0.00015), Fixed64.CreateFromDouble(0.00025));
+
+        Assert.True(smallRange1.Overlaps(smallRange2));
+    }
+
+
+    [Fact]
+    public void FixedRange_LargeRanges_OverlapCorrectly()
+    {
+        var largeRange1 = new FixedRange(new Fixed64(long.MinValue), new Fixed64(0));
+        var largeRange2 = new FixedRange(new Fixed64(-1000), new Fixed64(long.MaxValue));
+
+        Assert.True(largeRange1.Overlaps(largeRange2));
+    }
+
+    #region Test: Serialization
+
+
+    [Fact]
+    public void FixedRange_NetSerialization_RoundTripMaintainsData()
+    {
+        var originalRange = new FixedRange(new Fixed64(-10), new Fixed64(10));
+
+        var jsonOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        };
+        var json = JsonSerializer.SerializeToUtf8Bytes(originalRange, jsonOptions);
+        var deserializedRange = JsonSerializer.Deserialize<FixedRange>(json, jsonOptions);
+
+        // Check that deserialized values match the original
+        Assert.Equal(originalRange.Min, deserializedRange.Min);
+        Assert.Equal(originalRange.Max, deserializedRange.Max);
+    }
+
+    [Fact]
+    public void FixedRange_MemoryPackSerialization_RoundTripMaintainsData()
+    {
+        FixedRange originalValue = new(new Fixed64(-10), new Fixed64(10));
+
+        byte[] bytes = MemoryPackSerializer.Serialize(originalValue);
+        FixedRange deserializedValue = MemoryPackSerializer.Deserialize<FixedRange>(bytes);
+
+        // Check that deserialized values match the original
+        Assert.Equal(originalValue, deserializedValue);
+    }
+
+    #endregion
 }

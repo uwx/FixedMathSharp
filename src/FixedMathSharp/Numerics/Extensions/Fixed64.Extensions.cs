@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for the Fixed64 type, enabling additional mathematical, conversion, and comparison operations using a fluent syntax.
+/// </summary>
 public static class Fixed64Extensions
 {
     #region Fixed64 Operations
@@ -22,7 +24,7 @@ public static class Fixed64Extensions
     {
         return Fixed64.IsInteger(value);
     }
-        
+
     /// <inheritdoc cref="FixedMath.Squared(Fixed64)" />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Squared(this Fixed64 value)
@@ -238,7 +240,7 @@ public static class Fixed64Extensions
         var allowedErr = a.Abs() * percentage;
         // Compare directly to percentage if a is zero
         // Otherwise, use percentage of a's magnitude
-        return a == Fixed64.Zero ? diff <= percentage : diff <= allowedErr;
+        return a.LessThanEpsilon() ? diff <= percentage : diff <= allowedErr;
     }
 
     #endregion

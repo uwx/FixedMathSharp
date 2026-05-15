@@ -1,4 +1,4 @@
-﻿using MessagePack;
+﻿using MemoryPack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,15 +16,61 @@ namespace FixedMathSharp;
 /// The precision is determined by SHIFT_AMOUNT, which defines the resolution of fractional values.
 /// </summary>
 [Serializable]
+[MemoryPackable]
 [MessagePackObject]
 public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>
 {
-    #region Fields and Constants
+    #region Static Readonly Fields
+
+    /// <inheritdoc cref="FixedMath.MAX_VALUE_L" />
+    public static readonly Fixed64 MAX_VALUE = new(FixedMath.MAX_VALUE_L);
+    /// <inheritdoc cref="FixedMath.MIN_VALUE_L" />
+    public static readonly Fixed64 MIN_VALUE = new(FixedMath.MIN_VALUE_L);
+
+    /// <inheritdoc cref="FixedMath.ONE_L" />
+    public static readonly Fixed64 One = new(FixedMath.ONE_L);
+    /// <summary>
+    /// Represents the value 2 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
+    /// </summary>
+    public static readonly Fixed64 Two = One * 2;
+    /// <summary>
+    /// Represents the value 3 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
+    /// </summary>
+    public static readonly Fixed64 Three = One * 3;
+    /// <summary>
+    /// Represents the value 0.5 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
+    /// </summary>
+    public static readonly Fixed64 Half = One / 2;
+    /// <summary>
+    /// Represents the value 0.25 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
+    /// </summary>
+    public static readonly Fixed64 Quarter = One / 4;
+    /// <summary>
+    /// Represents the value 0.125 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
+    /// </summary>
+    public static readonly Fixed64 Eighth = One / 8;
+    /// <summary>
+    /// Represents the value 0 as a fixed-point number.
+    /// </summary>
+    public static readonly Fixed64 Zero = new(0);
+
+
+    /// <inheritdoc cref="FixedMath.MIN_INCREMENT_L" />
+    public static readonly Fixed64 MinIncrement = new(FixedMath.MIN_INCREMENT_L);
+
+    /// <inheritdoc cref="FixedMath.DEFAULT_TOLERANCE_L" />
+    public static readonly Fixed64 Epsilon = new(FixedMath.DEFAULT_TOLERANCE_L);
+
+    #endregion
+
+    #region Fields
 
     /// <summary>
     /// The underlying raw long value representing the fixed-point number.
     /// </summary>
     [Key(0)]
+    [JsonInclude]
+    [MemoryPackInclude]
     public readonly long m_rawValue;
 
     public static Fixed64 MAX_VALUE => new(FixedMath.MAX_VALUE_L);
@@ -51,25 +97,23 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// <summary>
     /// Internal constructor for a Fixed64 from a raw long value.
     /// </summary>
-    /// <param name="m_rawValue">Raw long value representing the fixed-point number.</param>
+    /// <param name="rawValue">Raw long value representing the fixed-point number.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [SerializationConstructor, JsonConstructor]
-    // ReSharper disable once InconsistentNaming
-    internal Fixed64(long m_rawValue)
-    {
-        this.m_rawValue = m_rawValue;
-    }
+    internal Fixed64(long rawValue) => m_rawValue = rawValue;
 
     /// <summary>
     /// Constructs a Fixed64 from an integer, with the fractional part set to zero.
     /// </summary>
     /// <param name="value">Integer value to convert to </param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64(int value) : this((long)value << FixedMath.SHIFT_AMOUNT_I) { }
 
     /// <summary>
     /// Constructs a Fixed64 from a double-precision floating-point value.
     /// </summary>
+    /// <remarks>
+    /// The value is multiplied by the scaling factor (2^SHIFT_AMOUNT) and 
+    /// rounded to the nearest integer to fit into the fixed-point representation.
+    /// </remarks>
     /// <param name="value">Double value to convert to </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 CreateFromDouble(double value) => new((long)Math.Round((double)value * FixedMath.ONE_L));
@@ -127,7 +171,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
         // Return the sign of the value, optimizing for branchless comparison
         return value.m_rawValue < 0 ? -1 : (value.m_rawValue > 0 ? 1 : 0);
     }
-        
+
     /// <summary>
     /// Returns true if the number has no decimal part (i.e., if the number is equivalent to an integer) and False otherwise. 
     /// </summary>
@@ -141,29 +185,53 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
 
     #region Explicit and Implicit Conversions
 
+    /// <summary>
+    /// Converts a 64-bit signed integer to a Fixed64 value using explicit casting.
+    /// </summary>
+    /// <remarks>
+    /// The conversion interprets the input value as the integer part of the fixed-point number. 
+    /// Use this operator when an explicit conversion from long to Fixed64 is required.
+    /// </remarks>
+    /// <param name="value">The 64-bit signed integer to convert to a Fixed64 value.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Fixed64(long value)
     {
         return FromRaw(value << FixedMath.SHIFT_AMOUNT_I);
     }
 
+    /// <summary>
+    /// Converts a Fixed64 value to a 64-bit signed integer by discarding the fractional part.
+    /// </summary>
+    /// <remarks>
+    /// The conversion truncates any fractional component. 
+    /// The result represents the integer portion of the Fixed64 value.</remarks>
+    /// <param name="value">The Fixed64 value to convert to a long integer.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator long(Fixed64 value)
     {
         return value.m_rawValue >> FixedMath.SHIFT_AMOUNT_I;
     }
 
+    /// <summary>
+    /// Defines an explicit conversion from a 32-bit signed integer to a Fixed64 value.
+    /// </summary>
+    /// <param name="value">The 32-bit signed integer to convert to a Fixed64 value.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Fixed64(int value)
     {
         return new Fixed64(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int RawToInt(Fixed64 value)
     {
         return (int)(value.m_rawValue >> FixedMath.SHIFT_AMOUNT_I);
     }
 
+    /// <summary>
+    /// Defines an explicit conversion from a single-precision floating-point value to a Fixed64 instance.
+    /// </summary>
+    /// <param name="value">The single-precision floating-point value to convert to Fixed64.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator int(Fixed64 value)
     {
@@ -180,30 +248,63 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
         return CreateFromDouble((double)value);
     }
 
+    /// <summary>
+    /// Converts a Fixed64 value to its equivalent single-precision floating-point representation.
+    /// </summary>
+    /// <remarks>
+    /// This conversion may result in a loss of precision if the Fixed64 value cannot be exactly  represented as a float.
+    /// </remarks>
+    /// <param name="value">The Fixed64 value to convert to a float.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator float(Fixed64 value)
     {
         return value.m_rawValue * FixedMath.SCALE_FACTOR_F;
     }
 
+    /// <summary>
+    /// Defines an explicit conversion from a double-precision floating-point number to a Fixed64 value.
+    /// </summary>
+    /// <remarks>
+    /// This conversion may result in loss of precision if the double value cannot be exactly represented as a Fixed64.
+    /// </remarks>
+    /// <param name="value">The double-precision floating-point number to convert to a Fixed64 value.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Fixed64(double value)
     {
         return CreateFromDouble(value);
     }
 
+    /// <summary>
+    /// Converts a Fixed64 value to its equivalent double-precision floating-point representation.
+    /// </summary>
+    /// <remarks>
+    /// This conversion may result in a loss of precision if the Fixed64 value cannot be exactly represented as a double.
+    /// </remarks>
+    /// <param name="value">The Fixed64 value to convert to a double.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator double(Fixed64 value)
     {
         return value.m_rawValue * FixedMath.SCALE_FACTOR_D;
     }
 
+    /// <summary>
+    /// Defines an explicit conversion from a decimal value to a Fixed64 instance.
+    /// </summary>
+    /// <param name="value">The decimal value to convert to a Fixed64 instance.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator Fixed64(decimal value)
     {
         return CreateFromDouble((double)value);
     }
 
+    /// <summary>
+    /// Converts a Fixed64 value to its decimal representation.
+    /// </summary>
+    /// <remarks>
+    /// This operator provides an explicit conversion from Fixed64 to decimal, preserving the numeric value as closely as possible. 
+    /// Use this conversion when precise decimal arithmetic is required.
+    /// </remarks>
+    /// <param name="value">The Fixed64 value to convert to decimal.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator decimal(Fixed64 value)
     {
@@ -302,69 +403,136 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Multiplies two Fixed64 numbers, handling overflow and rounding.
+    /// Multiplies two Fixed64 numbers using full-width 128-bit intermediate precision
+    /// and round-half-to-even semantics on the discarded fractional bits.
     /// </summary>
     public static Fixed64 MulPrecise(Fixed64 x, Fixed64 y)
     {
         long xl = x.m_rawValue;
         long yl = y.m_rawValue;
 
-        // Split both numbers into high and low parts
-        ulong xlo = (ulong)(xl & FixedMath.MAX_SHIFTED_AMOUNT_UI);
-        long xhi = xl >> FixedMath.SHIFT_AMOUNT_I;
-        ulong ylo = (ulong)(yl & FixedMath.MAX_SHIFTED_AMOUNT_UI);
-        long yhi = yl >> FixedMath.SHIFT_AMOUNT_I;
+        int shift = FixedMath.SHIFT_AMOUNT_I;
 
-        // Perform partial products
-        ulong lolo = xlo * ylo;          // low bits * low bits
-        long lohi = (long)xlo * yhi;     // low bits * high bits
-        long hilo = xhi * (long)ylo;     // high bits * low bits
-        long hihi = xhi * yhi;           // high bits * high bits
+        if (shift <= 0 || shift >= 64)
+            throw new InvalidOperationException($"SHIFT_AMOUNT_I must be in the range 1..63, but was {shift}.");
 
-        // Combine results, starting with the low part
-        ulong loResult = lolo >> FixedMath.SHIFT_AMOUNT_I;
-        long hiResult = hihi << FixedMath.SHIFT_AMOUNT_I;
+        // Determine sign of the final result.
+        bool negative = ((xl ^ yl) < 0);
 
-        // Adjust rounding for the fractional part of the lolo term
-        if ((lolo & (1UL << (FixedMath.SHIFT_AMOUNT_I - 1))) != 0)
-            loResult++; // Apply rounding up if the dropped bit is 1 (round half-up)
+        // Convert to unsigned magnitudes safely, including long.MinValue.
+        ulong ax = AbsToUInt64(xl);
+        ulong ay = AbsToUInt64(yl);
 
-        bool overflow = false;
-        long sum = FixedMath.AddOverflowHelper((long)loResult, lohi, ref overflow);
-        sum = FixedMath.AddOverflowHelper(sum, hilo, ref overflow);
-        sum = FixedMath.AddOverflowHelper(sum, hiResult, ref overflow);
+        // Compute exact 128-bit unsigned product: (hi << 64) | lo
+        Multiply64To128(ax, ay, out ulong hi, out ulong lo);
 
-        // Overflow handling
-        bool opSignsEqual = ((xl ^ yl) & FixedMath.MIN_VALUE_L) == 0;
+        // Shift-right with round-half-to-even using the FULL discarded remainder.
+        ulong magnitude = ShiftRightRoundedToEven(hi, lo, shift, out bool roundedOverflow);
 
-        // Positive overflow check
-        if (opSignsEqual)
+        // If rounding overflowed the shifted magnitude, carry it into saturation handling.
+        if (!negative)
         {
-            if (sum < 0 || (overflow && xl > 0))
-                return MAX_VALUE;
+            if (roundedOverflow || magnitude > long.MaxValue)
+                return new Fixed64(FixedMath.MAX_VALUE_L);
+
+            return new Fixed64((long)magnitude);
         }
         else
         {
-            if (sum > 0)
-                return MIN_VALUE;
+            // For negative results, magnitude may be exactly 2^63, which maps to long.MinValue.
+            const ulong minValueMagnitude = 0x8000000000000000UL;
+
+            if (roundedOverflow || magnitude > minValueMagnitude)
+                return new Fixed64(FixedMath.MIN_VALUE_L);
+
+            if (magnitude == minValueMagnitude)
+                return new Fixed64(FixedMath.MIN_VALUE_L);
+
+            return new Fixed64(-(long)magnitude);
         }
+    }
 
-        // Final overflow check: if the high 32 bits are non-zero or non-sign-extended, it's an overflow
-        long topCarry = hihi >> FixedMath.SHIFT_AMOUNT_I;
-        if (topCarry != 0 && topCarry != -1)
-            return opSignsEqual ? MAX_VALUE : MIN_VALUE;
+    /// <summary>
+    /// Returns the absolute value of a signed 64-bit integer as an unsigned 64-bit magnitude,
+    /// safely handling long.MinValue.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong AbsToUInt64(long value)
+    {
+        return value < 0
+            ? unchecked((ulong)(~value + 1))
+            : (ulong)value;
+    }
 
-        // Negative overflow check
-        if (!opSignsEqual)
+    /// <summary>
+    /// Computes the exact unsigned 128-bit product of two 64-bit unsigned integers.
+    /// The result is returned as hi:lo, where product = (hi &lt;&lt; 64) | lo.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void Multiply64To128(ulong a, ulong b, out ulong hi, out ulong lo)
+    {
+        ulong aLo = (uint)a;
+        ulong aHi = a >> 32;
+        ulong bLo = (uint)b;
+        ulong bHi = b >> 32;
+
+        ulong p0 = aLo * bLo;
+        ulong p1 = aLo * bHi;
+        ulong p2 = aHi * bLo;
+        ulong p3 = aHi * bHi;
+
+        ulong middle = (p0 >> 32) + (uint)p1 + (uint)p2;
+
+        lo = (p0 & 0xFFFFFFFFUL) | (middle << 32);
+        hi = p3 + (p1 >> 32) + (p2 >> 32) + (middle >> 32);
+    }
+
+    /// <summary>
+    /// Shifts the unsigned 128-bit value (hi:lo) right by <paramref name="shift"/> bits,
+    /// applying round-half-to-even to the discarded bits.
+    /// </summary>
+    /// <param name="hi">Upper 64 bits of the 128-bit value.</param>
+    /// <param name="lo">Lower 64 bits of the 128-bit value.</param>
+    /// <param name="shift">Number of bits to shift right. Must be in the range 1..63.</param>
+    /// <param name="overflowed">
+    /// True if rounding caused the 64-bit shifted result to overflow.
+    /// </param>
+    /// <returns>
+    /// The rounded 64-bit result of ((hi:lo) >> shift).
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong ShiftRightRoundedToEven(ulong hi, ulong lo, int shift, out bool overflowed)
+    {
+        // Preconditions: 1 <= shift <= 63
+
+        // Integer part after shifting right by 'shift':
+        // result = ((hi << (64 - shift)) | (lo >> shift))
+        ulong result = (hi << (64 - shift)) | (lo >> shift);
+
+        // Discarded remainder bits are the low 'shift' bits of lo.
+        ulong remainderMask = (1UL << shift) - 1UL;
+        ulong remainder = lo & remainderMask;
+
+        // Halfway value among the discarded bits.
+        ulong half = 1UL << (shift - 1);
+
+        // Round-half-to-even:
+        // - round up if remainder > half
+        // - if exactly half, round so final result is even
+        bool shouldRoundUp =
+            remainder > half ||
+            (remainder == half && (result & 1UL) != 0);
+
+        overflowed = false;
+
+        if (shouldRoundUp)
         {
-            long posOp = xl > yl ? xl : yl;
-            long negOp = xl < yl ? xl : yl;
-
-            if (sum > negOp && negOp < -FixedMath.ONE_L && posOp > FixedMath.ONE_L)
-                return MIN_VALUE;
+            ulong incremented = result + 1UL;
+            overflowed = incremented < result;
+            result = incremented;
         }
 
-        return new Fixed64(sum);
+        return result;
     }
 
     /// <summary>
@@ -377,7 +545,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Multiplies an integer by a 
+    /// Multiplies an integer by a Fixed64.
     /// </summary>
     public static Fixed64 operator *(int x, Fixed64 y)
     {
@@ -425,7 +593,9 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
 
             // Detect overflow
             if ((div & ~(0xFFFFFFFFFFFFFFFF >> bitPos)) != 0)
-                return ((xl ^ yl) & FixedMath.MIN_VALUE_L) == 0 ? MAX_VALUE : MIN_VALUE;
+                return ((xl ^ yl) & FixedMath.MIN_VALUE_L) == 0 
+                    ? new Fixed64(FixedMath.MAX_VALUE_L) 
+                    : new Fixed64(FixedMath.MIN_VALUE_L);
 
             remainder <<= 1;
             --bitPos;
@@ -458,6 +628,15 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
+    /// Divides an integer by a Fixed64
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Fixed64 operator /(int y, Fixed64 x)
+    {
+        return new Fixed64((long)y << FixedMath.SHIFT_AMOUNT_I) / x;
+    }
+
+    /// <summary>
     /// Computes the remainder of division of one Fixed64 number by another.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -474,7 +653,9 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator -(Fixed64 x)
     {
-        return x.m_rawValue == FixedMath.MIN_VALUE_L ? MAX_VALUE : new Fixed64(-x.m_rawValue);
+        return x.m_rawValue == FixedMath.MIN_VALUE_L 
+            ? new Fixed64(FixedMath.MAX_VALUE_L) 
+            : new Fixed64(-x.m_rawValue);
     }
 
     /// <summary>
@@ -483,7 +664,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator ++(Fixed64 a)
     {
-        return a + One;
+        a.m_rawValue += One.m_rawValue;
+        return a;
     }
 
     /// <summary>
@@ -492,7 +674,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator --(Fixed64 a)
     {
-        return a - One;
+        a.m_rawValue -= One.m_rawValue;
+        return a;
     }
 
     /// <summary>
@@ -714,30 +897,28 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
         return obj is Fixed64 other && Equals(other);
     }
 
-    /// <summary>
-    /// Determines whether this instance equals another 
-    /// </summary>
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Fixed64 other)
     {
         return m_rawValue == other.m_rawValue;
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Fixed64 x, Fixed64 y)
     {
         return x.Equals(y);
     }
 
-    /// <summary>
-    /// Returns the hash code for this Fixed64 instance.
-    /// </summary>
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
         return m_rawValue.GetHashCode();
     }
 
+    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetHashCode(Fixed64 obj)
     {

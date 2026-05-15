@@ -1,7 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿﻿using System.Runtime.CompilerServices;
 
 namespace FixedMathSharp;
 
+/// <summary>
+/// Provides extension methods for the Vector2d type to support additional vector operations, comparisons, and conversions.
+/// </summary>
 public static partial class Vector2dExtensions
 {
     #region Vector2d Operations
