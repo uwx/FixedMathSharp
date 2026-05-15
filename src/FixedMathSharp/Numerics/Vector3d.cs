@@ -188,7 +188,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
         {
             Fixed64 temp1 = FixedMath.Cos(X) * FixedMath.Sin(Y);
             Fixed64 temp2 = FixedMath.Sin(-X);
-            Fixed64 temp3 = FixedMath.Cos(X) * FixedMath.Cos(Y);
+            Fixed64 temp3 = -(FixedMath.Cos(X) * FixedMath.Cos(Y));
             return new Vector3d(temp1, temp2, temp3);
         }
     }
