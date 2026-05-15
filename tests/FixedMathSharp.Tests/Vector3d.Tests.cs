@@ -113,27 +113,27 @@ public class Vector3dTests
     [Fact]
     public void SnapSmallComponentsToZero_UsesDefaultEpsilonThreshold()
     {
-        var halfEpsilon = Fixed64.FromRaw(Fixed64.Epsilon.m_rawValue / 2);
+        var halfEpsilon = Fixed64.FromRaw(Fixed64.Epsilon.rawValue / 2);
         var vector = new Vector3d(halfEpsilon, -halfEpsilon, Fixed64.Epsilon);
 
         var result = vector.SnapSmallComponentsToZero();
 
-        Assert.Equal(Fixed64.Zero, result.x);
-        Assert.Equal(Fixed64.Zero, result.y);
-        Assert.Equal(Fixed64.Epsilon, result.z); // Boundary: abs(z) == threshold is retained
+        Assert.Equal(Fixed64.Zero, result.X);
+        Assert.Equal(Fixed64.Zero, result.Y);
+        Assert.Equal(Fixed64.Epsilon, result.Z); // Boundary: abs(z) == threshold is retained
     }
 
     [Fact]
     public void SnapSmallComponentsToZero_UsesCustomThreshold_AndKeepsBoundaryValues()
     {
-        var threshold = new Fixed64(0.1);
-        var vector = new Vector3d(new Fixed64(0.05), new Fixed64(-0.1), new Fixed64(0.2));
+        var threshold = Fixed64.CreateFromDouble(0.1);
+        var vector = new Vector3d(Fixed64.CreateFromDouble(0.05), Fixed64.CreateFromDouble(-0.1), Fixed64.CreateFromDouble(0.2));
 
         var result = vector.SnapSmallComponentsToZero(threshold);
 
-        Assert.Equal(Fixed64.Zero, result.x);      // abs(x) < threshold -> snapped
-        Assert.Equal(new Fixed64(-0.1), result.y); // abs(y) == threshold -> retained
-        Assert.Equal(new Fixed64(0.2), result.z);  // abs(z) > threshold -> retained
+        Assert.Equal(Fixed64.Zero, result.X);      // abs(x) < threshold -> snapped
+        Assert.Equal(Fixed64.CreateFromDouble(-0.1), result.Y); // abs(y) == threshold -> retained
+        Assert.Equal(Fixed64.CreateFromDouble(0.2), result.Z);  // abs(z) > threshold -> retained
     }
 
     #endregion
@@ -250,7 +250,7 @@ public class Vector3dTests
 
         Assert.Equal(new Fixed64(5), magnitude);
         Assert.Equal(vector, normalized);
-        Assert.True(vector.FuzzyEqual(new Vector3d(Fixed64.Zero, new Fixed64(0.6), new Fixed64(0.8)), new Fixed64(0.0001)));
+        Assert.True(vector.FuzzyEqual(new Vector3d(Fixed64.Zero, Fixed64.CreateFromDouble(0.6), Fixed64.CreateFromDouble(0.8)), Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]
@@ -470,7 +470,7 @@ public class Vector3dTests
     public void Slerp_ClampsDotProductBeforeAcos()
     {
         var start = Vector3d.Right;
-        var end = new Vector3d(Fixed64.FromRaw(Fixed64.One.m_rawValue + 1), Fixed64.Zero, Fixed64.Zero);
+        var end = new Vector3d(Fixed64.FromRaw(Fixed64.One.rawValue + 1), Fixed64.Zero, Fixed64.Zero);
 
         var result = Vector3d.Slerp(start, end, Fixed64.Half);
 
@@ -719,7 +719,7 @@ public class Vector3dTests
             Fixed64.Zero, Fixed64.Zero, Fixed64.Zero, Fixed64.One
         );
         var vector = new Vector3d(1, 2, 3);
-        var expected = new Vector3d(Fixed64.One, Fixed64.One, new Fixed64(1.5));
+        var expected = new Vector3d(Fixed64.One, Fixed64.One, Fixed64.CreateFromDouble(1.5));
 
         Assert.Equal(expected, matrix * vector);
         Assert.Equal(expected, vector * matrix);
@@ -757,9 +757,9 @@ public class Vector3dTests
         Assert.Equal(new Vector3d(2, 4, 6), new Fixed64(2) * vector);
         Assert.Equal(new Vector3d(3, 6, 9), 3 * vector);
         Assert.Equal(new Vector3d(2, 6, 12), vector * new Vector3d(2, 3, 4));
-        Assert.Equal(new Vector3d(new Fixed64(0.5), Fixed64.One, new Fixed64(1.5)), vector / new Fixed64(2));
+        Assert.Equal(new Vector3d(Fixed64.CreateFromDouble(0.5), Fixed64.One, Fixed64.CreateFromDouble(1.5)), vector / new Fixed64(2));
         Assert.Equal(Vector3d.Zero, vector / Fixed64.Zero);
-        Assert.Equal(new Vector3d(new Fixed64(0.5), Fixed64.One, new Fixed64(1.5)), vector / 2);
+        Assert.Equal(new Vector3d(Fixed64.CreateFromDouble(0.5), Fixed64.One, Fixed64.CreateFromDouble(1.5)), vector / 2);
         Assert.Equal(new Vector3d(Fixed64.Zero, new Fixed64(2), Fixed64.Zero), new Vector3d(4, 4, 4) / new Vector3d(0, 2, 0));
     }
 
@@ -781,7 +781,7 @@ public class Vector3dTests
     {
         var vector = new Vector3d(6, 8, 0);
 
-        Assert.True(vector.ClampMagnitude(new Fixed64(5)).FuzzyEqual(new Vector3d(3, 4, 0), new Fixed64(0.0001)));
+        Assert.True(vector.ClampMagnitude(new Fixed64(5)).FuzzyEqual(new Vector3d(3, 4, 0), Fixed64.CreateFromDouble(0.0001)));
         Assert.Equal(new Vector3d(1, 2, 3), new Vector3d(-1, -2, -3).Abs());
         Assert.Equal(new Vector3d(-1, 1, 0), Vector3dExtensions.Sign(new Vector3d(-2, 4, 0)));
     }
@@ -858,7 +858,7 @@ public class Vector3dTests
         var quaternion = FixedQuaternion.FromEulerAngles(new Fixed64(0), new Fixed64(0), FixedMath.PiOver2); // 90° rotation around Z-axis
 
         var result = vector.Rotate(position, quaternion);
-        Assert.True(new Vector3d(0, 1, 0).FuzzyEqual(result, new Fixed64(0.0001))); // Allow small error tolerance
+        Assert.True(new Vector3d(0, 1, 0).FuzzyEqual(result, Fixed64.CreateFromDouble(0.0001))); // Allow small error tolerance
     }
 
     [Fact]
@@ -884,7 +884,7 @@ public class Vector3dTests
         Assert.Equal(vector, Vector3d.ClampMagnitude(vector, new Fixed64(10)));
         Assert.True(Vector3d.AreParallel(new Vector3d(1, 0, 0), new Vector3d(2, 0, 0)));
         Assert.False(Vector3d.AreParallel(new Vector3d(1, 0, 0), new Vector3d(0, 1, 0)));
-        Assert.False(Vector3d.AreAlmostParallel(Vector3d.Right, Vector3d.Up, new Fixed64(0.5)));
+        Assert.False(Vector3d.AreAlmostParallel(Vector3d.Right, Vector3d.Up, Fixed64.CreateFromDouble(0.5)));
         Assert.Equal(Vector3d.Zero, Vector3d.Project(new Vector3d(1, 2, 3), Vector3d.Zero));
         Assert.Equal(new Vector3d(1, 2, 3), Vector3d.ProjectOnPlane(new Vector3d(1, 2, 3), Vector3d.Zero));
         Assert.Equal(Fixed64.Zero, Vector3d.Angle(Vector3d.Zero, Vector3d.Right));
@@ -922,16 +922,16 @@ public class Vector3dTests
     [Fact]
     public void Vector3d_OperatorsConversionsAndComparers_WorkCorrectly()
     {
-        var vector = new Vector3d(new Fixed64(1.25), new Fixed64(2.5), new Fixed64(3.75));
+        var vector = new Vector3d(Fixed64.CreateFromDouble(1.25), Fixed64.CreateFromDouble(2.5), Fixed64.CreateFromDouble(3.75));
         var rotation = FixedQuaternion.FromAxisAngle(Vector3d.Up, FixedMath.PiOver2);
 
-        Assert.True((Vector3d.Right * rotation).FuzzyEqual(rotation * Vector3d.Right, new Fixed64(0.0001)));
+        Assert.True((Vector3d.Right * rotation).FuzzyEqual(rotation * Vector3d.Right, Fixed64.CreateFromDouble(0.0001)));
         Assert.True(new Vector3d(2, 2, 2) > Vector3d.One);
         Assert.True(Vector3d.One < new Vector3d(2, 2, 2));
         Assert.True(new Vector3d(2, 2, 2) >= new Vector3d(2, 1, 2));
         Assert.True(Vector3d.One <= new Vector3d(1, 2, 3));
         Assert.Equal("(1.25, 2.5, 3.75)", vector.ToString());
-        Assert.Equal(new Vector2d(new Fixed64(1.25), new Fixed64(3.75)), vector.ToVector2d());
+        Assert.Equal(new Vector2d(Fixed64.CreateFromDouble(1.25), Fixed64.CreateFromDouble(3.75)), vector.ToVector2d());
 
         vector.Deconstruct(out float fx, out float fy, out float fz);
         vector.Deconstruct(out int ix, out int iy, out int iz);
@@ -944,7 +944,7 @@ public class Vector3dTests
         Assert.Equal(4, iz);
 
         Assert.False(vector.Equals("not-a-vector"));
-        Assert.True(vector.Equals(vector, new Vector3d(new Fixed64(1.25), new Fixed64(2.5), new Fixed64(3.75))));
+        Assert.True(vector.Equals(vector, new Vector3d(Fixed64.CreateFromDouble(1.25), Fixed64.CreateFromDouble(2.5), Fixed64.CreateFromDouble(3.75))));
         Assert.False(vector.Equals(vector, Vector3d.Zero));
         Assert.Equal(vector.GetHashCode(), vector.GetHashCode(vector));
         Assert.True(vector.CompareTo(Vector3d.One) > 0);

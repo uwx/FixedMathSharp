@@ -45,7 +45,7 @@ public class FixedTrigonometryTests
     [Fact]
     public void Pow_OneBase_ReturnsOneForAnyExponent()
     {
-        var result = FixedMath.Pow(Fixed64.One, new Fixed64(7.5));
+        var result = FixedMath.Pow(Fixed64.One, Fixed64.CreateFromDouble(7.5));
         Assert.Equal(Fixed64.One, result);
     }
 
@@ -77,8 +77,8 @@ public class FixedTrigonometryTests
     [Fact]
     public void Pow2_FractionalNegativeExponent_UsesReciprocalPath()
     {
-        var exponent = new Fixed64(-2.5);
-        var expected = new Fixed64(Math.Pow(2d, -2.5));
+        var exponent = Fixed64.CreateFromDouble(-2.5);
+        var expected = Fixed64.CreateFromDouble(Math.Pow(2d, -2.5));
         var result = FixedMath.Pow2(exponent);
 
         FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
@@ -123,7 +123,7 @@ public class FixedTrigonometryTests
     {
         var value = new Fixed64(2);
         var result = FixedMath.Sqrt(value);
-        var expected = new Fixed64(Math.Sqrt(2d));
+        var expected = Fixed64.CreateFromDouble(Math.Sqrt(2d));
 
         FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result);
     }
@@ -133,9 +133,9 @@ public class FixedTrigonometryTests
     {
         var value = Fixed64.FromRaw(7610643186905657857L);
         var result = FixedMath.Sqrt(value);
-        var expected = new Fixed64(Math.Sqrt((double)value));
+        var expected = Fixed64.CreateFromDouble(Math.Sqrt((double)value));
 
-        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, new Fixed64(0.001));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, Fixed64.CreateFromDouble(0.001));
     }
 
     #endregion
@@ -379,21 +379,21 @@ public class FixedTrigonometryTests
     [Fact]
     public void Asin_UsesPadeApproximationForSmallValues()
     {
-        var value = new Fixed64(0.25);
+        var value = Fixed64.CreateFromDouble(0.25);
         var result = FixedMath.Asin(value);
-        var expected = new Fixed64(Math.Asin(0.25d));
+        var expected = Fixed64.CreateFromDouble(Math.Asin(0.25d));
 
-        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, new Fixed64(0.001));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(expected, result, Fixed64.CreateFromDouble(0.001));
     }
 
     [Fact]
     public void Asin_UsesAcosIdentityForLargeMagnitudes()
     {
-        var positive = new Fixed64(0.75);
-        var negative = new Fixed64(-0.75);
+        var positive = Fixed64.CreateFromDouble(0.75);
+        var negative = Fixed64.CreateFromDouble(-0.75);
 
-        FixedMathTestHelper.AssertWithinRelativeTolerance(new Fixed64(Math.Asin(0.75d)), FixedMath.Asin(positive));
-        FixedMathTestHelper.AssertWithinRelativeTolerance(new Fixed64(Math.Asin(-0.75d)), FixedMath.Asin(negative));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(Fixed64.CreateFromDouble(Math.Asin(0.75d)), FixedMath.Asin(positive));
+        FixedMathTestHelper.AssertWithinRelativeTolerance(Fixed64.CreateFromDouble(Math.Asin(-0.75d)), FixedMath.Asin(negative));
     }
 
     #endregion

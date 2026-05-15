@@ -50,7 +50,7 @@ public class FixedMathTests
     public void ClampOne_ClampsToNegativeOneOneRange()
     {
         Assert.Equal(-Fixed64.One, FixedMath.ClampOne(new Fixed64(-2)));
-        Assert.Equal(new Fixed64(0.5), FixedMath.ClampOne(new Fixed64(0.5)));
+        Assert.Equal(Fixed64.CreateFromDouble(0.5), FixedMath.ClampOne(Fixed64.CreateFromDouble(0.5)));
         Assert.Equal(Fixed64.One, FixedMath.ClampOne(new Fixed64(2)));
     }
 
@@ -161,7 +161,7 @@ public class FixedMathTests
     [Fact]
     public void Round_AwayFromZero_RoundsUp()
     {
-        var result = FixedMath.Round(Fixed64.CreateFromDouble(2.5), System.MidpointRounding.AwayFromZero);
+        var result = FixedMath.Round(Fixed64.CreateFromDouble(2.5), MidpointRounding.AwayFromZero);
         Assert.Equal(new Fixed64(3), result);
     }
 
@@ -175,7 +175,7 @@ public class FixedMathTests
     [Fact]
     public void Round_AwayFromZero_NegativeHalf_RoundsDown()
     {
-        var result = FixedMath.Round(new Fixed64(-2.5), MidpointRounding.AwayFromZero);
+        var result = FixedMath.Round(Fixed64.CreateFromDouble(-2.5), MidpointRounding.AwayFromZero);
         Assert.Equal(new Fixed64(-3), result);
     }
 
@@ -207,8 +207,8 @@ public class FixedMathTests
     [Fact]
     public void Round_WithDecimalPlaces_ThrowsWhenPrecisionIsOutOfRange()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.RoundToPrecision(new Fixed64(1.23), -1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.RoundToPrecision(new Fixed64(1.23), FixedMath.Pow10Lookup.Length));
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.RoundToPrecision(Fixed64.CreateFromDouble(1.23), -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => FixedMath.RoundToPrecision(Fixed64.CreateFromDouble(1.23), FixedMath.Pow10Lookup.Length));
     }
 
     #endregion

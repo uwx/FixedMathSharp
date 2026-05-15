@@ -2,6 +2,7 @@
 using System;
 using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace FixedMathSharp;
 
@@ -26,24 +27,33 @@ public struct Fixed3x3 : IEquatable<Fixed3x3>
     #region Fields and Constants
 
     [Key(0)]
+    [JsonInclude]
     public Fixed64 m00;
     [Key(1)]
+    [JsonInclude]
     public Fixed64 m01;
     [Key(2)]
+    [JsonInclude]
     public Fixed64 m02;
 
     [Key(3)]
+    [JsonInclude]
     public Fixed64 m10;
     [Key(4)]
+    [JsonInclude]
     public Fixed64 m11;
     [Key(5)]
+    [JsonInclude]
     public Fixed64 m12;
 
     [Key(6)]
+    [JsonInclude]
     public Fixed64 m20;
     [Key(7)]
+    [JsonInclude]
     public Fixed64 m21;
     [Key(8)]
+    [JsonInclude]
     public Fixed64 m22;
 
     /// <summary>

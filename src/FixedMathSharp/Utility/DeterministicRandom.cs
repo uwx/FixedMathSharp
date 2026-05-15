@@ -146,7 +146,7 @@ namespace FixedMathSharp.Utility
         public Fixed64 NextFixed6401()
         {
             // Produce a raw value in [0, One.m_rawValue)
-            ulong rawOne = (ulong)Fixed64.One.m_rawValue;
+            ulong rawOne = (ulong)Fixed64.One.rawValue;
             ulong r = NextBounded(rawOne);
             return Fixed64.FromRaw((long)r);
         }
@@ -159,7 +159,7 @@ namespace FixedMathSharp.Utility
         {
             if (maxExclusive <= Fixed64.Zero)
                 throw new ArgumentOutOfRangeException(nameof(maxExclusive), "max must be > 0");
-            ulong rawMax = (ulong)maxExclusive.m_rawValue;
+            ulong rawMax = (ulong)maxExclusive.rawValue;
             ulong r = NextBounded(rawMax);
             return Fixed64.FromRaw((long)r);
         }
@@ -172,9 +172,9 @@ namespace FixedMathSharp.Utility
         {
             if (minInclusive >= maxExclusive)
                 throw new ArgumentException("min >= max");
-            ulong span = (ulong)(maxExclusive.m_rawValue - minInclusive.m_rawValue);
+            ulong span = (ulong)(maxExclusive.rawValue - minInclusive.rawValue);
             ulong r = NextBounded(span);
-            return Fixed64.FromRaw((long)r + minInclusive.m_rawValue);
+            return Fixed64.FromRaw((long)r + minInclusive.rawValue);
         }
 
         #endregion

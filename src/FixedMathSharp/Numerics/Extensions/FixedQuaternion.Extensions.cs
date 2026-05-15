@@ -29,10 +29,10 @@ public static partial class FixedQuaternionExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool FuzzyEqualAbsolute(this FixedQuaternion q1, FixedQuaternion q2, Fixed64 allowedDifference)
     {
-        return (q1.x - q2.x).Abs() <= allowedDifference &&
-               (q1.y - q2.y).Abs() <= allowedDifference &&
-               (q1.z - q2.z).Abs() <= allowedDifference &&
-               (q1.w - q2.w).Abs() <= allowedDifference;
+        return (q1.X - q2.X).Abs() <= allowedDifference &&
+               (q1.Y - q2.Y).Abs() <= allowedDifference &&
+               (q1.Z - q2.Z).Abs() <= allowedDifference &&
+               (q1.W - q2.W).Abs() <= allowedDifference;
     }
 
     /// <summary>
@@ -45,10 +45,10 @@ public static partial class FixedQuaternionExtensions
     public static bool FuzzyEqual(this FixedQuaternion q1, FixedQuaternion q2, Fixed64? percentage = null)
     {
         Fixed64 p = percentage ?? Fixed64.Epsilon;
-        return q1.x.FuzzyComponentEqual(q2.x, p) &&
-               q1.y.FuzzyComponentEqual(q2.y, p) &&
-               q1.z.FuzzyComponentEqual(q2.z, p) &&
-               q1.w.FuzzyComponentEqual(q2.w, p);
+        return q1.X.FuzzyComponentEqual(q2.X, p) &&
+               q1.Y.FuzzyComponentEqual(q2.Y, p) &&
+               q1.Z.FuzzyComponentEqual(q2.Z, p) &&
+               q1.W.FuzzyComponentEqual(q2.W, p);
     }
 
     #endregion

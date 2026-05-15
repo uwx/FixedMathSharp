@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using MessagePack;
 
 namespace FixedMathSharp;
 
@@ -71,22 +72,10 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [Key(0)]
     [JsonInclude]
     [MemoryPackInclude]
-    public readonly long m_rawValue;
-
-    public static Fixed64 MAX_VALUE => new(FixedMath.MAX_VALUE_L);
-    public static Fixed64 MIN_VALUE => new(FixedMath.MIN_VALUE_L);
+    public readonly long rawValue;
 
     public static Fixed64 MinusOne => new(-FixedMath.ONE_L);
-    public static Fixed64 One => new(FixedMath.ONE_L);
-    public static Fixed64 Two { get; } = One * 2;
-    public static Fixed64 Three { get; } = One * 3;
-    public static Fixed64 Half { get; } = One / 2;
-    public static Fixed64 Quarter { get; } = One / 4;
-    public static Fixed64 Eighth { get; } = One / 8;
-    public static Fixed64 Zero { get; } = new(0);
 
-    /// <inheritdoc cref="FixedMath.EPSILON_L" />
-    public static Fixed64 Epsilon => new(FixedMath.EPSILON_L);
     /// <inheritdoc cref="FixedMath.PRECISION_L" />
     public static Fixed64 Precision => new(FixedMath.PRECISION_L);
 
@@ -98,8 +87,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Internal constructor for a Fixed64 from a raw long value.
     /// </summary>
     /// <param name="rawValue">Raw long value representing the fixed-point number.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal Fixed64(long rawValue) => m_rawValue = rawValue;
+    [MethodImpl(MethodImplOptions.AggressiveInlining), JsonConstructor]
+    internal Fixed64(long rawValue) => this.rawValue = rawValue;
 
     /// <summary>
     /// Constructs a Fixed64 from an integer, with the fractional part set to zero.
@@ -123,12 +112,22 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     #region Methods (Instance)
 
     /// <summary>
+    /// Offsets the current Fixed64 by an integer value.
+    /// </summary>
+    /// <param name="x">The integer value to add.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Fixed64 Offset(int x)
+    {
+        return new Fixed64(rawValue + ((long)x << FixedMath.SHIFT_AMOUNT_I));
+    }
+
+    /// <summary>
     /// Returns the raw value as a string.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string RawToString()
     {
-        return m_rawValue.ToString();
+        return rawValue.ToString();
     }
 
     #endregion
@@ -169,7 +168,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     public static int Sign(Fixed64 value)
     {
         // Return the sign of the value, optimizing for branchless comparison
-        return value.m_rawValue < 0 ? -1 : (value.m_rawValue > 0 ? 1 : 0);
+        return value.rawValue < 0 ? -1 : (value.rawValue > 0 ? 1 : 0);
     }
 
     /// <summary>
@@ -178,7 +177,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInteger(Fixed64 value)
     {
-        return ((ulong)value.m_rawValue & FixedMath.MAX_SHIFTED_AMOUNT_UI) == 0;
+        return ((ulong)value.rawValue & FixedMath.MAX_SHIFTED_AMOUNT_UI) == 0;
     }
 
     #endregion
@@ -209,7 +208,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator long(Fixed64 value)
     {
-        return value.m_rawValue >> FixedMath.SHIFT_AMOUNT_I;
+        return value.rawValue >> FixedMath.SHIFT_AMOUNT_I;
     }
 
     /// <summary>
@@ -225,7 +224,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int RawToInt(Fixed64 value)
     {
-        return (int)(value.m_rawValue >> FixedMath.SHIFT_AMOUNT_I);
+        return (int)(value.rawValue >> FixedMath.SHIFT_AMOUNT_I);
     }
 
     /// <summary>
@@ -258,7 +257,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator float(Fixed64 value)
     {
-        return value.m_rawValue * FixedMath.SCALE_FACTOR_F;
+        return value.rawValue * FixedMath.SCALE_FACTOR_F;
     }
 
     /// <summary>
@@ -284,7 +283,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator double(Fixed64 value)
     {
-        return value.m_rawValue * FixedMath.SCALE_FACTOR_D;
+        return value.rawValue * FixedMath.SCALE_FACTOR_D;
     }
 
     /// <summary>
@@ -308,7 +307,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator decimal(Fixed64 value)
     {
-        return value.m_rawValue * FixedMath.SCALE_FACTOR_M;
+        return value.rawValue * FixedMath.SCALE_FACTOR_M;
     }
 
     #endregion
@@ -320,8 +319,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// </summary>
     public static Fixed64 operator +(Fixed64 x, Fixed64 y)
     {
-        long xl = x.m_rawValue;
-        long yl = y.m_rawValue;
+        long xl = x.rawValue;
+        long yl = y.rawValue;
         long sum = xl + yl;
         // Check for overflow, if signs of operands are equal and signs of sum and x are different
         if (((~(xl ^ yl) & (xl ^ sum)) & FixedMath.MIN_VALUE_L) != 0)
@@ -352,8 +351,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// </summary>
     public static Fixed64 operator -(Fixed64 x, Fixed64 y)
     {
-        long xl = x.m_rawValue;
-        long yl = y.m_rawValue;
+        long xl = x.rawValue;
+        long yl = y.rawValue;
         long diff = xl - yl;
         // Check for overflow, if signs of operands are different and signs of sum and x are different
         if ((((xl ^ yl) & (xl ^ diff)) & FixedMath.MIN_VALUE_L) != 0)
@@ -383,7 +382,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     public static Fixed64 operator *(Fixed64 a, Fixed64 b)
     {
         // Use Math.BigMul to get 128-bit result as high and low parts
-        long high = Math.BigMul(a.m_rawValue, b.m_rawValue, out long low);
+        long high = Math.BigMul(a.rawValue, b.rawValue, out long low);
 
         // Check the most significant bit that will be dropped for rounding
         ulong roundBit = 1UL << (FixedMath.SHIFT_AMOUNT_I - 1);
@@ -408,8 +407,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// </summary>
     public static Fixed64 MulPrecise(Fixed64 x, Fixed64 y)
     {
-        long xl = x.m_rawValue;
-        long yl = y.m_rawValue;
+        long xl = x.rawValue;
+        long yl = y.rawValue;
 
         int shift = FixedMath.SHIFT_AMOUNT_I;
 
@@ -541,7 +540,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator *(Fixed64 x, int y)
     {
-        return new Fixed64(x.m_rawValue * (long)y);
+        return new Fixed64(x.rawValue * (long)y);
     }
 
     /// <summary>
@@ -549,7 +548,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// </summary>
     public static Fixed64 operator *(int x, Fixed64 y)
     {
-        return new Fixed64(y.m_rawValue * (long)x);
+        return new Fixed64(y.rawValue * (long)x);
     }
 
     /// <summary>
@@ -557,8 +556,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// </summary>
     public static Fixed64 operator /(Fixed64 x, Fixed64 y)
     {
-        long xl = x.m_rawValue;
-        long yl = y.m_rawValue;
+        long xl = x.rawValue;
+        long yl = y.rawValue;
 
         if (yl == 0)
         {
@@ -642,9 +641,9 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator %(Fixed64 x, Fixed64 y)
     {
-        if (x.m_rawValue == FixedMath.MIN_VALUE_L && y.m_rawValue == -1)
+        if (x.rawValue == FixedMath.MIN_VALUE_L && y.rawValue == -1)
             return Zero;
-        return new Fixed64(x.m_rawValue % y.m_rawValue);
+        return new Fixed64(x.rawValue % y.rawValue);
     }
 
     /// <summary>
@@ -653,9 +652,9 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator -(Fixed64 x)
     {
-        return x.m_rawValue == FixedMath.MIN_VALUE_L 
+        return x.rawValue == FixedMath.MIN_VALUE_L 
             ? new Fixed64(FixedMath.MAX_VALUE_L) 
-            : new Fixed64(-x.m_rawValue);
+            : new Fixed64(-x.rawValue);
     }
 
     /// <summary>
@@ -664,8 +663,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator ++(Fixed64 a)
     {
-        a.m_rawValue += One.m_rawValue;
-        return a;
+        return a + One;
     }
 
     /// <summary>
@@ -674,8 +672,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator --(Fixed64 a)
     {
-        a.m_rawValue -= One.m_rawValue;
-        return a;
+        return a - One;
     }
 
     /// <summary>
@@ -687,7 +684,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator <<(Fixed64 a, int shift)
     {
-        return new Fixed64(a.m_rawValue << shift);
+        return new Fixed64(a.rawValue << shift);
     }
 
     /// <summary>
@@ -699,7 +696,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator >>(Fixed64 a, int shift)
     {
-        return new Fixed64(a.m_rawValue >> shift);
+        return new Fixed64(a.rawValue >> shift);
     }
 
     #endregion
@@ -712,7 +709,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >(Fixed64 x, Fixed64 y)
     {
-        return x.m_rawValue > y.m_rawValue;
+        return x.rawValue > y.rawValue;
     }
 
     /// <summary>
@@ -721,7 +718,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <(Fixed64 x, Fixed64 y)
     {
-        return x.m_rawValue < y.m_rawValue;
+        return x.rawValue < y.rawValue;
     }
 
     /// <summary>
@@ -730,7 +727,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator >=(Fixed64 x, Fixed64 y)
     {
-        return x.m_rawValue >= y.m_rawValue;
+        return x.rawValue >= y.rawValue;
     }
 
     /// <summary>
@@ -739,7 +736,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator <=(Fixed64 x, Fixed64 y)
     {
-        return x.m_rawValue <= y.m_rawValue;
+        return x.rawValue <= y.rawValue;
     }
 
     /// <summary>
@@ -901,7 +898,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Fixed64 other)
     {
-        return m_rawValue == other.m_rawValue;
+        return rawValue == other.rawValue;
     }
 
     /// <inheritdoc/>
@@ -915,7 +912,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
-        return m_rawValue.GetHashCode();
+        return rawValue.GetHashCode();
     }
 
     /// <inheritdoc/>
@@ -932,7 +929,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// <returns>-1 if less than, 0 if equal, 1 if greater than other.</returns>
     public int CompareTo(Fixed64 other)
     {
-        return m_rawValue.CompareTo(other.m_rawValue);
+        return rawValue.CompareTo(other.rawValue);
     }
 
     #endregion

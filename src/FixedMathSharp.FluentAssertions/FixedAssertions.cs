@@ -18,23 +18,23 @@ internal static class FixedAssertionHelpers
 
     public static bool AreComponentApproximatelyEqual(Vector2d actual, Vector2d expected, Fixed64 tolerance)
     {
-        return (actual.x - expected.x).Abs() <= tolerance
-            && (actual.y - expected.y).Abs() <= tolerance;
+        return (actual.X - expected.X).Abs() <= tolerance
+            && (actual.Y - expected.Y).Abs() <= tolerance;
     }
 
     public static bool AreComponentApproximatelyEqual(Vector3d actual, Vector3d expected, Fixed64 tolerance)
     {
-        return (actual.x - expected.x).Abs() <= tolerance
-            && (actual.y - expected.y).Abs() <= tolerance
-            && (actual.z - expected.z).Abs() <= tolerance;
+        return (actual.X - expected.X).Abs() <= tolerance
+            && (actual.Y - expected.Y).Abs() <= tolerance
+            && (actual.Z - expected.Z).Abs() <= tolerance;
     }
 
     public static bool AreComponentApproximatelyEqual(FixedQuaternion actual, FixedQuaternion expected, Fixed64 tolerance)
     {
-        return (actual.x - expected.x).Abs() <= tolerance
-            && (actual.y - expected.y).Abs() <= tolerance
-            && (actual.z - expected.z).Abs() <= tolerance
-            && (actual.w - expected.w).Abs() <= tolerance;
+        return (actual.X - expected.X).Abs() <= tolerance
+            && (actual.Y - expected.Y).Abs() <= tolerance
+            && (actual.Z - expected.Z).Abs() <= tolerance
+            && (actual.W - expected.W).Abs() <= tolerance;
     }
 
     public static bool AreComponentApproximatelyEqual(Fixed3x3 actual, Fixed3x3 expected, Fixed64 tolerance)
@@ -177,9 +177,9 @@ public sealed class Fixed64Assertions : ComparableTypeAssertions<Fixed64, Fixed6
         Fixed64 actual = (Fixed64)Subject;
 
         CurrentAssertionChain
-            .ForCondition(actual.m_rawValue == expected)
+            .ForCondition(actual.rawValue == expected)
             .BecauseOf(because, becauseArgs)
-            .FailWith("Expected fixed64 to have raw value {0}{reason}, but found {1}.", expected, actual.m_rawValue);
+            .FailWith("Expected fixed64 to have raw value {0}{reason}, but found {1}.", expected, actual.rawValue);
 
         return new AndConstraint<Fixed64Assertions>(this);
     }

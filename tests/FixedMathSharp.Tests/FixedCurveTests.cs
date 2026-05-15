@@ -181,14 +181,14 @@ public class FixedCurveTests
     [Fact]
     public void FixedCurveKey_ConstructorsEqualityAndHashCode_WorkCorrectly()
     {
-        FixedCurveKey fromDouble = new(1.5, 2.5, 3.5, 4.5);
-        FixedCurveKey same = new(new Fixed64(1.5), new Fixed64(2.5), new Fixed64(3.5), new Fixed64(4.5));
-        FixedCurveKey simple = new(1.5, 2.5);
+        FixedCurveKey fromDouble = FixedCurveKey.CreateFromDouble(1.5, 2.5, 3.5, 4.5);
+        FixedCurveKey same = new(Fixed64.CreateFromDouble(1.5), Fixed64.CreateFromDouble(2.5), Fixed64.CreateFromDouble(3.5), Fixed64.CreateFromDouble(4.5));
+        FixedCurveKey simple = FixedCurveKey.CreateFromDouble(1.5, 2.5);
 
-        Assert.Equal(new Fixed64(1.5), fromDouble.Time);
-        Assert.Equal(new Fixed64(2.5), fromDouble.Value);
-        Assert.Equal(new Fixed64(3.5), fromDouble.InTangent);
-        Assert.Equal(new Fixed64(4.5), fromDouble.OutTangent);
+        Assert.Equal(Fixed64.CreateFromDouble(1.5), fromDouble.Time);
+        Assert.Equal(Fixed64.CreateFromDouble(2.5), fromDouble.Value);
+        Assert.Equal(Fixed64.CreateFromDouble(3.5), fromDouble.InTangent);
+        Assert.Equal(Fixed64.CreateFromDouble(4.5), fromDouble.OutTangent);
         Assert.Equal(Fixed64.Zero, simple.InTangent);
         Assert.Equal(Fixed64.Zero, simple.OutTangent);
         Assert.True(fromDouble == same);

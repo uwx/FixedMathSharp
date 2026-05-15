@@ -92,6 +92,27 @@ namespace FixedMathSharp
         /// </summary>
         public const long DEFAULT_TOLERANCE_L = 1L << (SHIFT_AMOUNT_I - 24);
 
+        /// <summary>
+        /// Represents the smallest possible value that can be represented by the Fixed64 format.
+        /// </summary>
+        /// <remarks>
+        /// Precision of this type is 2^-SHIFT_AMOUNT, 
+        /// i.e. 1 / (2^SHIFT_AMOUNT) where SHIFT_AMOUNT defines the fractional bits.
+        /// </remarks>
+        public const long PRECISION_L = MIN_INCREMENT_L;
+
+        /// <summary>
+        ///  The smallest value that a Fixed64 can have different from zero.
+        /// </summary>
+        /// <remarks>
+        /// With the following rules:
+        ///      anyValue + Epsilon = anyValue
+        ///      anyValue - Epsilon = anyValue
+        ///      0 + Epsilon = Epsilon
+        ///      0 - Epsilon = -Epsilon
+        ///  A value Between any number and Epsilon will result in an arbitrary number due to truncating errors.
+        /// </remarks>
+        public const long EPSILON_L = 1L << (SHIFT_AMOUNT_I - 20); //~1E-06f
 
         #endregion
 
@@ -159,12 +180,12 @@ namespace FixedMathSharp
         public static Fixed64 Abs(Fixed64 value)
         {
             // For the minimum value, return the max to avoid overflow
-            if (value.m_rawValue == MIN_VALUE_L)
+            if (value.rawValue == MIN_VALUE_L)
                 return new Fixed64(MAX_VALUE_L);
 
             // Use branchless absolute value calculation
-            long mask = value.m_rawValue >> 63; // If negative, mask will be all 1s; if positive, all 0s
-            return Fixed64.FromRaw((value.m_rawValue + mask) ^ mask);
+            long mask = value.rawValue >> 63; // If negative, mask will be all 1s; if positive, all 0s
+            return Fixed64.FromRaw((value.rawValue + mask) ^ mask);
         }
 
         /// <summary>
@@ -173,7 +194,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 Ceiling(Fixed64 value)
         {
-            bool hasFractionalPart = (value.m_rawValue & MAX_SHIFTED_AMOUNT_UI) != 0;
+            bool hasFractionalPart = (value.rawValue & MAX_SHIFTED_AMOUNT_UI) != 0;
             return hasFractionalPart ? value.Floor() + Fixed64.One : value;
         }
 
@@ -184,7 +205,7 @@ namespace FixedMathSharp
         public static Fixed64 Floor(Fixed64 value)
         {
             // Efficiently zeroes out the fractional part
-            return Fixed64.FromRaw((long)((ulong)value.m_rawValue & FixedMath.MASK_UL));
+            return Fixed64.FromRaw((long)((ulong)value.rawValue & FixedMath.MASK_UL));
         }
 
         /// <summary>
@@ -210,19 +231,19 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 Round(Fixed64 value, MidpointRounding mode = MidpointRounding.ToEven)
         {
-            long fractionalPart = value.m_rawValue & MAX_SHIFTED_AMOUNT_UI;
+            long fractionalPart = value.rawValue & MAX_SHIFTED_AMOUNT_UI;
             Fixed64 integralPart = value.Floor();
-            if (fractionalPart < Fixed64.Half.m_rawValue)
+            if (fractionalPart < Fixed64.Half.rawValue)
                 return integralPart;
 
-            if (fractionalPart > Fixed64.Half.m_rawValue)
+            if (fractionalPart > Fixed64.Half.rawValue)
                 return integralPart + Fixed64.One;
 
             // When value is exactly Fixed64.Halfway between two numbers
             return mode switch
             {
-                MidpointRounding.AwayFromZero => value.m_rawValue > 0 ? integralPart + Fixed64.One : integralPart,// For negative midpoints, Floor() is already away from zero
-                _ => (integralPart.m_rawValue & ONE_L) == 0 ? integralPart : integralPart + Fixed64.One,// Rounds to the nearest even number (default behavior)
+                MidpointRounding.AwayFromZero => value.rawValue > 0 ? integralPart + Fixed64.One : integralPart,// For negative midpoints, Floor() is already away from zero
+                _ => (integralPart.rawValue & ONE_L) == 0 ? integralPart : integralPart + Fixed64.One,// Rounds to the nearest even number (default behavior)
             };
         }
 
@@ -236,7 +257,7 @@ namespace FixedMathSharp
 
             int factor = Pow10Lookup[decimalPlaces];
             Fixed64 scaled = value * factor;
-            long rounded = Round(scaled, mode).m_rawValue;
+            long rounded = Round(scaled, mode).rawValue;
             return new Fixed64(rounded + (factor / 2)) / factor;
         }
 
@@ -257,7 +278,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 FastAdd(Fixed64 x, Fixed64 y)
         {
-            return Fixed64.FromRaw(x.m_rawValue + y.m_rawValue);
+            return Fixed64.FromRaw(x.rawValue + y.rawValue);
         }
 
         /// <summary>
@@ -266,7 +287,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 FastSub(Fixed64 x, Fixed64 y)
         {
-            return Fixed64.FromRaw(x.m_rawValue - y.m_rawValue);
+            return Fixed64.FromRaw(x.rawValue - y.rawValue);
         }
 
         /// <summary>
@@ -274,8 +295,8 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 FastMul(Fixed64 x, Fixed64 y)
         {
-            long xl = x.m_rawValue;
-            long yl = y.m_rawValue;
+            long xl = x.rawValue;
+            long yl = y.rawValue;
 
             // Split values into high and low bits for long multiplication
             ulong xlo = (ulong)(xl & MAX_SHIFTED_AMOUNT_UI);
@@ -305,7 +326,7 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Fixed64 FastMod(Fixed64 x, Fixed64 y)
         {
-            return Fixed64.FromRaw(x.m_rawValue % y.m_rawValue);
+            return Fixed64.FromRaw(x.rawValue % y.rawValue);
         }
 
         /// <summary>
@@ -352,9 +373,9 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 LinearInterpolate(Fixed64 from, Fixed64 to, Fixed64 t)
         {
-            if (t.m_rawValue >= ONE_L)
+            if (t.rawValue >= ONE_L)
                 return to;
-            if (t.m_rawValue <= 0)
+            if (t.rawValue <= 0)
                 return from;
 
             return (to * t) + (from * (Fixed64.One - t));
@@ -379,7 +400,7 @@ namespace FixedMathSharp
                     from = to;
             }
 
-            return Fixed64.FromRaw(from.m_rawValue);
+            return Fixed64.FromRaw(from.rawValue);
         }
 
         /// <summary>

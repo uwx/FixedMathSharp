@@ -1,6 +1,7 @@
 ﻿using MessagePack;
 using System;
 using System.Linq;
+using MemoryPack;
 
 #if NET8_0_OR_GREATER
 using System.Text.Json.Serialization;
@@ -32,19 +33,22 @@ public enum FixedCurveMode : byte
 /// </summary>
 [Serializable]
 [MessagePackObject]
-public struct FixedCurve : IEquatable<FixedCurve>
+[MemoryPackable]
+public partial struct FixedCurve : IEquatable<FixedCurve>
 {
     [Key(0)]
+    [MemoryPackOrder(0)]
     public FixedCurveMode Mode { get; private set; }
 
     [Key(1)]
+    [MemoryPackOrder(1)]
     public FixedCurveKey[] Keyframes { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FixedCurve"/> with a default linear interpolation mode.
     /// </summary>
     /// <param name="keyframes">The keyframes defining the curve.</param>
-    public FixedCurve(params FixedCurveKey[] keyframes)
+    public FixedCurve(params FixedCurveKey[]? keyframes)
         : this(FixedCurveMode.Linear, keyframes) { }
 
     /// <summary>
@@ -52,13 +56,12 @@ public struct FixedCurve : IEquatable<FixedCurve>
     /// </summary>
     /// <param name="mode">The interpolation method to use.</param>
     /// <param name="keyframes">The keyframes defining the curve.</param>
-#if NET8_0_OR_GREATER
     [JsonConstructor]
-#endif
     [SerializationConstructor]
-    public FixedCurve(FixedCurveMode mode, params FixedCurveKey[] keyframes)
+    [MemoryPackConstructor]
+    public FixedCurve(FixedCurveMode mode, params FixedCurveKey[]? keyframes)
     {
-        Keyframes = keyframes.OrderBy(k => k.Time).ToArray();
+        Keyframes = keyframes?.OrderBy(static k => k.Time).ToArray() ?? [];
         Mode = mode;
     }
 

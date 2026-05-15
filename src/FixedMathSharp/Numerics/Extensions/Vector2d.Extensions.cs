@@ -17,8 +17,8 @@ public static partial class Vector2dExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d ClampOneInPlace(this Vector2d v)
     {
-        v.x = v.x.ClampOne();
-        v.y = v.y.ClampOne();
+        v.X = v.X.ClampOne();
+        v.Y = v.Y.ClampOne();
         return v;
     }
 
@@ -88,8 +88,8 @@ public static partial class Vector2dExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool FuzzyEqualAbsolute(this Vector2d me, Vector2d other, Fixed64 allowedDifference)
     {
-        return (me.x - other.x).Abs() <= allowedDifference &&
-               (me.y - other.y).Abs() <= allowedDifference;
+        return (me.X - other.X).Abs() <= allowedDifference &&
+               (me.Y - other.Y).Abs() <= allowedDifference;
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public static partial class Vector2dExtensions
     public static bool FuzzyEqual(this Vector2d me, Vector2d other, Fixed64? percentage = null)
     {
         Fixed64 p = percentage ?? Fixed64.Epsilon;
-        return me.x.FuzzyComponentEqual(other.x, p) && me.y.FuzzyComponentEqual(other.y, p);
+        return me.X.FuzzyComponentEqual(other.X, p) && me.Y.FuzzyComponentEqual(other.Y, p);
     }
 
     #endregion

@@ -29,7 +29,6 @@ public partial struct Fixed64
     public static bool operator >(int f1, Fixed64 f2) => (Fixed64)f1 > f2;
     public static bool operator >=(int f1, Fixed64 f2) => (Fixed64)f1 >= f2;
     public static bool operator <=(int f1, Fixed64 f2) => (Fixed64)f1 <= f2;
-    public static Fixed64 operator /(int f1, Fixed64 f2) => (Fixed64)f1 / f2;
     public static Fixed64 operator %(Fixed64 f1, int f2) => f1 % (Fixed64)f2;
     public static Fixed64 operator %(int f1, Fixed64 f2) => (Fixed64)f1 % f2;
 

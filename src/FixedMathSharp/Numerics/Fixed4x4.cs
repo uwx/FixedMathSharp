@@ -25,40 +25,40 @@ public partial struct Fixed4x4 : IEquatable<Fixed4x4>
 {
     #region Fields and Constants
 
-    [Key(0), JsonPropertyName("m00")]
+    [Key(0), JsonInclude, JsonPropertyName("m00")]
     public Fixed64 m00;
-    [Key(1), JsonPropertyName("m01")]
+    [Key(1), JsonInclude, JsonPropertyName("m01")]
     public Fixed64 m01;
-    [Key(2), JsonPropertyName("m02")]
+    [Key(2), JsonInclude, JsonPropertyName("m02")]
     public Fixed64 m02;
-    [Key(3), JsonPropertyName("m03")]
+    [Key(3), JsonInclude, JsonPropertyName("m03")]
     public Fixed64 m03;
 
-    [Key(4), JsonPropertyName("m10")]
+    [Key(4), JsonInclude, JsonPropertyName("m10")]
     public Fixed64 m10;
-    [Key(5), JsonPropertyName("m11")]
+    [Key(5), JsonInclude, JsonPropertyName("m11")]
     public Fixed64 m11;
-    [Key(6), JsonPropertyName("m12")]
+    [Key(6), JsonInclude, JsonPropertyName("m12")]
     public Fixed64 m12;
-    [Key(7), JsonPropertyName("m13")]
+    [Key(7), JsonInclude, JsonPropertyName("m13")]
     public Fixed64 m13;
 
-    [Key(8), JsonPropertyName("m20")]
+    [Key(8), JsonInclude, JsonPropertyName("m20")]
     public Fixed64 m20;
-    [Key(9), JsonPropertyName("m21")]
+    [Key(9), JsonInclude, JsonPropertyName("m21")]
     public Fixed64 m21;
-    [Key(10), JsonPropertyName("m22")]
+    [Key(10), JsonInclude, JsonPropertyName("m22")]
     public Fixed64 m22;
-    [Key(11), JsonPropertyName("m23")]
+    [Key(11), JsonInclude, JsonPropertyName("m23")]
     public Fixed64 m23;
 
-    [Key(12), JsonPropertyName("m30")]
+    [Key(12), JsonInclude, JsonPropertyName("m30")]
     public Fixed64 m30;
-    [Key(13), JsonPropertyName("m31")]
+    [Key(13), JsonInclude, JsonPropertyName("m31")]
     public Fixed64 m31;
-    [Key(14), JsonPropertyName("m32")]
+    [Key(14), JsonInclude, JsonPropertyName("m32")]
     public Fixed64 m32;
-    [Key(15), JsonPropertyName("m33")]
+    [Key(15), JsonInclude, JsonPropertyName("m33")]
     public Fixed64 m33;
 
     /// <summary>
@@ -1016,25 +1016,13 @@ public partial struct Fixed4x4 : IEquatable<Fixed4x4>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
-        unchecked
-        {
-            int hash = 17;
-            hash = hash * 23 + m00.GetHashCode();
-            hash = hash * 23 + m01.GetHashCode();
-            hash = hash * 23 + m02.GetHashCode();
-            hash = hash * 23 + m10.GetHashCode();
-            hash = hash * 23 + m11.GetHashCode();
-            hash = hash * 23 + m12.GetHashCode();
-            hash = hash * 23 + m20.GetHashCode();
-            hash = hash * 23 + m21.GetHashCode();
-            hash = hash * 23 + m22.GetHashCode();
-            hash = hash * 23 + m23.GetHashCode();
-            hash = hash * 23 + m30.GetHashCode();
-            hash = hash * 23 + m31.GetHashCode();
-            hash = hash * 23 + m32.GetHashCode();
-            hash = hash * 23 + m33.GetHashCode();
-            return hash;
-        }
+        return HashCode.Combine(HashCode.Combine(
+            m00, m01, m02, m03,
+            m10, m11, m12, m13
+        ), HashCode.Combine(
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        ));
     }
 
     #endregion    

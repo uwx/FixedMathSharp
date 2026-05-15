@@ -289,9 +289,9 @@ public class Fixed3x3Tests
             new Fixed64(7), new Fixed64(8), new Fixed64(10));
 
         Assert.True(baseline.FuzzyEqualAbsolute(same, Fixed64.Zero));
-        Assert.False(baseline.FuzzyEqualAbsolute(changed, new Fixed64(0.5)));
+        Assert.False(baseline.FuzzyEqualAbsolute(changed, Fixed64.CreateFromDouble(0.5)));
         Assert.True(baseline.FuzzyEqual(same));
-        Assert.False(baseline.FuzzyEqual(changed, new Fixed64(0.01)));
+        Assert.False(baseline.FuzzyEqual(changed, Fixed64.CreateFromDouble(0.01)));
     }
 
     [Fact]
@@ -460,7 +460,7 @@ public class Fixed3x3Tests
         Assert.Equal(
             new Fixed3x3(
                 Fixed64.One, Fixed64.Zero, Fixed64.Zero,
-                Fixed64.Zero, new Fixed64(1.5), Fixed64.Zero,
+                Fixed64.Zero, Fixed64.CreateFromDouble(1.5), Fixed64.Zero,
                 Fixed64.Zero, Fixed64.Zero, new Fixed64(2)),
             a / 2);
 

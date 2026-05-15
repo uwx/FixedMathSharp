@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endif
 using Xunit;
-using Xunit.Abstractions;
 
 using MemoryPack;
 using System.Text.Json;
@@ -87,7 +86,7 @@ public class Fixed4x4Tests
 
         Assert.Equal(scale, decomposedScale);
         Assert.Equal(translation, decomposedTranslation);
-        Assert.True(rotation.FuzzyEqual(FixedQuaternion.Identity, new Fixed64(0.0001)));
+        Assert.True(rotation.FuzzyEqual(FixedQuaternion.Identity, Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]
@@ -361,8 +360,8 @@ public class Fixed4x4Tests
         var updated = Fixed4x4.SetRotation(matrix, rotation);
 
         Assert.Equal(translation, updated.Translation);
-        Assert.True(scale.FuzzyEqual(updated.Scale, new Fixed64(0.0001)));
-        Assert.True(updated.Rotation.FuzzyEqual(rotation, new Fixed64(0.0001)));
+        Assert.True(scale.FuzzyEqual(updated.Scale, Fixed64.CreateFromDouble(0.0001)));
+        Assert.True(updated.Rotation.FuzzyEqual(rotation, Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]
@@ -376,8 +375,8 @@ public class Fixed4x4Tests
 
         Assert.Equal(new Vector3d(7, 8, 9), matrix.Translation);
         Assert.Equal(matrix, updated);
-        Assert.True(new Vector3d(2, 2, 2).FuzzyEqual(matrix.Scale, new Fixed64(0.0001)));
-        Assert.True(matrix.Rotation.FuzzyEqual(rotation, new Fixed64(0.0001)));
+        Assert.True(new Vector3d(2, 2, 2).FuzzyEqual(matrix.Scale, Fixed64.CreateFromDouble(0.0001)));
+        Assert.True(matrix.Rotation.FuzzyEqual(rotation, Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]
@@ -482,7 +481,7 @@ public class Fixed4x4Tests
 
         var transformed = Fixed4x4.TransformPoint(matrix, point);
 
-        Assert.Equal(new Vector3d(new Fixed64(0.5), Fixed64.One, new Fixed64(1.5)), transformed);
+        Assert.Equal(new Vector3d(Fixed64.CreateFromDouble(0.5), Fixed64.One, Fixed64.CreateFromDouble(1.5)), transformed);
     }
 
     [Fact]
@@ -514,7 +513,7 @@ public class Fixed4x4Tests
 
         var restored = Fixed4x4.InverseTransformPoint(matrix, transformed);
 
-        Assert.True(originalPoint.FuzzyEqual(restored, new Fixed64(0.0001)));
+        Assert.True(originalPoint.FuzzyEqual(restored, Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]
@@ -560,7 +559,7 @@ public class Fixed4x4Tests
         var restored = matrix.InverseTransformPoint(transformed);
 
         Assert.Equal(Fixed4x4.TransformPoint(matrix, point), transformed);
-        Assert.True(point.FuzzyEqual(restored, new Fixed64(0.0001)));
+        Assert.True(point.FuzzyEqual(restored, Fixed64.CreateFromDouble(0.0001)));
     }
 
     [Fact]

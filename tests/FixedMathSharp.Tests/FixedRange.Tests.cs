@@ -283,7 +283,7 @@ public class FixedRangeTests
     [Fact]
     public void FixedRange_ToString_FormatsMinAndMax()
     {
-        var range = new FixedRange(new Fixed64(-1.25), new Fixed64(2.5));
+        var range = new FixedRange(Fixed64.CreateFromDouble(-1.25), Fixed64.CreateFromDouble(2.5));
 
         Assert.Equal("-1.25 - 2.5", range.ToString());
     }

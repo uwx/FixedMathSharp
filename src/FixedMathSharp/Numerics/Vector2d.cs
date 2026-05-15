@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+using MessagePack;
 
 namespace FixedMathSharp;
 
@@ -20,6 +22,7 @@ namespace FixedMathSharp;
 /// - Handling interpolation and distance calculations in physics or simulation systems.
 /// - Useful for fixed-point math scenarios where floating-point precision is insufficient or not desired.
 /// </remarks>
+[MessagePackObject]
 [Serializable]
 [MemoryPackable]
 public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IEqualityComparer<Vector2d>
@@ -73,16 +76,18 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// The X component of the vector.
     /// </summary>
+    [Key(0)]
     [JsonInclude]
     [MemoryPackOrder(0)]
-    public Fixed64 x;
+    public Fixed64 X;
 
     /// <summary>
     /// The Y component of the vector.
     /// </summary>
+    [Key(1)]
     [JsonInclude]
     [MemoryPackOrder(1)]
-    public Fixed64 y;
+    public Fixed64 Y;
 
     #endregion
 
@@ -111,8 +116,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [JsonConstructor]
     public Vector2d(Fixed64 x, Fixed64 y)
     {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
     }
 
     #endregion
@@ -122,48 +127,53 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Rotates the vector to the right (90 degrees clockwise).
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Vector2d RotatedRight
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(y, -x);
+        get => new(Y, -X);
     }
 
     /// <summary>
     /// Rotates the vector to the left (90 degrees counterclockwise).
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Vector2d RotatedLeft
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(-y, x);
+        get => new(-Y, X);
     }
 
     /// <summary>
     /// Gets the right-hand (counter-clockwise) normal vector.
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Vector2d RightHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(-y, x);
+        get => new(-Y, X);
     }
 
     /// <summary>
     /// Gets the left-hand (clockwise) normal vector.
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Vector2d LeftHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(y, -x);
+        get => new(Y, -X);
     }
 
     /// <inheritdoc cref="GetNormalized(Vector2d)"/>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Vector2d Normal
@@ -175,6 +185,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns the actual length of this vector (RO).
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Fixed64 Magnitude
@@ -186,28 +197,31 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns the square magnitude of the vector (avoids calculating the square root).
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public Fixed64 SqrMagnitude
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => x * x + y * y;
+        get => X * X + Y * Y;
     }
 
     /// <summary>
     /// Returns a long hash of the vector based on its x and y values.
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public long LongStateHash
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => x.m_rawValue * 31 + y.m_rawValue * 7;
+        get => X.rawValue * 31 + Y.rawValue * 7;
     }
 
     /// <summary>
     /// Returns a hash of the vector based on its state.
     /// </summary>
+    [IgnoreMember]
     [JsonIgnore]
     [MemoryPackIgnore]
     public int StateHash
@@ -235,8 +249,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
         {
             return index switch
             {
-                0 => x,
-                1 => y,
+                0 => X,
+                1 => Y,
                 _ => throw new IndexOutOfRangeException("Invalid Vector2d index!"),
             };
         }
@@ -246,10 +260,10 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
             switch (index)
             {
                 case 0:
-                    x = value;
+                    X = value;
                     break;
                 case 1:
-                    y = value;
+                    Y = value;
                     break;
                 default:
                     throw new IndexOutOfRangeException("Invalid Vector2d index!");
@@ -269,8 +283,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Set(Fixed64 newX, Fixed64 newY)
     {
-        x = newX;
-        y = newY;
+        X = newX;
+        Y = newY;
     }
 
     /// <summary>
@@ -281,8 +295,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d AddInPlace(Fixed64 amount)
     {
-        x += amount;
-        y += amount;
+        X += amount;
+        Y += amount;
         return this;
     }
 
@@ -294,8 +308,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d AddInPlace(Fixed64 xAmount, Fixed64 yAmount)
     {
-        x += xAmount;
-        y += yAmount;
+        X += xAmount;
+        Y += yAmount;
         return this;
     }
 
@@ -303,7 +317,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d AddInPlace(Vector2d other)
     {
-        AddInPlace(other.x, other.y);
+        AddInPlace(other.X, other.Y);
         return this;
     }
 
@@ -314,8 +328,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d SubtractInPlace(Fixed64 amount)
     {
-        x -= amount;
-        y -= amount;
+        X -= amount;
+        Y -= amount;
         return this;
     }
 
@@ -327,8 +341,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d SubtractInPlace(Fixed64 xAmount, Fixed64 yAmount)
     {
-        x -= xAmount;
-        y -= yAmount;
+        X -= xAmount;
+        Y -= yAmount;
         return this;
     }
 
@@ -338,7 +352,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d SubtractInPlace(Vector2d other)
     {
-        SubtractInPlace(other.x, other.y);
+        SubtractInPlace(other.X, other.Y);
         return this;
     }
 
@@ -349,8 +363,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d ScaleInPlace(Fixed64 scaleFactor)
     {
-        x *= scaleFactor;
-        y *= scaleFactor;
+        X *= scaleFactor;
+        Y *= scaleFactor;
         return this;
     }
 
@@ -361,8 +375,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d ScaleInPlace(Vector2d scale)
     {
-        x *= scale.x;
-        y *= scale.y;
+        X *= scale.X;
+        Y *= scale.Y;
         return this;
     }
 
@@ -395,8 +409,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
         // If magnitude is zero, return a zero vector to avoid divide-by-zero errors
         if (mag == Fixed64.Zero)
         {
-            x = Fixed64.Zero;
-            y = Fixed64.Zero;
+            X = Fixed64.Zero;
+            Y = Fixed64.Zero;
             return this;
         }
 
@@ -404,8 +418,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
         if (mag == Fixed64.One)
             return this;
 
-        x /= mag;
-        y /= mag;
+        X /= mag;
+        Y /= mag;
 
         return this;
     }
@@ -416,7 +430,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2d LerpInPlace(Vector2d target, Fixed64 amount)
     {
-        LerpInPlace(target.x, target.y, amount);
+        LerpInPlace(target.X, target.Y, amount);
         return this;
     }
 
@@ -428,13 +442,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     {
         if (amount >= Fixed64.One)
         {
-            x = targetx;
-            y = targety;
+            X = targetx;
+            Y = targety;
         }
         else if (amount > Fixed64.Zero)
         {
-            x = targetx * amount + x * (Fixed64.One - amount);
-            y = targety * amount + y * (Fixed64.One - amount);
+            X = targetx * amount + X * (Fixed64.One - amount);
+            Y = targety * amount + Y * (Fixed64.One - amount);
         }
         return this;
     }
@@ -446,7 +460,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     public static Vector2d Lerp(Vector2d a, Vector2d b, Fixed64 amount)
     {
         amount = FixedMath.Clamp01(amount);
-        return new Vector2d(a.x + (b.x - a.x) * amount, a.y + (b.y - a.y) * amount);
+        return new Vector2d(a.X + (b.X - a.X) * amount, a.Y + (b.Y - a.Y) * amount);
     }
 
     /// <summary>
@@ -455,7 +469,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     public Vector2d Lerped(Vector2d target, Fixed64 amount)
     {
         Vector2d vec = this;
-        vec.LerpInPlace(target.x, target.y, amount);
+        vec.LerpInPlace(target.X, target.Y, amount);
         return vec;
     }
 
@@ -464,9 +478,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// </summary>
     public Vector2d RotateInPlace(Fixed64 cos, Fixed64 sin)
     {
-        Fixed64 temp1 = x * cos - y * sin;
-        y = x * sin + y * cos;
-        x = temp1;
+        Fixed64 temp1 = X * cos - Y * sin;
+        Y = X * sin + Y * cos;
+        X = temp1;
         return this;
     }
 
@@ -487,7 +501,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <returns>A new vector representing the result of the rotation.</returns>
     public Vector2d Rotated(Vector2d rotation)
     {
-        return Rotated(rotation.x, rotation.y);
+        return Rotated(rotation.X, rotation.Y);
     }
 
     /// <summary>
@@ -505,9 +519,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// </summary>
     public Vector2d RotateRightInPlace()
     {
-        Fixed64 temp1 = x;
-        x = y;
-        y = -temp1;
+        Fixed64 temp1 = X;
+        X = Y;
+        Y = -temp1;
         return this;
     }
 
@@ -516,9 +530,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// </summary>
     public Vector2d RotateLeftInPlace()
     {
-        Fixed64 temp1 = x;
-        x = -y;
-        y = temp1;
+        Fixed64 temp1 = X;
+        X = -Y;
+        Y = temp1;
         return this;
     }
 
@@ -527,7 +541,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// </summary>
     public Vector2d ReflectInPlace(Vector2d axis)
     {
-        return ReflectInPlace(axis.x, axis.y);
+        return ReflectInPlace(axis.X, axis.Y);
     }
 
     /// <summary>
@@ -549,8 +563,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     {
         Fixed64 temp1 = axisX * projection;
         Fixed64 temp2 = axisY * projection;
-        x = temp1 + temp1 - x;
-        y = temp2 + temp2 - y;
+        X = temp1 + temp1 - X;
+        Y = temp2 + temp2 - Y;
         return this;
     }
 
@@ -571,7 +585,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <returns>A new vector representing the result of the reflection.</returns>
     public Vector2d Reflected(Vector2d axis)
     {
-        return Reflected(axis.x, axis.y);
+        return Reflected(axis.X, axis.Y);
     }
 
     /// <summary>
@@ -580,7 +594,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 Dot(Fixed64 otherX, Fixed64 otherY)
     {
-        return x * otherX + y * otherY;
+        return X * otherX + Y * otherY;
     }
 
     /// <summary>
@@ -589,7 +603,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 Dot(Vector2d other)
     {
-        return Dot(other.x, other.y);
+        return Dot(other.X, other.Y);
     }
 
     /// <summary>
@@ -601,14 +615,14 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 CrossProduct(Fixed64 otherX, Fixed64 otherY)
     {
-        return x * otherY - y * otherX;
+        return X * otherY - Y * otherX;
     }
 
     /// <inheritdoc cref="CrossProduct(Fixed64, Fixed64)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 CrossProduct(Vector2d other)
     {
-        return CrossProduct(other.x, other.y);
+        return CrossProduct(other.X, other.Y);
     }
 
     /// <summary>
@@ -617,9 +631,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 Distance(Fixed64 otherX, Fixed64 otherY)
     {
-        Fixed64 temp1 = x - otherX;
+        Fixed64 temp1 = X - otherX;
         temp1 *= temp1;
-        Fixed64 temp2 = y - otherY;
+        Fixed64 temp2 = Y - otherY;
         temp2 *= temp2;
         return FixedMath.Sqrt(temp1 + temp2);
     }
@@ -630,7 +644,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 Distance(Vector2d other)
     {
-        return Distance(other.x, other.y);
+        return Distance(other.X, other.Y);
     }
 
     /// <summary>
@@ -640,9 +654,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 SqrDistance(Fixed64 otherX, Fixed64 otherY)
     {
-        Fixed64 temp1 = x - otherX;
+        Fixed64 temp1 = X - otherX;
         temp1 *= temp1;
-        Fixed64 temp2 = y - otherY;
+        Fixed64 temp2 = Y - otherY;
         temp2 *= temp2;
         return temp1 + temp2;
     }
@@ -654,7 +668,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Fixed64 SqrDistance(Vector2d other)
     {
-        return SqrDistance(other.x, other.y);
+        return SqrDistance(other.X, other.Y);
     }
 
     #endregion
@@ -680,8 +694,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
 
         // Normalize it exactly
         return new Vector2d(
-            value.x / mag,
-            value.y / mag
+            value.X / mag,
+            value.Y / mag
         );
     }
 
@@ -693,7 +707,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 GetMagnitude(Vector2d vector)
     {
-        Fixed64 mag = (vector.x * vector.x) + (vector.y * vector.y);
+        Fixed64 mag = (vector.X * vector.X) + (vector.Y * vector.Y);
 
         // If rounding error pushed magnitude slightly above 1, clamp it
         if (mag > Fixed64.One && mag <= Fixed64.One + Fixed64.Epsilon)
@@ -710,7 +724,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d Abs(Vector2d value)
     {
-        return new Vector2d(value.x.Abs(), value.y.Abs());
+        return new Vector2d(value.X.Abs(), value.Y.Abs());
     }
 
     /// <summary>
@@ -721,7 +735,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d Sign(Vector2d value)
     {
-        return new Vector2d(value.x.Sign(), value.y.Sign());
+        return new Vector2d(value.X.Sign(), value.Y.Sign());
     }
 
     /// <summary>
@@ -775,7 +789,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Dot(Vector2d lhs, Vector2d rhs)
     {
-        return lhs.Dot(rhs.x, rhs.y);
+        return lhs.Dot(rhs.X, rhs.Y);
     }
 
     /// <summary>
@@ -786,7 +800,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <returns></returns>
     public static Vector2d Scale(Vector2d a, Vector2d b)
     {
-        return new Vector2d(a.x * b.x, a.y * b.y);
+        return new Vector2d(a.X * b.X, a.Y * b.Y);
     }
 
     /// <summary>
@@ -812,8 +826,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
         Fixed64 cos = FixedMath.Cos(angleInRadians);
         Fixed64 sin = FixedMath.Sin(angleInRadians);
         return new Vector2d(
-            vec.x * cos - vec.y * sin,
-            vec.x * sin + vec.y * cos
+            vec.X * cos - vec.Y * sin,
+            vec.X * sin + vec.Y * cos
         );
     }
 
@@ -828,7 +842,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
-        return $"({Math.Round((double)x, 2)}, {Math.Round((double)y, 2)})";
+        return $"({Math.Round((double)X, 2)}, {Math.Round((double)Y, 2)})";
     }
 
     /// <summary>
@@ -843,7 +857,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly Vector3d ToVector3d(Fixed64 z)
     {
-        return new Vector3d(x, z, y);
+        return new Vector3d(X, z, Y);
     }
 
     /// <summary>
@@ -858,8 +872,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Deconstruct(out float x, out float y)
     {
-        x = this.x.ToPreciseFloat();
-        y = this.y.ToPreciseFloat();
+        x = this.X.ToPreciseFloat();
+        y = this.Y.ToPreciseFloat();
     }
 
     /// <summary>
@@ -874,8 +888,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Deconstruct(out int x, out int y)
     {
-        x = this.x.RoundToInt();
-        y = this.y.RoundToInt();
+        x = this.X.RoundToInt();
+        y = this.Y.RoundToInt();
     }
 
     /// <summary>
@@ -887,8 +901,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     public static Vector2d ToDegrees(Vector2d radians)
     {
         return new Vector2d(
-            FixedMath.RadToDeg(radians.x),
-            FixedMath.RadToDeg(radians.y)
+            FixedMath.RadToDeg(radians.X),
+            FixedMath.RadToDeg(radians.Y)
         );
     }
 
@@ -901,8 +915,8 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     public static Vector2d ToRadians(Vector2d degrees)
     {
         return new Vector2d(
-            FixedMath.DegToRad(degrees.x),
-            FixedMath.DegToRad(degrees.y)
+            FixedMath.DegToRad(degrees.X),
+            FixedMath.DegToRad(degrees.Y)
         );
     }
 
@@ -919,7 +933,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator +(Vector2d v1, Vector2d v2)
     {
-        return new Vector2d(v1.x + v2.x, v1.y + v2.y);
+        return new Vector2d(v1.X + v2.X, v1.Y + v2.Y);
     }
 
     /// <summary>
@@ -931,7 +945,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator +(Vector2d v1, Fixed64 mag)
     {
-        return new Vector2d(v1.x + mag, v1.y + mag);
+        return new Vector2d(v1.X + mag, v1.Y + mag);
     }
 
     /// <inheritdoc cref="operator +(Vector2d, Fixed64)"/>
@@ -951,7 +965,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator +(Vector2d v1, (int x, int y) v2)
     {
-        return new Vector2d(v1.x + v2.x, v1.y + v2.y);
+        return new Vector2d(v1.X + v2.x, v1.Y + v2.y);
     }
 
     /// <summary>
@@ -970,7 +984,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator +(Vector2d v1, (float x, float y) v2)
     {
-        return new Vector2d(v1.X + v2.x, v1.Y + v2.y);
+        return new Vector2d(v1.X + (Fixed64)v2.x, v1.Y + (Fixed64)v2.y);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -988,7 +1002,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Vector2d v1, Vector2d v2)
     {
-        return new Vector2d(v1.x - v2.x, v1.y - v2.y);
+        return new Vector2d(v1.X - v2.X, v1.Y - v2.Y);
     }
 
     /// <summary>
@@ -1001,14 +1015,14 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Vector2d v1, Fixed64 mag)
     {
-        return new Vector2d(v1.x - mag, v1.y - mag);
+        return new Vector2d(v1.X - mag, v1.Y - mag);
     }
 
     /// <inheritdoc cref="operator -(Vector2d, Fixed64)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Fixed64 mag, Vector2d v1)
     {
-        return new Vector2d(mag - v1.x, mag - v1.y);
+        return new Vector2d(mag - v1.X, mag - v1.Y);
     }
 
     /// <summary>
@@ -1020,7 +1034,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Vector2d v1, (int x, int y) v2)
     {
-        return new Vector2d(v1.x - v2.x, v1.y - v2.y);
+        return new Vector2d(v1.X - v2.x, v1.Y - v2.y);
     }
 
     /// <summary>
@@ -1038,13 +1052,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Vector2d v1, (float x, float y) v2)
     {
-        return new Vector2d(v1.X - v2.x, v1.Y - v2.y);
+        return new Vector2d(v1.X - (Fixed64)v2.x, v1.Y - (Fixed64)v2.y);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -((float x, float y) v1, Vector2d v2)
     {
-        return new Vector2d(v1.x - v2.X, v1.Y - v2.y);
+        return new Vector2d((Fixed64)v1.x - v2.X, (Fixed64)v1.y - v2.Y);
     }
 
     /// <summary>
@@ -1055,7 +1069,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator -(Vector2d v1)
     {
-        return new Vector2d(v1.x * -Fixed64.One, v1.y * -Fixed64.One);
+        return new Vector2d(v1.X * -Fixed64.One, v1.Y * -Fixed64.One);
     }
 
     /// <summary>
@@ -1067,7 +1081,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator *(Vector2d v1, Fixed64 mag)
     {
-        return new Vector2d(v1.x * mag, v1.y * mag);
+        return new Vector2d(v1.X * mag, v1.Y * mag);
     }
 
     /// <summary>
@@ -1081,7 +1095,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator *(Vector2d v1, Vector2d v2)
     {
-        return new Vector2d(v1.x * v2.x, v1.y * v2.y);
+        return new Vector2d(v1.X * v2.X, v1.Y * v2.Y);
     }
 
     /// <summary>
@@ -1093,7 +1107,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2d operator /(Vector2d v1, Fixed64 div)
     {
-        return new Vector2d(v1.x / div, v1.y / div);
+        return new Vector2d(v1.X / div, v1.Y / div);
     }
 
     /// <summary>
@@ -1132,7 +1146,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool AllComponentsGreaterThanEpsilon()
     {
-        return x.Abs() > Fixed64.Epsilon && y.Abs() > Fixed64.Epsilon;
+        return X.Abs() > Fixed64.Epsilon && Y.Abs() > Fixed64.Epsilon;
     }
 
     /// <inheritdoc/>
@@ -1141,7 +1155,7 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
 
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector2d other) => other.x == x && other.y == y;
+    public bool Equals(Vector2d other) => other.X == X && other.Y == Y;
 
     /// <inheritdoc/>
     public bool Equals(Vector2d x, Vector2d y) => x.Equals(y);
