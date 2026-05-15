@@ -64,7 +64,9 @@ namespace FixedMathSharp
         /// Vertices of the bounding box.
         /// </summary>
         [MemoryPackIgnore]
-        [IgnoreMember] private Vector3d[] _vertices;
+        [IgnoreMember] private InlineArray8<Vector3d> _vertices;
+
+        public const int MAX_VERTS = 8;
 
         #endregion
 
@@ -76,7 +78,7 @@ namespace FixedMathSharp
 
         public BoundingBox(Vector3d center, Vector3d size)
         {
-            _vertices = new Vector3d[8];
+            _vertices = new InlineArray8<Vector3d>();
 
             _center = center;
             _size = size;
@@ -134,7 +136,7 @@ namespace FixedMathSharp
         /// <inheritdoc cref="_vertices" />
         [IgnoreMember]
         [MemoryPackIgnore]
-        public Vector3d[] Vertices
+        public InlineArray8<Vector3d> Vertices
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => GenerateVertices();
@@ -190,6 +192,7 @@ namespace FixedMathSharp
         {
             this._center = center;
             _scope = scope;
+            _size = scope * Fixed64.Two;
             _min = this._center - Scope;
             _max = this._center + Scope;
             _isDirty = true;
@@ -353,7 +356,7 @@ namespace FixedMathSharp
         ///  2 - 6 Top left near to top left far
         ///  3 - 7 Top right near to top right far  
         /// </remarks>
-        private Vector3d[] GenerateVertices()
+        private InlineArray8<Vector3d> GenerateVertices()
         {
             if (_isDirty)
             {
@@ -397,7 +400,7 @@ namespace FixedMathSharp
         {
             Vector3d closestPoint = Vector3d.Zero;
             Fixed64 minDistance = Fixed64.MAX_VALUE;
-            for (int i = 0; i < b.Vertices.Length; i++)
+            for (int i = 0; i < MAX_VERTS; i++)
             {
                 Vector3d point = a.ClosestPointOnSurface(b.Vertices[i]);
                 Fixed64 distance = Vector3d.Distance(point, b.Vertices[i]);
@@ -425,23 +428,17 @@ namespace FixedMathSharp
 
         #region Equality and HashCode Overrides
 
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is BoundingBox other && Equals(other);
 
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(BoundingBox other) => _center.Equals(other._center) && Scope.Equals(other.Scope);
 
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + _center.GetHashCode();
-                hash = hash * 23 + Scope.GetHashCode();
-                return hash;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(_center, Scope);
 
         #endregion
 
@@ -450,12 +447,12 @@ namespace FixedMathSharp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Recalculate()
         {
-            _vertices ??= new Vector3d[8];
-
             // half-extent
             _scope = _size * Fixed64.Half;
-            _min = _center - _scope;
-            _max = _center + _scope;
+            var a = _center - _scope;
+            var b = _center + _scope;
+            _min = Vector3d.Min(a, b);
+            _max = Vector3d.Max(a, b);
             _isDirty = true;
         }
         
