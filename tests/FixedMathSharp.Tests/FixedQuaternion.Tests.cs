@@ -246,8 +246,8 @@ public class FixedQuaternionTests
         var direction = Vector3d.Right; // X-axis direction
         var result = FixedQuaternion.FromDirection(direction);
 
-        // Expect a 90-degree rotation around the Y-axis
-        var expected = FixedQuaternion.FromAxisAngle(Vector3d.Up, FixedMath.PiOver2);
+        // Expect a -90-degree rotation around the Y-axis (XNA: Forward is -Z, so rotating to Right is clockwise)
+        var expected = FixedQuaternion.FromAxisAngle(Vector3d.Up, -FixedMath.PiOver2);
 
         Assert.True(result.FuzzyEqual(expected), $"FromDirection returned {result}, expected {expected}.");
     }
@@ -272,7 +272,7 @@ public class FixedQuaternionTests
         axis = Vector3d.Forward;
 
         result = FixedQuaternion.FromAxisAngle(axis, angle);
-        expected = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, FixedMath.Sin(FixedMath.PiOver4), FixedMath.Cos(FixedMath.PiOver4));
+        expected = new FixedQuaternion(Fixed64.Zero, Fixed64.Zero, -FixedMath.Sin(FixedMath.PiOver4), FixedMath.Cos(FixedMath.PiOver4));
 
         Assert.True(result.FuzzyEqual(expected), $"FromAxisAngle returned {result}, expected {expected}.");
 
