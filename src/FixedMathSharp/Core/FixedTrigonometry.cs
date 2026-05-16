@@ -181,8 +181,7 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 Ln(Fixed64 x)
         {
-            if (x.rawValue <= 0)
-                throw new ArgumentOutOfRangeException("Cannot compute logarithm of non-positive number.");
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(x.rawValue, 0, "Cannot compute logarithm of non-positive number.");
 
             return FastMul(Log2(x), Ln2).Round();
         }
@@ -192,8 +191,7 @@ namespace FixedMathSharp
         /// </summary>
         public static Fixed64 Sqrt(Fixed64 x)
         {
-            if (x.rawValue < 0)
-                throw new ArgumentOutOfRangeException("Cannot compute square root of a negative number.");
+            ArgumentOutOfRangeException.ThrowIfLessThan(x.rawValue, 0, "Cannot compute square root of a negative number.");
 
             ulong num = (ulong)x.rawValue;
             ulong result = 0UL;
