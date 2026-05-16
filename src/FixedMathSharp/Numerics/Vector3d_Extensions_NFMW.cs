@@ -1054,4 +1054,36 @@ public partial struct Vector3d
 	{
 		return MemoryMarshal.CreateSpan(ref Unsafe.As<Vector3d, Fixed64>(ref this), 3);
 	}
+
+	public Fixed64 LengthNoOverflow()
+	{
+		// To avoid overflow, we can divide the components by a large power of two smaller than the absolute value of
+		// any of the components (very fast to divide) and then multiply later
+		
+		var absX = Fixed64.Abs(X);
+		var absY = Fixed64.Abs(Y);
+		var absZ = Fixed64.Abs(Z);
+		var maxComponent = Fixed64.Max(absX, Fixed64.Max(absY, absZ));
+
+		// count left bits
+		var shiftBits = FixedMath.SHIFT_AMOUNT_I - BitOperations.LeadingZeroCount((ulong)maxComponent.rawValue);
+		
+		// divide (shift right)
+		absX >>= shiftBits;
+		absY >>= shiftBits;
+		absZ >>= shiftBits;
+		
+		// length
+		var len = Fixed64.Sqrt(absX * absX + absY * absY + absZ * absZ);
+		
+		// multiply (shift left)
+		// sqrt(X^2+Y^2) = sqrt( (X/D)^2+(Y/D)^2) * D
+		// D = 2^n
+		return len << shiftBits;
+	}
+
+	public static Fixed128 Dot128(in Vector3d a, in Vector3d b)
+	{
+		return (Fixed128)a.X * (Fixed128)b.X + (Fixed128)a.Y * (Fixed128)b.Y + (Fixed128)a.Z * (Fixed128)b.Z;
+	}
 }

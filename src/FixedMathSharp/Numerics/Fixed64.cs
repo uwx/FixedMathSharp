@@ -147,20 +147,6 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Counts the leading zeros in a 64-bit unsigned integer.
-    /// </summary>
-    /// <param name="x">The number to count leading zeros for.</param>
-    /// <returns>The number of leading zeros.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static int CountLeadingZeroes(ulong x)
-    {
-        int result = 0;
-        while ((x & 0xF000000000000000) == 0) { result += 4; x <<= 4; }
-        while ((x & 0x8000000000000000) == 0) { result += 1; x <<= 1; }
-        return result;
-    }
-
-    /// <summary>
     /// Returns a number indicating the sign of a Fix64 number.
     /// Returns 1 if the value is positive, 0 if is 0, and -1 if it is negative.
     /// </summary>
