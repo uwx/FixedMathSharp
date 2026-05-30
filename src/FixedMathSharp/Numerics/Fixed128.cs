@@ -19,7 +19,7 @@ namespace FixedMathSharp;
 [Serializable]
 [MemoryPackable]
 [MessagePackObject]
-public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixed128>, IEqualityComparer<Fixed128>
+public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixed128>, IEqualityComparer<Fixed128>, IFormattable
 {
     #region Static Readonly Fields
 
@@ -972,4 +972,10 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     }
 
     #endregion
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        return ((decimal)this).ToString(format, formatProvider);
+    }
 }

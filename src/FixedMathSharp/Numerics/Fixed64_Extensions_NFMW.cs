@@ -1,8 +1,10 @@
-﻿using MessagePack;
+﻿using System;
+using System.Runtime.CompilerServices;
+using MessagePack;
 
 namespace FixedMathSharp;
 
-public partial struct Fixed64
+public partial struct Fixed64 : ISpanFormattable
 {
     private static readonly Fixed64 MachineEpsilonFloat = Fixed64.Epsilon;
 
@@ -158,33 +160,49 @@ public partial struct Fixed64
         Fixed64 amountSquared = amount * amount;
         Fixed64 amountCubed = amountSquared * amount;
         return (Fixed64)(
-            (Fixed64)0.5f *
+            Half *
             (
-                (((Fixed64)2.0f * value2 + (value3 - value1) * amount) +
-                 (((Fixed64)2.0f * value1 - (Fixed64)5.0f * value2 + (Fixed64)4.0f * value3 - value4) *
+                (((Fixed64)2 * value2 + (value3 - value1) * amount) +
+                 (((Fixed64)2 * value1 - (Fixed64)5 * value2 + (Fixed64)4 * value3 - value4) *
                   amountSquared) +
-                 ((Fixed64)3.0f * value2 - value1 - (Fixed64)3.0f * value3 + value4) * amountCubed)
+                 ((Fixed64)3 * value2 - value1 - (Fixed64)3 * value3 + value4) * amountCubed)
             )
         );
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Atan(Fixed64 value)
     {
         return FixedMath.Atan(value);
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Max(Fixed64 a, Fixed64 b)
     {
         return a > b ? a : b;
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Min(Fixed64 a, Fixed64 b)
     {
         return a < b ? a : b;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 CreateRaw(long value)
     {
         return new Fixed64(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        return ((double)this).ToString(format, formatProvider);
+    }
+
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
+        IFormatProvider? provider)
+    {
+        return ((double)this).TryFormat(destination, out charsWritten, format, provider);
     }
 }

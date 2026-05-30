@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FixedMathSharp;
 
-public partial struct Vector3d
+public partial struct Vector3d : IFormattable
 {
 	/// <summary>
 	/// Returns the length of this <see cref="Vector3d"/>.
@@ -1085,5 +1085,10 @@ public partial struct Vector3d
 	public static Fixed128 Dot128(in Vector3d a, in Vector3d b)
 	{
 		return (Fixed128)a.X * (Fixed128)b.X + (Fixed128)a.Y * (Fixed128)b.Y + (Fixed128)a.Z * (Fixed128)b.Z;
+	}
+
+	public string ToString(string? format, IFormatProvider? formatProvider)
+	{
+		return $"{X.ToString(format, formatProvider)}, {Y.ToString(format, formatProvider)}, {Z.ToString(format, formatProvider)}";
 	}
 }
