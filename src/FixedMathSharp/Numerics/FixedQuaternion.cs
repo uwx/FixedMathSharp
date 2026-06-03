@@ -453,6 +453,16 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
         return FromEulerAngles(pitch, yaw, roll);
     }
 
+    private static void Wrap(ref Fixed64 radians)
+    {
+        radians = radians % Fixed64.TwoPi;
+
+        if (radians <= -Fixed64.Pi)
+            radians += Fixed64.TwoPi;
+        else if (radians > Fixed64.Pi)
+            radians -= Fixed64.TwoPi;
+    }
+
     /// <summary>
     /// Converts Euler angles (pitch, yaw, roll) to a quaternion and normalizes the result afterwards. 
     /// Assumes the input angles are in radians.
@@ -463,13 +473,10 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
     public static FixedQuaternion FromEulerAngles(Fixed64 pitch, Fixed64 yaw, Fixed64 roll)
     {
         // Check if the angles are in a valid range (-pi, pi)
-        if (pitch < -FixedMath.PI || pitch > FixedMath.PI)
-            throw new ArgumentOutOfRangeException(nameof(pitch), pitch, $"Pitch must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {pitch}");
-        if (yaw < -FixedMath.PI || yaw > FixedMath.PI)
-            throw new ArgumentOutOfRangeException(nameof(yaw), yaw, $"Yaw must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {yaw}");
-        if (roll < -FixedMath.PI || roll > FixedMath.PI)
-            throw new ArgumentOutOfRangeException(nameof(roll), roll, $"Roll must be in the range ({-FixedMath.PI}, {FixedMath.PI}), but was {roll}");
-
+        Wrap(ref pitch);
+        Wrap(ref yaw);
+        Wrap(ref roll);
+        
         Fixed64 halfPitch = pitch / Fixed64.Two;
         Fixed64 halfYaw = yaw / Fixed64.Two;
         Fixed64 halfRoll = roll / Fixed64.Two;
