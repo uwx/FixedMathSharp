@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using MemoryPack;
 using MessagePack;
 
 namespace FixedMathSharp;
@@ -8,16 +9,16 @@ public partial struct Fixed64 : ISpanFormattable
 {
     private static readonly Fixed64 MachineEpsilonFloat = Fixed64.Epsilon;
 
-    [IgnoreMember] public static Fixed64 MaxValue => new(FixedMath.MAX_VALUE_L);
-    [IgnoreMember] public static Fixed64 MinValue => new(FixedMath.MIN_VALUE_L);
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 MaxValue => new(FixedMath.MAX_VALUE_L);
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 MinValue => new(FixedMath.MIN_VALUE_L);
 
-    [IgnoreMember] public static Fixed64 Pi => FixedMath.PI;
-    [IgnoreMember] public static Fixed64 HalfPi => FixedMath.PiOver2;
-    [IgnoreMember] public static Fixed64 TwoPi => FixedMath.TwoPI;
-    [IgnoreMember] public static Fixed64 PiOver4 => FixedMath.PiOver4;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 Pi => FixedMath.PI;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 HalfPi => FixedMath.PiOver2;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 TwoPi => FixedMath.TwoPI;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 PiOver4 => FixedMath.PiOver4;
 
-    [IgnoreMember] public static Fixed64 DegToRad => FixedMath.Deg2Rad;
-    [IgnoreMember] public static Fixed64 RadToDeg => FixedMath.Rad2Deg;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 DegToRad => FixedMath.Deg2Rad;
+    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 RadToDeg => FixedMath.Rad2Deg;
 
     public static bool operator ==(Fixed64 f1, int f2) => f1 == (Fixed64)f2;
     public static bool operator !=(Fixed64 f1, int f2) => f1 != (Fixed64)f2;
