@@ -76,7 +76,6 @@
 
 	<!-- Dependencies and Package References -->
 	<ItemGroup>
-		<PackageReference Include="MemoryPack" Version="1.21.4" />
 		<PackageReference Include="System.Text.Json" Version="10.0.5" />
 		<PackageReference Include="MessagePack" Version="3.1.4" />
 	</ItemGroup>
@@ -92,5 +91,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\FNA.Math\FNA.Math.csproj" />
+	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" />
+	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	</ItemGroup>
 </Project>
