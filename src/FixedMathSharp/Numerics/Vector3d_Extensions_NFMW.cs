@@ -1045,11 +1045,6 @@ public partial struct Vector3d : IFormattable
 	public static explicit operator Vector3d(Vector3 value)
 		=> new((Fixed64)value.X, (Fixed64)value.Y, (Fixed64)value.Z);
 
-	public static explicit operator Microsoft.Xna.Framework.Vector3(Vector3d value)
-		=> new((float)value.X, (float)value.Y, (float)value.Z);
-	public static explicit operator Vector3d(Microsoft.Xna.Framework.Vector3 value)
-		=> new((Fixed64)value.X, (Fixed64)value.Y, (Fixed64)value.Z);
-
 	public Span<Fixed64> AsSpan()
 	{
 		return MemoryMarshal.CreateSpan(ref Unsafe.As<Vector3d, Fixed64>(ref this), 3);
