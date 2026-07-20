@@ -7,8 +7,6 @@ using System.Text.Json.Serialization;
 using Xunit;
 
 using MemoryPack;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 namespace FixedMathSharp.Tests;
 
 public class Fixed4x4Tests
