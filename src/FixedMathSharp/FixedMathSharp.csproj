@@ -77,7 +77,7 @@
 	<!-- Dependencies and Package References -->
 	<ItemGroup>
 		<PackageReference Include="System.Text.Json" Version="10.0.5" />
-		<PackageReference Include="MessagePack" Version="3.1.4" />
+		<PackageReference Include="MessagePack" Version="3.1.8" />
 	</ItemGroup>
 	
 	<!-- Ensure LICENSE, README, & icon files are included in the NuGet package -->
