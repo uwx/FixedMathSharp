@@ -871,7 +871,6 @@ public partial struct Vector3d : IFormattable
 	}
 
 	/// <summary>
-
 	/// Apply transformation on vectors within array of <see cref="Vector3d"/> by the specified <see cref="Quaternion"/> and places the results in an another array.
 	/// </summary>
 	/// <param name="sourceArray">Source array.</param>
