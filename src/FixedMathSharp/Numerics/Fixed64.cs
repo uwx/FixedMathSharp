@@ -7,6 +7,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using MessagePack;
+using NuLua;
+using NuLua.Luau;
 
 namespace FixedMathSharp;
 
@@ -19,8 +21,46 @@ namespace FixedMathSharp;
 [Serializable]
 [MemoryPackable]
 [MessagePackObject]
-public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>
+public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>, IPrimitiveUserData<Fixed64>
 {
+    #region ILuaUserData
+
+    public static int PrimitiveId => 0;
+
+    static LuaUserDataMetamethods ILuaUserData<Fixed64>.SupportedMetamethods =>
+        LuaUserDataMetamethods.Unm |
+        LuaUserDataMetamethods.Add |
+        LuaUserDataMetamethods.Sub |
+        LuaUserDataMetamethods.Mul |
+        LuaUserDataMetamethods.Div |
+        LuaUserDataMetamethods.Idiv |
+        LuaUserDataMetamethods.Mod |
+        LuaUserDataMetamethods.Pow |
+        LuaUserDataMetamethods.Eq |
+        LuaUserDataMetamethods.Lt |
+        LuaUserDataMetamethods.Le |
+        LuaUserDataMetamethods.ToString |
+        LuaUserDataMetamethods.Index;
+
+    bool ILuaUserData<Fixed64>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    {
+        if (key.TryRead<string>(out var strKey))
+        {
+            if (strKey == "raw") value = LuaValue.FromNumber(rawValue);
+        }
+
+        value = default;
+        return false;
+    }
+
+    string? ILuaUserData<Fixed64>.ToLuaString(LuauState state) => ToString();
+    
+    static Fixed64 ILuaUserData<Fixed64>.FloorDivide(Fixed64 self, Fixed64 other) => Floor(self / other);
+
+    static Fixed64 ILuaUserData<Fixed64>.Power(Fixed64 self, Fixed64 other) => FixedMath.Pow(self, other);
+
+    #endregion
+    
     #region Static Readonly Fields
 
     /// <inheritdoc cref="FixedMath.MAX_VALUE_L" />

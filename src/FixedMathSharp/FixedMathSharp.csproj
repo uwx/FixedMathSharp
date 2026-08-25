@@ -93,5 +93,6 @@
 	  <ProjectReference Include="..\..\..\FNA.Math\FNA.Math.csproj" />
 	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" />
 	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\..\NuLua\src\NuLua.Luau\NuLua.Luau.csproj" />
 	</ItemGroup>
 </Project>

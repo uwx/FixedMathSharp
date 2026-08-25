@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using MessagePack;
 using Microsoft.Xna.Framework;
+using NuLua;
+using NuLua.Luau;
 
 namespace FixedMathSharp;
 
@@ -24,8 +26,41 @@ namespace FixedMathSharp;
 [Serializable]
 [MemoryPackable]
 [MessagePackObject]
-public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IEqualityComparer<Vector3d>
+public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IEqualityComparer<Vector3d>, IPrimitiveUserData<Vector3d>
 {
+    #region ILuaUserData
+
+    public static int PrimitiveId => 1;
+
+    static LuaUserDataMetamethods ILuaUserData<Vector3d>.SupportedMetamethods =>
+        LuaUserDataMetamethods.Unm |
+        LuaUserDataMetamethods.Add |
+        LuaUserDataMetamethods.Sub |
+        LuaUserDataMetamethods.Mul |
+        LuaUserDataMetamethods.Div |
+        LuaUserDataMetamethods.Eq |
+        LuaUserDataMetamethods.Lt |
+        LuaUserDataMetamethods.Le |
+        LuaUserDataMetamethods.ToString |
+        LuaUserDataMetamethods.Index;
+
+    bool ILuaUserData<Vector3d>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    {
+        if (key.TryRead<string>(out var strKey))
+        {
+            if (strKey == "x") value = LuaValue.FromPrimitive(X);
+            if (strKey == "y") value = LuaValue.FromPrimitive(Y);
+            if (strKey == "z") value = LuaValue.FromPrimitive(Z);
+        }
+
+        value = default;
+        return false;
+    }
+
+    string? ILuaUserData<Vector3d>.ToLuaString(LuauState state) => ToString();
+
+    #endregion
+    
     #region Fields
 
     /// <summary>
