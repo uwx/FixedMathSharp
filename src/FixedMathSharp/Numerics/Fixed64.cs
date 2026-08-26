@@ -14,20 +14,20 @@ namespace FixedMathSharp;
 
 /// <summary>
 /// Represents a Q(64-SHIFT_AMOUNT).SHIFT_AMOUNT fixed-point number.
-/// Provides high precision for fixed-point arithmetic where SHIFT_AMOUNT bits 
+/// Provides high precision for fixed-point arithmetic where SHIFT_AMOUNT bits
 /// are used for the fractional part and (64 - SHIFT_AMOUNT) bits for the integer part.
 /// The precision is determined by SHIFT_AMOUNT, which defines the resolution of fractional values.
 /// </summary>
 [Serializable]
 [MemoryPackable]
 [MessagePackObject]
-public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>, IPrimitiveUserData<Fixed64>
+public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>, IPrimitive<Fixed64>
 {
     #region ILuaUserData
 
     public static int PrimitiveId => 0;
 
-    static LuaUserDataMetamethods ILuaUserData<Fixed64>.SupportedMetamethods =>
+    static LuaUserDataMetamethods IPrimitive<Fixed64>.SupportedMetamethods =>
         LuaUserDataMetamethods.Unm |
         LuaUserDataMetamethods.Add |
         LuaUserDataMetamethods.Sub |
@@ -42,25 +42,29 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
         LuaUserDataMetamethods.ToString |
         LuaUserDataMetamethods.Index;
 
-    bool ILuaUserData<Fixed64>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    bool IPrimitive<Fixed64>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
     {
         if (key.TryRead<string>(out var strKey))
         {
-            if (strKey == "raw") value = LuaValue.FromNumber(rawValue);
+            if (strKey == "raw")
+            {
+                value = LuaValue.FromNumber(rawValue);
+                return true;
+            }
         }
 
         value = default;
         return false;
     }
 
-    string? ILuaUserData<Fixed64>.ToLuaString(LuauState state) => ToString();
-    
-    static Fixed64 ILuaUserData<Fixed64>.FloorDivide(Fixed64 self, Fixed64 other) => Floor(self / other);
+    string? IPrimitive<Fixed64>.ToLuaString(LuauState state) => ToString();
 
-    static Fixed64 ILuaUserData<Fixed64>.Power(Fixed64 self, Fixed64 other) => FixedMath.Pow(self, other);
+    static Fixed64 IPrimitive<Fixed64>.FloorDivide(Fixed64 self, Fixed64 other) => Floor(self / other);
+
+    static Fixed64 IPrimitive<Fixed64>.Power(Fixed64 self, Fixed64 other) => FixedMath.Pow(self, other);
 
     #endregion
-    
+
     #region Static Readonly Fields
 
     /// <inheritdoc cref="FixedMath.MAX_VALUE_L" />
@@ -140,7 +144,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Constructs a Fixed64 from a double-precision floating-point value.
     /// </summary>
     /// <remarks>
-    /// The value is multiplied by the scaling factor (2^SHIFT_AMOUNT) and 
+    /// The value is multiplied by the scaling factor (2^SHIFT_AMOUNT) and
     /// rounded to the nearest integer to fit into the fixed-point representation.
     /// </remarks>
     /// <param name="value">Double value to convert to </param>
@@ -198,7 +202,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Returns true if the number has no decimal part (i.e., if the number is equivalent to an integer) and False otherwise. 
+    /// Returns true if the number has no decimal part (i.e., if the number is equivalent to an integer) and False otherwise.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInteger(Fixed64 value)
@@ -214,7 +218,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Converts a 64-bit signed integer to a Fixed64 value using explicit casting.
     /// </summary>
     /// <remarks>
-    /// The conversion interprets the input value as the integer part of the fixed-point number. 
+    /// The conversion interprets the input value as the integer part of the fixed-point number.
     /// Use this operator when an explicit conversion from long to Fixed64 is required.
     /// </remarks>
     /// <param name="value">The 64-bit signed integer to convert to a Fixed64 value.</param>
@@ -228,7 +232,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Converts a Fixed64 value to a 64-bit signed integer by discarding the fractional part.
     /// </summary>
     /// <remarks>
-    /// The conversion truncates any fractional component. 
+    /// The conversion truncates any fractional component.
     /// The result represents the integer portion of the Fixed64 value.</remarks>
     /// <param name="value">The Fixed64 value to convert to a long integer.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -326,7 +330,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Converts a Fixed64 value to its decimal representation.
     /// </summary>
     /// <remarks>
-    /// This operator provides an explicit conversion from Fixed64 to decimal, preserving the numeric value as closely as possible. 
+    /// This operator provides an explicit conversion from Fixed64 to decimal, preserving the numeric value as closely as possible.
     /// Use this conversion when precise decimal arithmetic is required.
     /// </remarks>
     /// <param name="value">The Fixed64 value to convert to decimal.</param>
@@ -355,7 +359,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Adds an int to x 
+    /// Adds an int to x
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator +(Fixed64 x, int y)
@@ -364,7 +368,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Adds an Fixed64 to x 
+    /// Adds an Fixed64 to x
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator +(int x, Fixed64 y)
@@ -387,7 +391,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Subtracts an int from x 
+    /// Subtracts an int from x
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator -(Fixed64 x, int y)
@@ -396,14 +400,14 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Subtracts a Fixed64 from x 
+    /// Subtracts a Fixed64 from x
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator -(int x, Fixed64 y)
     {
         return new Fixed64((long)x << FixedMath.SHIFT_AMOUNT_I) - y;
     }
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator *(Fixed64 a, Fixed64 b)
     {
@@ -618,8 +622,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
 
             // Detect overflow
             if ((div & ~(0xFFFFFFFFFFFFFFFF >> bitPos)) != 0)
-                return ((xl ^ yl) & FixedMath.MIN_VALUE_L) == 0 
-                    ? new Fixed64(FixedMath.MAX_VALUE_L) 
+                return ((xl ^ yl) & FixedMath.MIN_VALUE_L) == 0
+                    ? new Fixed64(FixedMath.MAX_VALUE_L)
                     : new Fixed64(FixedMath.MIN_VALUE_L);
 
             remainder <<= 1;
@@ -678,8 +682,8 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 operator -(Fixed64 x)
     {
-        return x.rawValue == FixedMath.MIN_VALUE_L 
-            ? new Fixed64(FixedMath.MAX_VALUE_L) 
+        return x.rawValue == FixedMath.MIN_VALUE_L
+            ? new Fixed64(FixedMath.MAX_VALUE_L)
             : new Fixed64(-x.rawValue);
     }
 
@@ -803,7 +807,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// Converts the numeric value of the current Fixed64 object to its equivalent string representation.
     /// </summary>
     /// <param name="format">A format specification that governs how the current Fixed64 object is converted.</param>
-    /// <returns>The string representation of the value of the current Fixed64 object.</returns>  
+    /// <returns>The string representation of the value of the current Fixed64 object.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ToString(string format)
     {
@@ -949,7 +953,7 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     }
 
     /// <summary>
-    /// Compares this instance to another 
+    /// Compares this instance to another
     /// </summary>
     /// <param name="other">The Fixed64 to compare with.</param>
     /// <returns>-1 if less than, 0 if equal, 1 if greater than other.</returns>

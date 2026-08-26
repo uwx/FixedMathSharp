@@ -14,9 +14,9 @@ namespace FixedMathSharp;
 /// Represents a 3D vector with fixed-point precision, supporting a wide range of vector operations such as rotation, scaling, interpolation, and projection.
 /// </summary>
 /// <remarks>
-/// The Vector3d struct is designed for high-precision applications in 3D space, including games, simulations, and physics engines. 
+/// The Vector3d struct is designed for high-precision applications in 3D space, including games, simulations, and physics engines.
 /// It offers essential operations like addition, subtraction, dot product, cross product, distance calculation, and normalization.
-/// 
+///
 /// Use Cases:
 /// - Modeling 3D positions, directions, and velocities with fixed-point precision.
 /// - Performing vector transformations, including rotations using quaternions.
@@ -26,13 +26,13 @@ namespace FixedMathSharp;
 [Serializable]
 [MemoryPackable]
 [MessagePackObject]
-public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IEqualityComparer<Vector3d>, IPrimitiveUserData<Vector3d>
+public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IEqualityComparer<Vector3d>, IPrimitive<Vector3d>
 {
     #region ILuaUserData
 
     public static int PrimitiveId => 1;
 
-    static LuaUserDataMetamethods ILuaUserData<Vector3d>.SupportedMetamethods =>
+    static LuaUserDataMetamethods IPrimitive<Vector3d>.SupportedMetamethods =>
         LuaUserDataMetamethods.Unm |
         LuaUserDataMetamethods.Add |
         LuaUserDataMetamethods.Sub |
@@ -44,23 +44,23 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
         LuaUserDataMetamethods.ToString |
         LuaUserDataMetamethods.Index;
 
-    bool ILuaUserData<Vector3d>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    bool IPrimitive<Vector3d>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
     {
         if (key.TryRead<string>(out var strKey))
         {
-            if (strKey == "x") value = LuaValue.FromPrimitive(X);
-            if (strKey == "y") value = LuaValue.FromPrimitive(Y);
-            if (strKey == "z") value = LuaValue.FromPrimitive(Z);
+            if (strKey == "x") { value = LuaValue.FromPrimitive(X); return true; }
+            if (strKey == "y") { value = LuaValue.FromPrimitive(Y); return true; }
+            if (strKey == "z") { value = LuaValue.FromPrimitive(Z); return true; }
         }
 
         value = default;
         return false;
     }
 
-    string? ILuaUserData<Vector3d>.ToLuaString(LuauState state) => ToString();
+    string? IPrimitive<Vector3d>.ToLuaString(LuauState state) => ToString();
 
     #endregion
-    
+
     #region Fields
 
     /// <summary>
@@ -284,7 +284,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Gets or sets the component value at the specified index.
     /// </summary>
     /// <remarks>
-    /// Use this indexer to access or modify the x, y, or z components of the vector by index. 
+    /// Use this indexer to access or modify the x, y, or z components of the vector by index.
     /// Index 0 corresponds to x, 1 to y, and 2 to z.
     /// </remarks>
     /// <param name="index">The zero-based index of the component to access. Valid values are 0 (x), 1 (y), or 2 (z).</param>
@@ -452,7 +452,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Normalizes this vector in place, making its magnitude (length) equal to 1, and returns the modified vector.
     /// </summary>
     /// <remarks>
-    /// If the vector is zero-length or already normalized, no operation is performed. 
+    /// If the vector is zero-length or already normalized, no operation is performed.
     /// This method modifies the current vector in place and supports method chaining.
     /// </remarks>
     /// <returns>The normalized vector.</returns>
@@ -514,11 +514,11 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Returns a new vector with components whose absolute values are less than the specified threshold set to zero.
     /// </summary>
     /// <remarks>
-    /// This method is useful for eliminating insignificant floating-point errors by zeroing out very small vector components. 
+    /// This method is useful for eliminating insignificant floating-point errors by zeroing out very small vector components.
     /// The default threshold is suitable for most cases where near-zero values are considered noise.
     /// </remarks>
     /// <param name="threshold">
-    /// The minimum absolute value a component must have to be retained. 
+    /// The minimum absolute value a component must have to be retained.
     /// If null, a default epsilon value is used.
     /// </param>
     /// <returns>A new Vector3d instance with small components snapped to zero based on the specified threshold.</returns>
@@ -633,7 +633,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <param name="t">The interpolation factor. Values outside the range [0, 1] will cause the interpolation to go beyond the start or end points.</param>
     /// <returns>The interpolated vector.</returns>
     /// <remarks>
-    /// Unlike traditional Lerp, this function allows interpolation factors greater than 1 or less than 0, 
+    /// Unlike traditional Lerp, this function allows interpolation factors greater than 1 or less than 0,
     /// which means the resulting vector can extend beyond the endpoints.
     /// </remarks>
     public static Vector3d UnclampedLerp(Vector3d a, Vector3d b, Fixed64 t)
@@ -706,7 +706,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
         if (FixedMath.Abs(mag - Fixed64.One) <= Fixed64.Epsilon)
             return value;
 
-        // Normalize it exactly           
+        // Normalize it exactly
         return new Vector3d(
             value.X / mag,
             value.Y / mag,
@@ -1296,7 +1296,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Multiplies a 3x3 matrix by a 3-dimensional vector and returns the resulting vector.
     /// </summary>
     /// <remarks>
-    /// This operation applies the linear transformation represented by the matrix to the vector. 
+    /// This operation applies the linear transformation represented by the matrix to the vector.
     /// The multiplication is performed using standard matrix-vector multiplication rules.
     /// </remarks>
     /// <param name="matrix">The 3x3 matrix to multiply.</param>
@@ -1323,9 +1323,9 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Transforms the specified 3D vector by the given 4x4 matrix using homogeneous coordinates.
     /// </summary>
     /// <remarks>
-    /// If the matrix is affine, the transformation is performed without perspective division. 
+    /// If the matrix is affine, the transformation is performed without perspective division.
     /// For non-affine matrices, the result is divided by the computed w component to account for perspective
-    /// transformations. 
+    /// transformations.
     /// If the computed w component is zero, it is treated as one to avoid division by zero.
     /// </remarks>
     /// <param name="matrix">The 4x4 matrix to apply to the vector. Must represent a valid transformation.</param>
@@ -1365,7 +1365,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Multiplies the corresponding components of two vectors and returns the resulting vector.
     /// </summary>
     /// <remarks>
-    /// This operation performs component-wise multiplication, not a dot or cross product. 
+    /// This operation performs component-wise multiplication, not a dot or cross product.
     /// Each component of the result is calculated as the product of the corresponding components of the input
     /// vectors.
     /// </remarks>
@@ -1386,7 +1386,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <param name="div">The scalar value by which to divide each component of the vector.</param>
     /// <returns>
     /// A new vector whose components are the result of dividing the corresponding components of the input vector by the
-    /// specified scalar. 
+    /// specified scalar.
     /// Returns a zero vector if the scalar is zero.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1403,7 +1403,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <param name="v1">The vector whose components are to be divided (the dividend).</param>
     /// <param name="v2">The vector whose components are used as divisors.</param>
     /// <returns>
-    /// A new Vector3d whose components are the result of dividing the corresponding components of v1 by v2. 
+    /// A new Vector3d whose components are the result of dividing the corresponding components of v1 by v2.
     /// If a component of v2 is zero, the corresponding result component is set to zero.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1422,7 +1422,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <param name="div">The integer divisor. If zero, the result is a zero vector.</param>
     /// <returns>
     /// A new vector whose components are the result of dividing each component of the input vector by the specified
-    /// divisor. 
+    /// divisor.
     /// Returns a zero vector if the divisor is zero.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1507,7 +1507,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Vector3d.
     /// </summary>
     /// <remarks>
-    /// This operator performs a component-wise comparison. 
+    /// This operator performs a component-wise comparison.
     /// All components of left must be less than the corresponding components of right for the result to be true.</remarks>
     /// <param name="left">The first Vector3d to compare.</param>
     /// <param name="right">The second Vector3d to compare.</param>
@@ -1566,11 +1566,11 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     }
 
     /// <summary>
-    /// Converts this <see cref="Vector3d"/> to a <see cref="Vector2d"/>, 
+    /// Converts this <see cref="Vector3d"/> to a <see cref="Vector2d"/>,
     /// dropping the Y component (height) of this vector in the resulting vector.
     /// </summary>
     /// <returns>
-    /// A new <see cref="Vector2d"/> where (X, Z) from this <see cref="Vector3d"/> 
+    /// A new <see cref="Vector2d"/> where (X, Z) from this <see cref="Vector3d"/>
     /// become (X, Y) in the resulting vector.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1668,7 +1668,7 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// </summary>
     /// <remarks>
     /// This comparison uses the squared magnitude of each vector, which avoids the computational
-    /// cost of calculating the actual magnitude. 
+    /// cost of calculating the actual magnitude.
     /// Use this method when only relative vector lengths are
     /// important.
     /// </remarks>
