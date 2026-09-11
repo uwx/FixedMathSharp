@@ -44,13 +44,13 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
         LuaUserDataMetamethods.ToString |
         LuaUserDataMetamethods.Index;
 
-    bool IPrimitive<Vector3d>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    bool IPrimitive<Vector3d>.TryGetIndex(LuauState state, LuaArgumentValue key, out LuaRefValue value)
     {
         if (key.TryRead<string>(out var strKey))
         {
-            if (strKey == "x") { value = LuaValue.FromPrimitive(X); return true; }
-            if (strKey == "y") { value = LuaValue.FromPrimitive(Y); return true; }
-            if (strKey == "z") { value = LuaValue.FromPrimitive(Z); return true; }
+            if (strKey == "x") { value = LuaRefValue.FromPrimitive(X); return true; }
+            if (strKey == "y") { value = LuaRefValue.FromPrimitive(Y); return true; }
+            if (strKey == "z") { value = LuaRefValue.FromPrimitive(Z); return true; }
         }
 
         value = default;

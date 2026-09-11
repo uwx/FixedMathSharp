@@ -42,13 +42,13 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
         LuaUserDataMetamethods.ToString |
         LuaUserDataMetamethods.Index;
 
-    bool IPrimitive<Fixed64>.TryGetIndex(LuauState state, LuaValue key, out LuaValue value)
+    bool IPrimitive<Fixed64>.TryGetIndex(LuauState state, LuaArgumentValue key, out LuaRefValue value)
     {
         if (key.TryRead<string>(out var strKey))
         {
             if (strKey == "raw")
             {
-                value = LuaValue.FromNumber(rawValue);
+                value = LuaRefValue.FromNumber(rawValue);
                 return true;
             }
         }
