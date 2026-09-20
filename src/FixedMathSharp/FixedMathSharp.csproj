@@ -90,7 +90,6 @@
 		<None Remove=".gitignore" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\FNA.Math\FNA.Math.csproj" />
 	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" />
 	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	</ItemGroup>
