@@ -1,7 +1,11 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -9,34 +13,54 @@ namespace FixedMathSharp;
 /// Represents a keyframe in a <see cref="FixedCurve"/>, defining a value at a specific time.
 /// </summary>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public partial struct FixedCurveKey : IEquatable<FixedCurveKey>
 {
     #region Fields
 
     /// <summary>The time at which this keyframe occurs.</summary>
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(0)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     public Fixed64 Time;
 
     /// <summary>The value of the curve at this keyframe.</summary>
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(1)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     public Fixed64 Value;
 
     /// <summary>The incoming tangent for cubic interpolation.</summary>
-    [Key(2)]
+    #if MESSAGEPACK_ENABLED
+[Key(2)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(2)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(2)]
+#endif
     public Fixed64 InTangent;
 
     /// <summary>The outgoing tangent for cubic interpolation.</summary>
-    [Key(3)]
+    #if MESSAGEPACK_ENABLED
+[Key(3)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(3)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(3)]
+#endif
     public Fixed64 OutTangent;
 
     #endregion

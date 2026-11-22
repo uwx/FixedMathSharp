@@ -1,8 +1,12 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -11,8 +15,12 @@ namespace FixedMathSharp;
 /// Quaternions are useful for representing rotations and can be used to perform smooth rotations and avoid gimbal lock.
 /// </summary>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
 {
     #region Static Readonly Fields
@@ -34,33 +42,49 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// <summary>
     /// Represents the X component of the vector as a fixed-point value.
     /// </summary>
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(0)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     public Fixed64 X;
 
     /// <summary>
     /// Represents the Y component of the vector as a fixed-point value.
     /// </summary>
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(1)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     public Fixed64 Y;
 
     /// <summary>
     /// Represents the Z component of the vector as a fixed-point value.
     /// </summary>
-    [Key(2)]
+    #if MESSAGEPACK_ENABLED
+[Key(2)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(2)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(2)]
+#endif
     public Fixed64 Z;
 
     /// <summary>
     /// Represents the W component of the vector as a fixed-point value.
     /// </summary>
-    [Key(3)]
+    #if MESSAGEPACK_ENABLED
+[Key(3)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(3)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(3)]
+#endif
     public Fixed64 W;
 
     #endregion
@@ -86,8 +110,12 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// Normalized version of this quaternion.
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public FixedQuaternion Normal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,8 +126,12 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// Returns the Euler angles (in degrees) of this quaternion.
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Vector3d EulerAngles
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,7 +148,9 @@ public partial struct FixedQuaternion : IEquatable<FixedQuaternion>
     /// <returns>The value of the component at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException">Thrown when the specified index is less than 0 or greater than 3.</exception>
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

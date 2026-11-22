@@ -1,9 +1,13 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -22,9 +26,13 @@ namespace FixedMathSharp;
 /// - Handling interpolation and distance calculations in physics or simulation systems.
 /// - Useful for fixed-point math scenarios where floating-point precision is insufficient or not desired.
 /// </remarks>
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
 public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IEqualityComparer<Vector2d>
 {
     #region Static Readonly Fields
@@ -76,17 +84,25 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// The X component of the vector.
     /// </summary>
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(0)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     public Fixed64 X;
 
     /// <summary>
     /// The Y component of the vector.
     /// </summary>
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(1)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     public Fixed64 Y;
 
     #endregion
@@ -127,9 +143,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Rotates the vector to the right (90 degrees clockwise).
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Vector2d RotatedRight
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -139,9 +159,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Rotates the vector to the left (90 degrees counterclockwise).
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Vector2d RotatedLeft
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,9 +175,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Gets the right-hand (counter-clockwise) normal vector.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Vector2d RightHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -163,9 +191,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Gets the left-hand (clockwise) normal vector.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Vector2d LeftHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -173,9 +205,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     }
 
     /// <inheritdoc cref="GetNormalized(Vector2d)"/>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Vector2d Normal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -185,9 +221,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns the actual length of this vector (RO).
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 Magnitude
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -197,9 +237,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns the square magnitude of the vector (avoids calculating the square root).
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 SqrMagnitude
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -209,9 +253,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns a long hash of the vector based on its x and y values.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public long LongStateHash
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,9 +269,13 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <summary>
     /// Returns a hash of the vector based on its state.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public int StateHash
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -241,7 +293,9 @@ public partial struct Vector2d : IEquatable<Vector2d>, IComparable<Vector2d>, IE
     /// <returns>The vector component at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException">Thrown when the index is less than 0 or greater than 1.</exception>
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

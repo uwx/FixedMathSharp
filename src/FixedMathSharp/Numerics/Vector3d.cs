@@ -1,9 +1,13 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -21,8 +25,12 @@ namespace FixedMathSharp;
 /// - Essential for fixed-point math scenarios where floating-point precision isn't suitable.
 /// </remarks>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IEqualityComparer<Vector3d>
 {
     #region Fields
@@ -30,8 +38,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <summary>
     /// The X component of the vector.
     /// </summary>
-    [Key(0)]
-    [MemoryPackOrder(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     [JsonInclude]
     [JsonPropertyName("x")]
     public Fixed64 X;
@@ -39,18 +51,26 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <summary>
     /// The Y component of the vector.
     /// </summary>
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(1)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     [JsonPropertyName("y")]
     public Fixed64 Y;
 
     /// <summary>
     /// The Z component of the vector.
     /// </summary>
-    [Key(2)]
+    #if MESSAGEPACK_ENABLED
+[Key(2)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(2)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(2)]
+#endif
     [JsonPropertyName("z")]
     public Fixed64 Z;
 
@@ -129,8 +149,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// If your right hand's thumb points in the positive Y direction, then your fingers curl in the positive direction of rotation.
     /// </remarks>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Vector3d RightHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -141,8 +165,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Provides a rotated version of the current vector, where rotation is a 90 degrees rotation around the Y axis in the clockwise direction.
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Vector3d LeftHandNormal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,8 +179,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
 
     /// <inheritdoc cref="GetNormalized(Vector3d)"/>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Vector3d Normal
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -163,8 +195,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Returns the actual length of this vector (RO).
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Fixed64 Magnitude
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -179,8 +215,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// where 'x' represents the yaw (horizontal rotation) and 'y' represents the pitch (vertical rotation).
     /// </remarks>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Vector3d Direction
     {
         get
@@ -197,8 +237,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// </summary>
     /// <returns></returns>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public bool IsZero
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -212,8 +256,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// </summary>
     /// <returns>The magnitude.</returns>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Fixed64 SqrMagnitude
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -224,8 +272,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Returns a long hash of the vector based on its x, y, and z values.
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public long LongStateHash
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -236,8 +288,12 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// Returns a hash of the vector based on its state.
     /// </summary>
     [JsonIgnore]
-    [MemoryPackIgnore]
-    [IgnoreMember]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public int StateHash
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -255,7 +311,9 @@ public partial struct Vector3d : IEquatable<Vector3d>, IComparable<Vector3d>, IE
     /// <returns>The value of the component at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException">Thrown if index is less than 0 or greater than 2.</exception>
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

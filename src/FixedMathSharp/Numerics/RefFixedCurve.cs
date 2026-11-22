@@ -1,4 +1,6 @@
-﻿using MessagePack;
+﻿#if MESSAGEPACK_ENABLED
+using MessagePack;
+#endif
 using System;
 using System.Linq;
 

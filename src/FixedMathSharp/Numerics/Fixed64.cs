@@ -1,4 +1,6 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,7 +8,9 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -17,8 +21,12 @@ namespace FixedMathSharp;
 /// The precision is determined by SHIFT_AMOUNT, which defines the resolution of fractional values.
 /// </summary>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed64>, IEqualityComparer<Fixed64>
 {
     #region Static Readonly Fields
@@ -69,9 +77,13 @@ public readonly partial struct Fixed64 : IEquatable<Fixed64>, IComparable<Fixed6
     /// <summary>
     /// The underlying raw long value representing the fixed-point number.
     /// </summary>
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackInclude]
+    #if MEMORYPACK_ENABLED
+[MemoryPackInclude]
+#endif
     public readonly long rawValue;
 
     public static Fixed64 MinusOne => new(-FixedMath.ONE_L);

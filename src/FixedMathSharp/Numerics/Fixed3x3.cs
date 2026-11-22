@@ -1,4 +1,6 @@
-﻿using MessagePack;
+﻿#if MESSAGEPACK_ENABLED
+using MessagePack;
+#endif
 using System;
 using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
@@ -21,38 +23,58 @@ namespace FixedMathSharp;
 /// - Useful when optimizing transformations, as it omits the overhead of translation and perspective.
 /// </remarks>
 [Serializable]
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public struct Fixed3x3 : IEquatable<Fixed3x3>
 {
     #region Fields and Constants
 
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
     public Fixed64 m00;
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
     public Fixed64 m01;
-    [Key(2)]
+    #if MESSAGEPACK_ENABLED
+[Key(2)]
+#endif
     [JsonInclude]
     public Fixed64 m02;
 
-    [Key(3)]
+    #if MESSAGEPACK_ENABLED
+[Key(3)]
+#endif
     [JsonInclude]
     public Fixed64 m10;
-    [Key(4)]
+    #if MESSAGEPACK_ENABLED
+[Key(4)]
+#endif
     [JsonInclude]
     public Fixed64 m11;
-    [Key(5)]
+    #if MESSAGEPACK_ENABLED
+[Key(5)]
+#endif
     [JsonInclude]
     public Fixed64 m12;
 
-    [Key(6)]
+    #if MESSAGEPACK_ENABLED
+[Key(6)]
+#endif
     [JsonInclude]
     public Fixed64 m20;
-    [Key(7)]
+    #if MESSAGEPACK_ENABLED
+[Key(7)]
+#endif
     [JsonInclude]
     public Fixed64 m21;
-    [Key(8)]
+    #if MESSAGEPACK_ENABLED
+[Key(8)]
+#endif
     [JsonInclude]
     public Fixed64 m22;
 
@@ -99,7 +121,9 @@ public struct Fixed3x3 : IEquatable<Fixed3x3>
 
     #region Properties and Methods (Instance)
 
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Fixed64 this[int index]
     {
         get

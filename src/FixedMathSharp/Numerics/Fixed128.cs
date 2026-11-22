@@ -5,8 +5,13 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MEMORYPACK_ENABLED
 using MemoryPack;
+#endif
+
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -17,39 +22,51 @@ namespace FixedMathSharp;
 /// The precision is determined by SHIFT_AMOUNT, which defines the resolution of fractional values.
 /// </summary>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
-public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixed128>, IEqualityComparer<Fixed128>, IFormattable
+#endif
+public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixed128>, IEqualityComparer<Fixed128>,
+    IFormattable
 {
     #region Static Readonly Fields
 
     /// <inheritdoc cref="FixedMathSharp.Fixed128Math.MAX_VALUE_L" />
     public static readonly Fixed128 MAX_VALUE = new(Fixed128Math.MAX_VALUE_L);
+
     /// <inheritdoc cref="Fixed128Math.MIN_VALUE_L" />
     public static readonly Fixed128 MIN_VALUE = new(Fixed128Math.MIN_VALUE_L);
 
     /// <inheritdoc cref="Fixed128Math.ONE_L" />
     public static readonly Fixed128 One = new(Fixed128Math.ONE_L);
+
     /// <summary>
     /// Represents the value 2 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
     /// </summary>
     public static readonly Fixed128 Two = One * 2;
+
     /// <summary>
     /// Represents the value 3 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
     /// </summary>
     public static readonly Fixed128 Three = One * 3;
+
     /// <summary>
     /// Represents the value 0.5 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
     /// </summary>
     public static readonly Fixed128 Half = One / 2;
+
     /// <summary>
     /// Represents the value 0.25 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
     /// </summary>
     public static readonly Fixed128 Quarter = One / 4;
+
     /// <summary>
     /// Represents the value 0.125 shifted left by the number of bits specified by SHIFT_AMOUNT_I.
     /// </summary>
     public static readonly Fixed128 Eighth = One / 8;
+
     /// <summary>
     /// Represents the value 0 as a fixed-point number.
     /// </summary>
@@ -69,9 +86,13 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     /// <summary>
     /// The underlying raw Int128 value representing the fixed-point number.
     /// </summary>
-    [Key(0)]
+#if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackInclude]
+#if MEMORYPACK_ENABLED
+[MemoryPackInclude]
+#endif
     public readonly Int128 rawValue;
 
     public static Fixed128 MinusOne => new(-Fixed128Math.ONE_L);
@@ -94,7 +115,9 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     /// Constructs a Fixed128 from an integer, with the fractional part set to zero.
     /// </summary>
     /// <param name="value">Integer value to convert to </param>
-    public Fixed128(int value) : this((Int128)value << Fixed128Math.SHIFT_AMOUNT_I) { }
+    public Fixed128(int value) : this((Int128)value << Fixed128Math.SHIFT_AMOUNT_I)
+    {
+    }
 
     /// <summary>
     /// Constructs a Fixed128 from a double-precision floating-point value.
@@ -105,7 +128,8 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     /// </remarks>
     /// <param name="value">Double value to convert to </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Fixed128 CreateFromDouble(double value) => new((Int128)Math.Round(value * (double)Fixed128Math.ONE_L));
+    public static Fixed128 CreateFromDouble(double value) =>
+        new((Int128)Math.Round(value * (double)Fixed128Math.ONE_L));
 
     #endregion
 
@@ -178,7 +202,7 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     {
         return FromRaw((Int128)f64.rawValue << (Fixed128Math.SHIFT_AMOUNT_I - FixedMath.SHIFT_AMOUNT_I));
     }
-    
+
     /// <summary>
     /// Truncates a Fixed128 to a Fixed64 value using explicit casting.
     /// </summary>
@@ -187,7 +211,7 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     {
         return new Fixed64((long)(f128.rawValue >> (Fixed128Math.SHIFT_AMOUNT_I - FixedMath.SHIFT_AMOUNT_I)));
     }
-    
+
     /// <summary>
     /// Converts a 64-bit signed integer to a Fixed128 value using explicit casting.
     /// </summary>
@@ -381,7 +405,7 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     {
         return new Fixed128((Int128)x << Fixed128Math.SHIFT_AMOUNT_I) - y;
     }
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed128 operator *(Fixed128 a, Fixed128 b)
     {
@@ -613,8 +637,8 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
 
             // Detect overflow
             if ((div & ~(new UInt128(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF) >> bitPos)) != 0)
-                return ((xl ^ yl) & Fixed128Math.MIN_VALUE_L) == 0 
-                    ? new Fixed128(Fixed128Math.MAX_VALUE_L) 
+                return ((xl ^ yl) & Fixed128Math.MIN_VALUE_L) == 0
+                    ? new Fixed128(Fixed128Math.MAX_VALUE_L)
                     : new Fixed128(Fixed128Math.MIN_VALUE_L);
 
             remainder <<= 1;
@@ -691,8 +715,8 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed128 operator -(Fixed128 x)
     {
-        return x.rawValue == Fixed128Math.MIN_VALUE_L 
-            ? new Fixed128(Fixed128Math.MAX_VALUE_L) 
+        return x.rawValue == Fixed128Math.MIN_VALUE_L
+            ? new Fixed128(Fixed128Math.MAX_VALUE_L)
             : new Fixed128(-x.rawValue);
     }
 
@@ -733,7 +757,7 @@ public readonly partial struct Fixed128 : IEquatable<Fixed128>, IComparable<Fixe
     /// <param name="shift">Number of bits to shift.</param>
     /// <returns>The shifted value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Fixed128 operator >>(Fixed128 a, int shift)
+    public static Fixed128 operator >> (Fixed128 a, int shift)
     {
         return new Fixed128(a.rawValue >> shift);
     }

@@ -1,4 +1,6 @@
-﻿using MessagePack;
+﻿#if MESSAGEPACK_ENABLED
+using MessagePack;
+#endif
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -20,45 +22,79 @@ namespace FixedMathSharp;
 /// - Useful in animation, physics engines, and 3D rendering for full transformation control.
 /// </remarks>
 [Serializable]
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public partial struct Fixed4x4 : IEquatable<Fixed4x4>
 {
     #region Fields and Constants
 
-    [Key(0), JsonInclude, JsonPropertyName("m00")]
+    #if MESSAGEPACK_ENABLED
+[Key(0), JsonInclude, JsonPropertyName("m00")]
+#endif
     public Fixed64 m00;
-    [Key(1), JsonInclude, JsonPropertyName("m01")]
+    #if MESSAGEPACK_ENABLED
+[Key(1), JsonInclude, JsonPropertyName("m01")]
+#endif
     public Fixed64 m01;
-    [Key(2), JsonInclude, JsonPropertyName("m02")]
+    #if MESSAGEPACK_ENABLED
+[Key(2), JsonInclude, JsonPropertyName("m02")]
+#endif
     public Fixed64 m02;
-    [Key(3), JsonInclude, JsonPropertyName("m03")]
+    #if MESSAGEPACK_ENABLED
+[Key(3), JsonInclude, JsonPropertyName("m03")]
+#endif
     public Fixed64 m03;
 
-    [Key(4), JsonInclude, JsonPropertyName("m10")]
+    #if MESSAGEPACK_ENABLED
+[Key(4), JsonInclude, JsonPropertyName("m10")]
+#endif
     public Fixed64 m10;
-    [Key(5), JsonInclude, JsonPropertyName("m11")]
+    #if MESSAGEPACK_ENABLED
+[Key(5), JsonInclude, JsonPropertyName("m11")]
+#endif
     public Fixed64 m11;
-    [Key(6), JsonInclude, JsonPropertyName("m12")]
+    #if MESSAGEPACK_ENABLED
+[Key(6), JsonInclude, JsonPropertyName("m12")]
+#endif
     public Fixed64 m12;
-    [Key(7), JsonInclude, JsonPropertyName("m13")]
+    #if MESSAGEPACK_ENABLED
+[Key(7), JsonInclude, JsonPropertyName("m13")]
+#endif
     public Fixed64 m13;
 
-    [Key(8), JsonInclude, JsonPropertyName("m20")]
+    #if MESSAGEPACK_ENABLED
+[Key(8), JsonInclude, JsonPropertyName("m20")]
+#endif
     public Fixed64 m20;
-    [Key(9), JsonInclude, JsonPropertyName("m21")]
+    #if MESSAGEPACK_ENABLED
+[Key(9), JsonInclude, JsonPropertyName("m21")]
+#endif
     public Fixed64 m21;
-    [Key(10), JsonInclude, JsonPropertyName("m22")]
+    #if MESSAGEPACK_ENABLED
+[Key(10), JsonInclude, JsonPropertyName("m22")]
+#endif
     public Fixed64 m22;
-    [Key(11), JsonInclude, JsonPropertyName("m23")]
+    #if MESSAGEPACK_ENABLED
+[Key(11), JsonInclude, JsonPropertyName("m23")]
+#endif
     public Fixed64 m23;
 
-    [Key(12), JsonInclude, JsonPropertyName("m30")]
+    #if MESSAGEPACK_ENABLED
+[Key(12), JsonInclude, JsonPropertyName("m30")]
+#endif
     public Fixed64 m30;
-    [Key(13), JsonInclude, JsonPropertyName("m31")]
+    #if MESSAGEPACK_ENABLED
+[Key(13), JsonInclude, JsonPropertyName("m31")]
+#endif
     public Fixed64 m31;
-    [Key(14), JsonInclude, JsonPropertyName("m32")]
+    #if MESSAGEPACK_ENABLED
+[Key(14), JsonInclude, JsonPropertyName("m32")]
+#endif
     public Fixed64 m32;
-    [Key(15), JsonInclude, JsonPropertyName("m33")]
+    #if MESSAGEPACK_ENABLED
+[Key(15), JsonInclude, JsonPropertyName("m33")]
+#endif
     public Fixed64 m33;
 
     /// <summary>
@@ -105,25 +141,37 @@ public partial struct Fixed4x4 : IEquatable<Fixed4x4>
 
     #region Properties and Methods (Instance)
 
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public readonly bool IsAffine => (m33 == Fixed64.One) && (m03 == Fixed64.Zero && m13 == Fixed64.Zero && m23 == Fixed64.Zero);
 
     /// <inheritdoc cref="ExtractTranslation(Fixed4x4)" />
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public readonly Vector3d Translation => ExtractTranslation(this);
 
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public readonly Vector3d Up => ExtractUp(this);
 
     /// <inheritdoc cref="ExtractScale(Fixed4x4)" />
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public readonly Vector3d Scale => ExtractScale(this);
 
     /// <inheritdoc cref="ExtractRotation(Fixed4x4)" />
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public readonly FixedQuaternion Rotation => ExtractRotation(this);
 
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     public Fixed64 this[int index]
     {
         get

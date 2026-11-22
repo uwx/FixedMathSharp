@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+#if MEMORYPACK_ENABLED
 using MemoryPack;
+#endif
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -9,16 +13,64 @@ public partial struct Fixed64 : ISpanFormattable
 {
     private static readonly Fixed64 MachineEpsilonFloat = Fixed64.Epsilon;
 
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 MaxValue => new(FixedMath.MAX_VALUE_L);
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 MinValue => new(FixedMath.MIN_VALUE_L);
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 MaxValue => new(FixedMath.MAX_VALUE_L);
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 MinValue => new(FixedMath.MIN_VALUE_L);
 
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 Pi => FixedMath.PI;
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 HalfPi => FixedMath.PiOver2;
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 TwoPi => FixedMath.TwoPI;
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 PiOver4 => FixedMath.PiOver4;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 Pi => FixedMath.PI;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 HalfPi => FixedMath.PiOver2;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 TwoPi => FixedMath.TwoPI;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 PiOver4 => FixedMath.PiOver4;
 
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 DegToRad => FixedMath.Deg2Rad;
-    [IgnoreMember] [MemoryPackIgnore] public static Fixed64 RadToDeg => FixedMath.Rad2Deg;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 DegToRad => FixedMath.Deg2Rad;
+#if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
+    public static Fixed64 RadToDeg => FixedMath.Rad2Deg;
 
     public static bool operator ==(Fixed64 f1, int f2) => f1 == (Fixed64)f2;
     public static bool operator !=(Fixed64 f1, int f2) => f1 != (Fixed64)f2;
@@ -78,7 +130,7 @@ public partial struct Fixed64 : ISpanFormattable
         if (value > max) return max;
         return value;
     }
-    
+
     public static Fixed64 Abs(Fixed64 value) => value.Abs();
 
     public static bool WithinEpsilon(Fixed64 floatA, Fixed64 floatB) => Abs(floatA - floatB) < MachineEpsilonFloat;
@@ -176,13 +228,13 @@ public partial struct Fixed64 : ISpanFormattable
     {
         return FixedMath.Atan(value);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Max(Fixed64 a, Fixed64 b)
     {
         return a > b ? a : b;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Fixed64 Min(Fixed64 a, Fixed64 b)
     {

@@ -1,7 +1,11 @@
-﻿using MessagePack;
+﻿#if MESSAGEPACK_ENABLED
+using MessagePack;
+#endif
 using System;
 using System.Linq;
+#if MEMORYPACK_ENABLED
 using MemoryPack;
+#endif
 
 #if NET8_0_OR_GREATER
 using System.Text.Json.Serialization;
@@ -32,16 +36,28 @@ public enum FixedCurveMode : byte
 /// Used for animations, physics calculations, and procedural data.
 /// </summary>
 [Serializable]
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
 public partial struct FixedCurve : IEquatable<FixedCurve>
 {
-    [Key(0)]
-    [MemoryPackOrder(0)]
+#if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     public FixedCurveMode Mode { get; private set; }
 
-    [Key(1)]
-    [MemoryPackOrder(1)]
+#if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     public FixedCurveKey[] Keyframes { get; private set; }
 
     /// <summary>
@@ -49,7 +65,9 @@ public partial struct FixedCurve : IEquatable<FixedCurve>
     /// </summary>
     /// <param name="keyframes">The keyframes defining the curve.</param>
     public FixedCurve(params FixedCurveKey[]? keyframes)
-        : this(FixedCurveMode.Linear, keyframes) { }
+        : this(FixedCurveMode.Linear, keyframes)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FixedCurve"/> with a specified interpolation mode.
@@ -57,8 +75,12 @@ public partial struct FixedCurve : IEquatable<FixedCurve>
     /// <param name="mode">The interpolation method to use.</param>
     /// <param name="keyframes">The keyframes defining the curve.</param>
     [JsonConstructor]
-    [SerializationConstructor]
-    [MemoryPackConstructor]
+#if MESSAGEPACK_ENABLED
+[SerializationConstructor]
+#endif
+#if MEMORYPACK_ENABLED
+[MemoryPackConstructor]
+#endif
     public FixedCurve(FixedCurveMode mode, params FixedCurveKey[]? keyframes)
     {
         Keyframes = keyframes?.OrderBy(static k => k.Time).ToArray() ?? [];
@@ -89,7 +111,7 @@ public partial struct FixedCurve : IEquatable<FixedCurve>
                 // Choose interpolation method
                 return Mode switch
                 {
-                    FixedCurveMode.Step => Keyframes[i].Value,// Immediate transition
+                    FixedCurveMode.Step => Keyframes[i].Value, // Immediate transition
                     FixedCurveMode.Smooth => FixedMath.SmoothStep(Keyframes[i].Value, Keyframes[i + 1].Value, t),
                     FixedCurveMode.Cubic => FixedMath.CubicInterpolate(
                         Keyframes[i].Value, Keyframes[i + 1].Value,

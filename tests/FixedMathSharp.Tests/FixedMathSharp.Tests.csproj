@@ -36,4 +36,9 @@
   <ItemGroup>
     <None Remove=".gitignore" />
   </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MessagePack" Version="4.0.0-rc.1" />
+        <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" />
+        <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    </ItemGroup>
 </Project>

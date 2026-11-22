@@ -6,6 +6,10 @@
 		<Configurations>Debug;Release</Configurations>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Deterministic>true</Deterministic>
+        <MemoryPackEnabled>false</MemoryPackEnabled>
+        <MessagePackEnabled>false</MessagePackEnabled>
+        <DefineConstants Condition="'$(MemoryPackEnabled)' == 'true'">$(DefineConstants);MEMORYPACK_ENABLED</DefineConstants>
+        <DefineConstants Condition="'$(MessagePackEnabled)' == 'true'">$(DefineConstants);MESSAGEPACK_ENABLED</DefineConstants>
 	</PropertyGroup>
 	
 	<!-- Git Versioning -->
@@ -77,7 +81,7 @@
 	<!-- Dependencies and Package References -->
 	<ItemGroup>
 		<PackageReference Include="System.Text.Json" Version="11.0.0" />
-		<PackageReference Include="MessagePack" Version="4.0.0-rc.1" />
+		<PackageReference Include="MessagePack" Version="4.0.0-rc.1" Condition="'$(MessagePackEnabled)' == 'true'" />
 	</ItemGroup>
 	
 	<!-- Ensure LICENSE, README, & icon files are included in the NuGet package -->
@@ -90,7 +94,7 @@
 		<None Remove=".gitignore" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" />
-	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Core\MemoryPack.Core.csproj" Condition="'$(MemoryPackEnabled)' == 'true'" />
+	  <ProjectReference Include="..\..\..\MemoryPack\src\MemoryPack.Generator\MemoryPack.Generator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" Condition="'$(MemoryPackEnabled)' == 'true'" />
 	</ItemGroup>
 </Project>

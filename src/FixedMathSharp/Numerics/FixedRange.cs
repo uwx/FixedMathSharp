@@ -1,8 +1,12 @@
-﻿using MemoryPack;
+﻿#if MEMORYPACK_ENABLED
+using MemoryPack;
+#endif
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+#if MESSAGEPACK_ENABLED
 using MessagePack;
+#endif
 
 namespace FixedMathSharp;
 
@@ -10,8 +14,12 @@ namespace FixedMathSharp;
 /// Represents a range of values with fixed precision.
 /// </summary>
 [Serializable]
+#if MESSAGEPACK_ENABLED
 [MemoryPackable]
+#endif
+#if MEMORYPACK_ENABLED
 [MessagePackObject]
+#endif
 public partial struct FixedRange : IEquatable<FixedRange>
 {
     #region Static Readonly Fields
@@ -33,17 +41,25 @@ public partial struct FixedRange : IEquatable<FixedRange>
     /// <summary>
     /// Gets the minimum value of the range.
     /// </summary>
-    [Key(0)]
+    #if MESSAGEPACK_ENABLED
+[Key(0)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(0)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(0)]
+#endif
     public Fixed64 Min;
 
     /// <summary>
     /// Gets the maximum value of the range.
     /// </summary>
-    [Key(1)]
+    #if MESSAGEPACK_ENABLED
+[Key(1)]
+#endif
     [JsonInclude]
-    [MemoryPackOrder(1)]
+    #if MEMORYPACK_ENABLED
+[MemoryPackOrder(1)]
+#endif
     public Fixed64 Max;
 
     #endregion
@@ -77,9 +93,13 @@ public partial struct FixedRange : IEquatable<FixedRange>
     /// <summary>
     /// The length of the range, computed as Max - Min.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 Length
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,9 +109,13 @@ public partial struct FixedRange : IEquatable<FixedRange>
     /// <summary>
     /// The midpoint of the range.
     /// </summary>
-    [IgnoreMember]
+    #if MESSAGEPACK_ENABLED
+[IgnoreMember]
+#endif
     [JsonIgnore]
-    [MemoryPackIgnore]
+    #if MEMORYPACK_ENABLED
+[MemoryPackIgnore]
+#endif
     public Fixed64 MidPoint
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
